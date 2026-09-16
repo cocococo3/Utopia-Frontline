@@ -1,0 +1,510 @@
+:: 处理间 {"position":"2400,2875","size":"100,100"}
+<<tick>><<set $playerPos to { layer: 3, block: "处理间" }>>
+光亮照亮了处理间绿色的墙壁和瓷砖地板，分解池是一个直径十余米的黑洞，大口一般张着，四周安装着往里滚动的传送带。
+全副装备的清道夫们正在把怪物的尸块搬运到污渍斑斑的传送带上，让它们落进分解池。橙黄的光芒照亮了她们脸上的保护面具。
+
+[[回收间|处理间-回收间]]
+[[样本室]]
+[[分解池]]
+[[返回走廊|L3流通走廊]]
+
+
+
+:: 样本室 {"position":"2650,2975","size":"100,100"}
+ 样本室的低温让你的周身浮起一层雾气。四周陈列着的玻璃罐里安放着从怪物身上剖下的各种器官，一个黑色的保温柜中放置着一排排按照编码排放的芯片。
+<<tick 5>><<set $playerPos to { layer: 3, block: "处理间-样本室" }>>
+[[查看芯片]]
+[[返回|处理间]]
+
+:: 查看芯片[nobr]
+你走近那个保温柜，透过玻璃柜门，你能够看到里面整齐排列的芯片并不齐全，有一些芯片之间有着空格，似乎是丢失了。<br>
+
+<<if $authority_cabin>>
+    随着你的靠近，柜门上的电子锁转动插销，最后随着咔哒一声，电子锁亮起绿光，现在你能够打开它了。<br><br>
+   [[打开保温柜]]<br>
+   <<else>>
+    你看到保温柜上面有一个严密的电子锁，毫无疑问你需要权限才能开启它。<br><br>
+<</if>>
+[[返回|样本室]]
+
+:: 打开保温柜[nobr]
+里面排列着数十个黑色芯片，但只有其中的几个弹出了，其他的芯片被某种锁留在原位。<br>
+<<if !$possessingEquipment>>
+    你拿出了你能拿走了所有芯片，但在看向你手中那些电子元件的时候，你突然想到你的机体上并没有可以读取它们的接口。<br>
+    ……这可怎么办才好？<br>
+    <span style="color: grey;">【新的任务已经添加到你的任务列表中】</span>
+    <<set $task411 to true>>
+    <<set $task41 to false>>
+    <<questunlock "task411">>
+    <<questcomplete "task41">>
+<<else>>
+    你拿出了你能拿走了所有芯片，把它们插入到Wafrin给你的电子书中。<br>
+        <<silently>>
+            <<unlockEbook "ebk_1" true>>
+            <<unlockEbook "ebk_2" true>>
+            <<unlockEbook "ebk_3" true>>
+            <<unlockEbook "ebk_4" true>>
+            <<unlockEbook "ebk_5" true>>
+            <<unlockEbook "ebk_6" true>>
+            <<unlockEbook "ebk_7" true>>
+        <</silently>>
+    <span style="color: grey;">——新的条目已经添加到你的电子书中，点击侧边栏的【电子书】条目即可阅读它们——</span><br><<questcomplete "task41">>
+<</if>>
+<<set $task41 to false>>
+<br><br>
+[[继续|样本室]]
+
+:: 分解池 {"position":"2650,2875","size":"100,100"}
+你走到分解池边缘，探头看向它的深处，立刻因为扑上来的酸热蒸汽而不由得皱眉。一圈圈向下延伸的灯带散发出荧橙黄的亮光，也只够稍微照亮了分解池的边缘。<<set $woreout+=1>>
+命名分解池的人一定是见过足够直达星球核心的深洞，才会将这个设施称为“池”。在你看来，分解池和无底深渊并没有太大的差别。你只能看见附近一块块比数个人形还大的怪物尸块被从传送带上推下，落入黑暗之中，却听不见它们与底部碰撞的声音。
+
+在你还想俯身仔细查看时，有一只手抓住了你的后领，把你拉了回来。
+“小心一些，分解池里可没有防护措施。”你身后被面具遮盖面目的清道夫说完，转身返回到工作之中。
+
+[[继续|处理间]] 
+
+
+
+:: 处理间-回收间 {"position":"2650,2775","size":"100,100"}
+<<tick 5>><<set $playerPos to { layer: 3, block: "处理间-回收间" }>>回收间放置着大量可以翻盖的金属箱子，上面贴着不同的垃圾类型标签。通风扇正在它们上方呜呜旋转着。
+<<if $chaos>=70>>
+    你留意到其中一个箱子上写着“人形零件”，看来它被用来倾倒维修部维修人形时产生的垃圾。既然如此，里面就是用来放置被分解的人形碎片的。
+    或许你以后有一天能够用上。
+<</if>>
+[[丢弃你持有的垃圾]]
+[[返回|处理间]] 
+
+:: 丢弃你持有的垃圾
+<<set _trashCount to 0>>
+<<for _i = $inv.length - 1; _i >= 0; _i-->>
+  <<if $inv[_i] and $inv[_i].id is "trash">>
+    <<set _trashCount += 1>>
+    <<set $inv.deleteAt(_i)>>
+  <</if>>
+<</for>>
+<<if _trashCount > 0>>
+你把你携带的 <<print _trashCount>> 份垃圾都丢进了对应标签的金属箱子里，这让你的载重轻了不少。
+<<else>>
+你翻遍了背包，确认自己没有携带任何垃圾，回收间的箱子里也没有什么需要处理的东西。
+<</if>>
+
+[[完成|处理间-回收间]]
+
+
+
+:: 巡逻队休息室 {"position":"2525,1775","size":"100,100"}
+<<if $playerJob != "巡逻队">>
+    <<set $playerPos to {layer:2, block:"L2流通走廊"}>>
+    巡逻队休息室的门并没有向你开启，你需要成为巡逻队的一员才能进入。<br><br>
+    [[返回走廊|L2流通走廊]]
+<<else>>
+<<set $playerPos to {layer:2, block:"巡逻队休息室"}>>你正处于巡逻队休息室中，这里的充电仓以一种特殊的秩序放置而非堆叠，使得人形在离开充电仓后能迅速来到地面。
+<<if $metearthy>><<earthytalkwidget>><</if>><<peptalkwidget>>
+
+<<if $checkmap&&!$outlet2on>>[[寻找通风口|寻找通风管2]]<</if>><<if $outlet2on>>    [[通风口]]<</if>>
+[[充电仓|休息1]] 
+[[模拟格斗室]]
+[[武器存放处]]
+[[衣柜]]
+[[返回走廊|L2流通走廊]]
+<</if>>
+
+
+:: 模拟格斗室 {"position":"2450,1450","size":"100,100"}
+模拟格斗室虽然主要是巡逻队的成员在使用，但是也向管理区的其他部门成员开放。一般情况下，这是最快提升战斗能力的方式。
+走道两侧有许多配备有相关器械的房间，你可以选择其中一个进行战斗相关的训练，提升你的战斗、闪避或者躲藏能力。
+
+<<if $fighting>=60>>
+    [[练习射击]]
+<</if>>
+[[练习战斗]]
+[[练习闪避]]
+[[练习躲藏]]
+[[返回|L2流通走廊]] 
+
+
+:: 练习射击
+你打开格斗室里的射击练习模式，墙上出现了若干个作为目标圈的移动红点。
+你举起练习用弩枪对准那些斑点。
+<<tick 60>><<set $shoot+=3>><<set $power-=5>><<set $woreout+=3>>
+<span style="color: green;">++射击</span>
+[[再次练习|练习射击]]
+[[退出|模拟格斗室]]
+
+:: 练习战斗 {"position":"2550,1450","size":"100,100"}
+你打开格斗室里的战斗练习模式，模拟成怪物外形的沙包开始扭曲地朝你蠕动。
+<<if $fighting<=80>>
+    <<if $fighting<=25>>
+        你的攻击手段丝毫没有章法，不仅击中率低得可怜，好几次还都被沙包弹开了。
+    <<elseif $fighting<=50>>
+        你的攻击开始能够击中沙包了，但你还是没办法很准确地击中它的要害。
+    <<else>>
+        你对于攻击逐渐得心应手，每一次进攻你都能打中沙包上标出的红点。这样的练习已经逐渐满足不了你进步的需求了。
+    <</if>>
+在进行一番劈砍之后，你稍微学到了一些战斗的技巧。
+<span style="color: green;">++力量</span>
+<<tick 60>><<set $fighting+=3>><<set $power-=5>><<set $woreout+=4>>
+<<else>>
+    你没法从这样的训练中学会更多的战斗技巧了。
+<</if>>
+
+[[再次练习|练习战斗]]
+[[退出|模拟格斗室]]
+
+
+:: 练习闪避 {"position":"2550,1450","size":"100,100"}
+你打开格斗室里的闪避练习模式，模拟成怪物外形的沙包开始扭曲地朝你蠕动。
+<<if $evade<=90>>
+    在进行一阵闪躲之后，你稍微学到了一些躲避敌人攻击的技巧。
+<span style="color: green;">++敏捷</span>
+<<tick 60>><<set $evade+=3>><<set $power-=5>><<set $woreout+=3>>
+<<else>>
+    你没法从这样的训练中学会更多的闪避技巧了。
+<</if>>
+
+[[再次练习|练习闪避]]
+[[退出|模拟格斗室]]
+
+
+:: 练习躲藏 {"position":"2550,1450","size":"100,100"}
+你打开格斗室里的躲藏练习模式，一些障碍物缓缓升起，同时一道检测物体的射线开始从房间的另一侧缓缓逼近你。
+<<if $hiding<=90>>
+    在一段时间之后，你稍微学到了一些躲藏的技巧。
+<span style="color: green;">++躲藏</span>
+<<tick 60>><<set $hiding+=5>><<set $power-=5>><<set $woreout+=2>>
+<<else>>
+    你没法从这样的训练中学会更多的躲藏技巧了。
+<</if>>
+
+[[再次练习|练习躲藏]]
+[[退出|模拟格斗室]]
+
+
+
+
+:: 后勤休息区 [nobr] {"position":"2625,8775","size":"100,100"}
+<<set $playerPos to {layer:10, block:"后勤休息区"}>>
+这里是管理区面积最大的休息用空间，你的周围像胶囊公寓一样布置着大量的休眠仓，排列的仓门旁设置了小型的升降平台，将苏醒或者要去休息的人形送到她们要去的地方。
+<br>
+<<cleanbeforefight>><br>
+你可以在这里休息和查看自己存放的物品，也可以在旁边的商店里购买消耗品。
+<<showNpcContent>>
+<br><br>
+<<if $checkmap&&!$outlet10on>>[[寻找通风口|寻找通风管10]]<br><</if>>
+[[充电仓|休息3]] <br>
+[[衣柜]]<br>
+[[武器存放处]] <br>
+<<if $outlet10on>>    [[通风口]]<br><</if>>
+[[商店]]<br>
+[[返回走廊|L10流通走廊]]
+
+
+
+:: 商店 {"position":"2625,8875","size":"100,100"}
+<<set $playerPos to {layer:10, block:"商店"}>>
+货架上放着大量商品，电子标牌上显示购买它们需要的工分数量。
+它们并不必须在你的工作中出现。
+
+<<shop "10L商店">>
+
+[[返回走廊|L10流通走廊]]
+
+
+
+:: 寻找通风管2
+你花了一点时间，终于找到了一个合适而保护盖老化的通风口。固定它的钉子和部件因为锈蚀和其他原因已经开始松动了，你不用花很大的力气就能把它从原本的位置上扯下来，同时也不会发出太大的声响……
+<<tick 30>>
+[[扯掉通风口保护板][$outlet2on to true]]
+<<link "放弃">><<goto $playerPos.block>><</link>>
+
+
+:: 寻找通风管3
+你花了一点时间，终于找到了一个合适而保护盖老化的通风口。固定它的钉子和部件因为锈蚀和其他原因已经开始松动了，你不用花很大的力气就能把它从原本的位置上扯下来，同时也不会发出太大的声响……
+<<tick 30>>
+[[扯掉通风口保护板][$outlet3on to true]]
+<<link "放弃">><<goto $playerPos.block>><</link>>
+
+
+:: 寻找通风管4
+你花了一点时间，终于找到了一个合适而保护盖老化的通风口。固定它的钉子和部件因为锈蚀和其他原因已经开始松动了，你不用花很大的力气就能把它从原本的位置上扯下来，同时也不会发出太大的声响……
+<<tick 30>>
+[[扯掉通风口保护板][$outlet4on to true]]
+<<link "放弃">><<goto $playerPos.block>><</link>>
+
+
+:: 寻找通风管8
+你花了一点时间，终于找到了一个合适而保护盖老化的通风口。固定它的钉子和部件因为锈蚀和其他原因已经开始松动了，你不用花很大的力气就能把它从原本的位置上扯下来，同时也不会发出太大的声响……
+<<tick 30>>
+[[扯掉通风口保护板][$outlet8on to true]]
+<<link "放弃">><<goto $playerPos.block>><</link>>
+
+
+:: 寻找通风管10
+你花了一点时间，终于找到了一个合适而保护盖老化的通风口。固定它的钉子和部件因为锈蚀和其他原因已经开始松动了，你不用花很大的力气就能把它从原本的位置上扯下来，同时也不会发出太大的声响……
+<<tick 30>>
+[[扯掉通风口保护板][$outlet10on to true]]
+<<link "放弃">><<goto $playerPos.block>><</link>>
+
+
+
+:: 扯掉通风口保护板
+你将手指扣进通风口边缘的缝隙，将它从墙上取了下来。黑洞洞的通风口在你面前暴露出来。
+<span style="color:red;">+混乱</span>
+……要进去吗？
+<<set $chaos+=2>>
+[[进入通风口|通风口]]
+<<link "以后再说" >><<goto $playerPos.block>><</link>>
+
+:: 通风口[nobr]
+<<switch $playerPos.layer>>
+    <<case 10>>
+        <<set $playerPos.block to "后勤休息区">>
+    <<case 8>>
+        <<set $playerPos.block to "食品部-生产车间-垂直农场">>
+    <<case 4>>
+        <<set $playerPos.block to "化工部-清洁间">>
+    <<case 3>>
+        <<set $playerPos.block to "清道夫休息室-快速浴室">>
+    <<case 2>>
+        <<set $playerPos.block to "巡逻队休息室">>
+    <<default>>
+        <<set $playerPos.block to "通风竖井-第" + $playerPos.layer + "层">>
+<</switch>>
+你正位于''$playerPos.block''通风口的管道中，更前方是通风的竖井。<br>
+在一片黑暗中，你能感知到面前的温热而潮湿的气流正从下而上流动。<br><br>
+
+[[进入竖井|竖井]]<br>
+<<link "离开通风口" >><<goto $playerPos.block>><</link>>
+
+:: 竖井[nobr]
+这里是管理区的通风竖井，面前没有任何维修用的梯子，你只能通过抓住面前的混凝土结构凸起来对抗重力。能够给你的视野提供方向的只有些许从通风口透进来的微光，强力的气流正在从你的脚下往上吹拂。<br>
+
+<<set $playerPos.block to "通风竖井">><<tick 35>>
+<<set _x to random(1,100)>>
+<<if _x<=40>>
+    热而潮湿的水汽嵌进你的机体部件，加速了它们的锈蚀，你开始想念管理区室内永远合适的气温和湿度了。<br>
+    <span style="color:red;">+磨损</span><br>
+    <<set $woreout+=1>>
+<<elseif _x<=80&&$bodyHeight is "高大">>
+    这里的空间对你来说太狭窄了，四周的粗糙颗粒正在不断剐蹭着你身体的表面。你只能希望维修部的人形不会对此多说什么。<br>
+    <span style="color:red;">+磨损</span><br>
+    <<set $woreout+=1>>
+<</if>><br>
+你的定位系统显示你目前在$playerPos.layer层。
+<<if $playerPos.layer==10>>
+    这里已经是管理区的最深处，你能感到一种奇异的热度正在炙烤着你，你不能再向下了。<br><br>
+    
+    [[向上爬|竖井][$playerPos.layer-=1]]<br>
+    [[进入通风口|离开竖井]]
+
+<<elseif $playerPos.layer==8>>
+这段路程异常地潮湿，并且混杂着植物的气味。<br><br>
+
+[[向上爬|竖井][$playerPos.layer-=1]]<br>
+[[进入通风口|离开竖井]]<br>
+[[向下爬|竖井][$playerPos.layer+=1]]
+
+
+<<elseif $playerPos.layer==4>>
+你嗅到化学物质特有的怪味。<br><br>
+
+[[向上爬|竖井][$playerPos.layer-=1]]<br>
+[[进入通风口|离开竖井]]<br>
+[[向下爬|竖井][$playerPos.layer+=1]]
+
+
+<<elseif $playerPos.layer==3>>
+强效清洁剂和腐烂怪物尸体的气味正从离你最近的那个通风口里散出来。<br><br>
+
+[[向上爬|竖井][$playerPos.layer-=1]]<br>
+[[进入通风口|离开竖井]]<br>
+[[向下爬|竖井][$playerPos.layer+=1]]
+
+<<elseif $playerPos.layer==2>>
+你的上方被层层叠叠的铁丝网拦住了，再前进势必会引发警报。<br><br>
+
+[[进入通风口|离开竖井]]<br>
+[[向下爬|竖井][$playerPos.layer+=1]]
+
+<<else>><br><br>
+[[向上爬|竖井][$playerPos.layer-=1]]<br>
+[[向下爬|竖井][$playerPos.layer+=1]]
+<</if>>
+
+
+:: 离开竖井[nobr]
+<<if $playerPos.layer==10 && $outlet10on>><<set $playerPos to {layer:10, block:"后勤休息区"}>>
+你爬进那个狭窄的混凝土空间，这里的通风口保护板已经被你打开过了，可以轻易进出。<br>
+<<brokeoutletfound>><br>
+ <<link "进入室内">>
+        <<roll $finalfoundoutlet>>
+        <<if $success>>
+            <<goto "翻通风口被发现">>
+        <<else>>
+            <<goto $playerPos.block>>
+        <</if>>
+    <</link>> <br>   
+<<elseif $playerPos.layer==10 &&!$outlet10on>>
+    这里的通风口保护板还牢牢地待在原位。<br><br>
+
+    [[破坏|竖井内破坏保护板][$chaos+=2]]<br>
+<</if>>
+
+<<if $playerPos.layer==8 && $outlet8on>><<set $playerPos to {layer:8, block:"食品部-生产车间-垂直农场"}>>
+你爬进那个狭窄的混凝土空间，这里的通风口保护板已经被你打开过了，可以轻易进出。<br>
+<<brokeoutletfound>><br>
+
+ <<link "进入室内">>
+        <<roll $finalfoundoutlet>>
+        <<if $success>>
+            <<goto "翻通风口被发现">>
+        <<else>>
+            <<goto $playerPos.block>>
+        <</if>>
+    <</link>> <br>    
+<<elseif $playerPos.layer==8 &&!$outlet8on>>
+    这里的通风口保护板还牢牢地待在原位。<br><br>
+
+    [[破坏|竖井内破坏保护板][$chaos+=2]]<br>
+<</if>>
+
+
+
+<<if $playerPos.layer==4 && $outlet4on>><<set $playerPos to {layer:4, block:"化工部-清洁间"}>>
+你爬进那个狭窄的混凝土空间，这里的通风口保护板已经被你打开过了，可以轻易进出。<br>
+<<brokeoutletfound>><br>
+
+ <<link "进入室内">>
+        <<roll $finalfoundoutlet>>
+        <<if $success>>
+            <<goto "翻通风口被发现">>
+        <<else>>
+            <<goto $playerPos.block>>
+        <</if>>
+    <</link>> <br>    
+<<elseif $playerPos.layer==4 &&!$outlet4on>>
+    这里的通风口保护板还牢牢地待在原位。<br><br>
+
+    [[破坏|竖井内破坏保护板][$chaos+=2]]<br>
+<</if>>
+
+
+
+<<if $playerPos.layer==3 && $outlet3on>><<set $playerPos to {layer:3, block:"清道夫休息室-快速浴室"}>>
+你爬进那个狭窄的混凝土空间，这里的通风口保护板已经被你打开过了，可以轻易进出。<br>
+<<brokeoutletfound>><br>
+
+ <<link "进入室内">>
+        <<roll $finalfoundoutlet>>
+        <<if $success>>
+            <<goto "翻通风口被发现">>
+        <<else>>
+            <<goto $playerPos.block>>
+        <</if>>
+    <</link>> <br>    
+<<elseif $playerPos.layer==3 &&!$outlet3on>>
+    这里的通风口保护板还牢牢地待在原位。<br><br>
+
+    [[破坏|竖井内破坏保护板][$chaos+=2]]
+<</if>>
+
+
+<<if $playerPos.layer==2 && $outlet2on>><<set $playerPos to {layer:2, block:"巡逻队休息室"}>>
+你爬进那个狭窄的混凝土空间，这里的通风口保护板已经被你打开过了，可以轻易进出。<br>
+<<brokeoutletfound>><br>
+
+ <<link "进入室内">>
+        <<roll $finalfoundoutlet>>
+        <<if $success>>
+            <<goto "翻通风口被发现">>
+        <<else>>
+            <<goto $playerPos.block>>
+        <</if>>
+    <</link>> <br>    <br>
+<<elseif $playerPos.layer==2 &&!$outlet2on>>
+    这里的通风口保护板还牢牢地待在原位。<br><br>
+
+    [[破坏|竖井内破坏保护板][$chaos+=2]]<br>
+<</if>>
+[[离开|竖井]]
+
+
+
+
+:: 破坏通风口保护板被发现的概率[widget nobr]
+<<widget "brokeoutletfound">>
+    <<set _initfoundoutlet to random(10,50)>>
+    <<set $finalfoundoutlet to (_initfoundoutlet+random(1,Math.max(1,100-$maidtrust)))>>
+    <<if $playerPos.layer==2||$playerPos.layer==3||$playerPos.layer==10>>
+        <<set $finalfoundoutlet+=15>>
+    <</if>>
+    <<if $finalfoundoutlet<=25>>
+        隔着通风口，外面只有机器运作的轰鸣声。现在出去没人会发现你。<br>
+        <<elseif  $finalfoundoutlet<=80>>
+        隔着通风口，你听到有人形的脚步声。但她应该离这里有一段距离，不大可能会发现你的行动。<br> 
+        <<else>>
+        你在这里可以很轻易地听到外界人形的交谈声，现在出去可能不太算是一个明智之举。<br>       
+    <</if>>
+    <</widget>>
+
+
+:: 竖井内破坏保护板[nobr]
+<<switch $playerPos.layer>>
+    <<case 10>>
+        <<set $playerPos.block to "后勤休息区">>
+    <<case 8>>
+        <<set $playerPos.block to "食品部-生产车间-垂直农场">>
+    <<case 4>>
+        <<set $playerPos.block to "化工部-清洁间">>
+    <<case 3>>
+        <<set $playerPos.block to "清道夫休息室-快速浴室">>
+    <<case 2>>
+        <<set $playerPos.block to "巡逻队休息室">>
+    <<default>>
+        <<set $playerPos.block to "通风竖井-第" + $playerPos.layer + "层">>
+<</switch>>
+你抓住通风口保护板的栅格口，用力摇晃了几下。<br>
+<<roll $fighting>><span style="color:red;">+混乱</span><br><br>
+<<set $chaos+=2>>
+<<brokeoutletfound>>
+<<if $success>>
+    <<set State.setVar("$outlet" + $playerPos.layer + "on", true)>>
+    随着你的动作，栅格口很快松动了，变得能够被轻易取下。<br><br>
+    <<set $finalfoundoutlet+=5>>
+    <<link "进入室内">>
+        <<roll $finalfoundoutlet>>
+        <<if $success>>
+            <<goto "翻通风口被发现">>
+        <<else>>
+            <<goto $playerPos.block>>
+        <</if>>
+    <</link>> <br>
+<<else>>
+    你没能破坏保护板，它只是随着你的动作嘎嘎作响了几声。<br><br>
+    <<set $finalfoundoutlet+=5>>
+    [[再次尝试|竖井内破坏保护板]]<br>
+<</if>>
+[[暂且放弃|离开竖井]]
+
+:: 翻通风口被发现[nobr]
+<<if $playerPos.block=="巡逻队休息室">>
+    当你从通风口跳下时，正好面对一个举着武器对着你的巡逻队成员。<br>
+    在看清你之后，她脸上的敌意稍微消散了一些。她放下武器，为刚刚的行为向你道歉，她以为你是一只准备从通风管道进行突袭的怪物……<br>
+    <<if $playerJob!="巡逻队">>
+        不管如何，你的身份被认出来了，巡逻队的人形们礼貌地请你离开她们的休息室。<br>
+        <span style="color:red;">-人形的信任</span><<set $maidtrust-=1>><br><br>
+
+        [[好吧|L2流通走廊]]
+    <<else>>
+        不过她话锋一转，请你下次不要再这样了。<br>
+        <span style="color:red;">-人形的信任</span><<set $maidtrust-=1>><br><br>
+
+        [[好吧|巡逻队休息室]]
+    <</if>>
+<<else>>
+爬出通风口时，不巧有几个人形被你这侧的动静吸引了注意力，直直地看向爬出通风口的你。<br>
+你能感觉到她们眼中的警惕，但是在她们确认你确实是管理区的人形后，似乎又稍微放松了下来。但你在她们处理器中的形象多少是下降了一点。<br>
+        <span style="color:red;">-人形的信任</span><<set $maidtrust-=1>><br><br>
+
+[[继续|$playerPos.block]]
+<</if>>

@@ -1,0 +1,422 @@
+:: 电梯 {"position":"1200,2175","size":"100,200"}
+垂直连通管理区的是一排相当大的电梯，进入其中可以去到任何一个层级。
+<<set $playerPos.block to "电梯">><<set $movelayer to $playerPos.layer>>
+当前所在层级：$playerPos.layer
+[[L1（流通区域）|L1流通走廊]]
+[[L2（看守部、巡逻队休息室）|L2流通走廊]]
+[[L3（清道夫休息室）|L3流通走廊]]
+[[L4（化工部、锻造部）|L4流通走廊]]
+[[L5（维修部、工程部）|L5流通走廊]]
+[[L6（洗衣部、保洁部）|L6流通走廊]]
+[[L7（人事部、食品部）|L7流通走廊]]
+[[L8（垂直农场）|L8流通走廊]]
+[[L9（会议室）|L9流通走廊]]
+[[L10（后勤部门休息区、商店）|L10流通走廊]]
+
+
+:: 走廊widget [widget nobr] {"position":"1675,500","size":"100,100"}
+<<widget "randomwalkcase">>
+<<set _x to random(1,100)>>
+<<if _x>=50 && $incorridorcase==false>>
+	<<if _x>=95>>
+    <<goto "whispercase">>
+    <<elseif _x>=90>>
+    <<goto "transferaccident">>
+    <<elseif _x>=85>>
+    <<goto "cleanaccident">>
+    <<elseif _x>=70>>
+    
+    <</if>>
+<<else>>
+  <<set $incorridorcase to false>>
+<</if>>
+<</widget>>
+
+<<widget "totalcorridorwidget">>
+  <<beforefirstgodepartment>>
+  <<randomwalkcase>>
+  <<cleanbeforefight>>
+  <<superperceptionaccident>>
+
+<</widget>>
+
+
+:: 首次进入部门前的新手引导文案 [widget nobr]
+<<widget "beforefirstgodepartment">>
+
+ <<if $woreout>=80 && $playerPos.layer==5>>
+   <span style="color:yellow;">你差不多该去修复一下身上的磨损了。</span>
+ <</if>>
+ <<if $power<=30 && $playerPos.layer==10 && $playerJob=="后勤">>
+   <span style="color:yellow;">你差不多该去补充电量了。</span>
+ <</if>>
+
+<</widget>>
+
+
+:: superperceptionaccidentwidget[widget nobr]
+<<widget "superperceptionaccident">>
+  <<set _x to random(1,100)>>
+<<if _x<=$superperception >>
+	<<set $perceptionscene = ["你的余光瞥到你右侧的墙壁消失了，取而代之的是一团漆黑而纠结在一起的黏滑触须正在苍白的背景下缓缓移动。但在你正视它的瞬间，那里又恢复成了普通的墙壁。",
+  "你前方的走廊突然变为了极简的面，同时跳动着扭曲在一起，但转瞬间这个穿模体又消失了，正常的管理区走廊仍然在你面前。",
+  "有窸窸窣窣的石头碎屑和灰土从天花板上洒落，掉落在你的头发上，但当你试图拍打它们时，却发现那里什么都没有。"
+]>>
+    <span style="color:red;"><<print either( $perceptionscene )>></span><br>
+    <<set $superperceptionaccident to true>>
+<</if>>
+<</widget>>
+
+
+:: cleanaccident
+你注意到正在走廊一旁工作的自动清扫机似乎有齿轮被卡住了，它的内部构件正在因为被物体卡住而咔咔作响。
+<<set $incorridorcase to true >><<set _check=$repair+(100-$repair)*$cleaning/100>>
+[[检查清扫机]]<<prob _check>>
+[[不管它|$playerPos.block]]
+
+:: 检查清扫机[nobr]
+你按下让清扫机停止工作的按键，试图确认它到底出了什么毛病。<br>
+<<roll $repair>>
+<<if $success>><<tick 10>>
+  你的维修知识足够让你知道机器为什么会发出这样的声音，于是你精准地拆开了清扫机，把异物掏出后又将它利落地复原了回去。<br>
+  <<set _materialPool to ["slime","armors","armorm","armorl","databomb","maybeseed","claw"]>>
+  <<set _materialId to either(_materialPool)>>
+  <<if !$shopDB || !$shopDB[_materialId] || !$shopDB.trash>><<initShopDB>><</if>>
+  <<set _materialDef to (($shopDB && $shopDB[_materialId]) || ($shopPool && $shopPool[_materialId]))>>
+  <<set _trashDef to (($shopDB && $shopDB.trash) || ($shopPool && $shopPool.trash))>>
+  <<gainItem _materialId 1>>
+  <<gainItem "trash" 1>>
+  你获得了 <<print ((_materialDef?.icon ?? "📦") + " " + (_materialDef?.name ?? _materialId))>> 和 <<print ((_trashDef?.icon ?? "🗑️") + " " + (_trashDef?.name ?? "垃圾"))>>。<br>
+  <<if $maidtrust<=70>>
+      <span style="color:green;">+人形的信任</span><br><<set $maidtrust+=1>><br>
+  <</if>>
+  <<else>>
+    <<roll $cleaning>>
+    <<if $success>><<tick 15>>
+      你根据长期使用清洁机器的经验拆开了清扫机，把异物掏出后又将它复原了回去。<br>
+      <<set _materialPool to ["slime","armors","armorm","armorl","databomb","maybeseed","claw"]>>
+      <<set _materialId to either(_materialPool)>>
+      <<if !$shopDB || !$shopDB[_materialId] || !$shopDB.trash>><<initShopDB>><</if>>
+      <<set _materialDef to (($shopDB && $shopDB[_materialId]) || ($shopPool && $shopPool[_materialId]))>>
+      <<set _trashDef to (($shopDB && $shopDB.trash) || ($shopPool && $shopPool.trash))>>
+      <<gainItem _materialId 1>>
+      <<gainItem "trash" 1>>
+      你获得了 <<print ((_materialDef?.icon ?? "📦") + " " + (_materialDef?.name ?? _materialId))>> 和 <<print ((_trashDef?.icon ?? "🗑️") + " " + (_trashDef?.name ?? "垃圾"))>>。<br>
+      <<if $maidtrust<=70>>
+      <span style="color:green;">+人形的信任</span><br><<set $maidtrust+=1>><br>
+  <</if>>
+    <<else>><<tick 15>>
+    你绕着清扫机走了半天也没有找出一个所以然来，只能先放生这个自动清扫机了。<br>
+    <<if $repair<=30>>
+      借此机会学到了一些有关维修的知识。<br>
+      <<set $repair+=1>>
+      <span style="color:green;">+维修知识</span><br>
+    <<else>>
+        你没法因此学到更多了。<br>
+      <</if>>  
+    <</if>>
+<</if>><br>
+[[继续|$playerPos.block]]
+
+
+:: transferaccident
+<<set $incorridorcase to true >>
+在你侧后方传来一声巨响，你转过身，看到一辆运输车因为某种原因而侧翻在了地上。
+
+[[走过去看看]]
+[[忽视它|$playerPos.block]]
+
+:: 走过去看看
+你走到运输车侧旁，它正因为侧翻而发出滴滴的故障声，过一会其他人形就会发现它了，但是你是最先到达的。
+在查看的同时，你也发现它原先严丝合缝的盖子因为撞击地面而裂开了一个正好够你的手伸进去的缝隙。
+
+[[试着把它扶正]]<<prob $fighting>>
+[[把手伸进去看看能拿出什么东西]]<<prob $hiding>><span style="color:red;">【偷窃】</span>
+[[把盖子关上并离开]]
+
+
+:: 试着把它扶正[nobr]
+<<roll $fighting>><<if $success>>
+  你伸手扣住运输车的另一侧，双臂用力把它拉了起来。它太沉重了，你在做这件事时几乎能听到你肘部和肩部的纤维因此过度拉伸而发出的声音。<br>
+  <span style="color:red;">+磨损</span>  <<set $woreout+=1>><br><br>
+
+  但你成功了，在你松手后，过度装载的运输车只是轻微摇晃了两下，便稳稳当当地立在了地上。<br>
+  运输车在稳定后停止发出故障警报音，重新开始按照原定的路线缓慢移动。<br>
+  你在其他人形敬佩的注视下离开。你做了一件好事吗？或许吧。<br>
+  <span style="color:green;">+++人形的信任</span><br>
+  <<set $maidtrust+=5>>
+<<else>>
+  你伸手扣住运输车的另一侧，试图通过用力把它拉起来。但是它太沉重了，你没办法通过你自己的力量做到。<br>
+  <span style="color:red;">+磨损</span> <<set $woreout+=1>><br><br>
+ 
+  好在很快有人形注意到你和倒地的运输车。在你们合力把运输车扶正后，它停止发出故障警报音，重新开始按照原定的路线缓慢移动。<br>
+  <span style="color:green;">++人形的信任</span><br><br>
+  <<set $maidtrust+=3>>
+  <<print either($transferaccidenttalk )>>
+  你在人形离开时听到她们有人这么嘟囔着。<br>
+<</if>><br>
+<<link "继续">>
+  <<tick 20>>
+  <<goto $playerPos.block>>
+<</link>>
+
+:: 把盖子关上并离开
+你不认为你需要为一辆运输车的侧翻负责，更何况，你觉得自己并没有能力把它整个扶起来。于是你只是把运输车的盖子关严实，防止里面的东西又因为什么意外掉出来。
+  <span style="color:green;">+人形的信任</span>
+  <<set $maidtrust+=1>>
+
+<<link "继续">>
+  <<tick 5>>
+  <<goto $playerPos.block>>
+<</link>>
+
+:: 把手伸进去看看能拿出什么东西
+<nobr>你把手伸进缝隙，掏出了<<set _x to Math.random(1,4)>>
+<<if _x==1>>
+  一件衣服<<gain "powerbag" 1>>
+<<elseif _x==2>>
+  一瓶化学制品
+<<elseif _x==3>>
+  一块处理后的怪物残骸
+<<else>>
+  一块充电宝<<gain "powerbag" 1>>
+<</if>>。</nobr>
+<<roll $hiding>>
+你把你拿到的物品收了起来。
+<<if $success>>
+  当你这么做的时候，你看到有人形正在往这个方向走来。你不确定她是否看到了你的动作，总之你尽可能快地离开了现场。
+  
+  <<link "离开">>
+  <<tick 5>>
+  <<goto $playerPos.block>>
+  <</link>>
+  <<else>>
+    当你打算离开现场的时候，你看到有一个人形正站在你身后，她脸上怀疑和厌弃的神色表明她刚刚看到了你的偷窃行为。
+  <span style="color:red;">-人形的信任</span>
+  <<set $maidtrust-=2>>
+
+  [[在注视下把东西放回去]]
+  [[迅速藏匿赃物并且举起双手表明你没有偷东西]]
+  [[若无其事地离开]]
+<</if>>
+
+:: 在注视下把东西放回去
+你心虚地把你刚刚拿走的东西放了回去。
+
+那个人形看起来对你的认错行为很满意。她没有再追究你刚刚的偷窃行为，而是去专心研究怎么把运输车拉起来。
+  <span style="color:green;">+人形的信任</span>
+  <<set $maidtrust+=1>>
+
+你趁着这个机会离开了现场。
+
+ <<link "离开">>
+  <<tick 5>>
+  <<goto $playerPos.block>>
+  <</link>>
+
+:: 迅速藏匿赃物并且举起双手表明你没有偷东西
+<<roll $evade>>
+<<if $success>>
+  你成功在那个人形的眼下藏匿了你手中的赃物，并且举起双手表明自己并没有偷东西。
+  <<if $evade<=80>>    <span style="color:green;">+敏捷</span><<set $evade+=2>>  <</if>>
+
+  那个人形的态度稍微缓和了一些，但她没有让你再待在这里，而是示意你离开。
+
+  你趁着这个机会带着你的赃物离开了现场。
+
+<span style="color:grey;">你的【偷窃】罪行没有被目击，但是稍微增长了一些人形们对你的怀疑</span>
+<<set $suspect+=5>>
+ <<link "离开">>
+  <<tick 5>>
+  <<goto $playerPos.block>>
+  <</link>>
+<<else>>
+  你没能成功藏匿赃物。在这么近的距离下，你的行为完全被对方看得一清二楚。
+  <span style="color:red;">--人形的信任</span>
+  <<set $maidtrust-=3>>
+
+  [[在注视下把东西放回去]]
+  [[若无其事地离开]]
+<</if>>
+
+:: 若无其事地离开
+你假装无事发生地站起身，准备离开现场。
+<span style="color:red;">--人形的信任</span>
+  <<set $maidtrust-=3>>
+<<set _y to random(1,100)>>
+<<if _y>=50>>
+  在你经过那个人形时，你被拦住了。
+
+  “同僚，你是否从运输车上拿走了不属于你的东西？”
+
+  她盯着你，问道。
+
+  [[在注视下把东西放回去]]
+  [[说谎]]
+<<else>>
+  那个人形没有阻止，但你能确定她的目光一直追着你。
+<span style="color:red;">--人形的信任</span>
+  <<set $maidtrust-=3>>
+  <span style="color:grey;">你的【偷窃】罪行被目击了，管理区很快就会有相关人员来调查此事</span>
+  <<set $crime.steal+=1>>
+<<link "离开">>
+  <<tick 15>>
+  <<goto $playerPos.block>>
+  <</link>>
+<</if>>
+
+:: 说谎
+人形面无表情地看着你。
+
+“无所谓，Corrina迟早会调查明白你到底说的是真是假。现在，滚开，别碍我的事。”
+<span style="color:red;">--人形的信任</span>
+  <<set $maidtrust-=3>>
+<span style="color:grey;">你的【偷窃】罪行被目击了，管理区很快就会有相关人员来调查此事</span>
+  <<set $crime.steal+=1>>
+<<link "离开">>
+  <<tick 15>>
+  <<goto $playerPos.block>>
+  <</link>>
+
+
+
+
+:: whispercase {"position":"1825,500","size":"100,100"}
+<<set $incorridorcase to true >>
+你注意到有几个人形正在你不远处窃窃私语，其中一个看了你一眼，在注意到你的视线后又移开了目光。
+
+[[移开目光]]
+[[朝她们打招呼]]
+[[无视她们]]
+
+:: 无视她们 {"position":"1950,625","size":"100,100"}
+你为什么要在这种事情上浪费算力呢？你把这件事从你的处理器中抹除，继续去做你想要做的事情。
+
+那几个人形的交谈声在你身后没有停歇，甚至没有因为你路过而出现片刻的停顿。
+
+你不确定这让你感到安心还是更不安。
+
+<<link "离开">>
+	<<goto $playerPos.block>>
+<</link>>
+
+:: 朝她们打招呼[nobr] {"position":"1825,625","size":"100,100"}
+<<set _x to random(1,100)>>
+<<if $maidtrust>=30&&$matidrust<=70>>
+<<if _x<=25>>
+  你朝她们挥了挥手，于是那个和你对视的人形也朝你挥了挥手，算是打了个招呼。
+<<elseif _x<=45>>
+她们都向你问好，但你注意到其中一个人形在你靠近的时候假装若无其事地切换了话题。
+<<elseif _x<=55>>
+其中一个你认识的人形——你们曾经在某次任务里短暂搭档过——朝你点了点头:"$playerName。"<br><br>
+其他人也跟着向你问好，交谈自然地岔开到别的话题上。<br><br>
+你离开的时候感觉一切如常，但你没办法确定之前她们在说什么。
+<<elseif _x<=65>>
+你朝她们挥了挥手，那几个人形都看向你，里面没有你认识的人形，你也理所应当地没有得到回应。<br><br>
+你略感尴尬，于是低下头快步走开了。
+<<else>>
+你朝她们挥了挥手，那几个人形都转向你，她们都向你问好。
+<<set $maidtrust+=1>><span style="color:green;">+人形的信任</span>
+<</if>>
+
+<<elseif $maidtrust<30>>
+<<if _x<=50>>
+你朝她们挥了挥手，那几个人形都看向你，里面没有你认识的人形，你也理所应当地没有得到回应。<br><br>
+你略感尴尬，于是低下头快步走开了。
+<<elseif _x<=60>>
+她们都向你问好，但你注意到其中一个人形在你靠近的时候假装若无其事地切换了话题。
+<<set $maidtrust+=1>><span style="color:green;">+人形的信任</span>
+<<elseif _x<=70>>
+其中一个你认识的人形——你们曾经在某次任务里短暂搭档过——朝你点了点头:"$playerName。"<br><br>
+其他人也跟着向你问好，交谈自然地岔开到别的话题上。<br><br>
+你离开的时候感觉一切如常，但你没办法确定之前她们在说什么。
+<<set $maidtrust+=1>><span style="color:green;">+人形的信任</span>
+<<elseif _x<=90>>
+你朝她们挥了挥手，于是那个和你对视的人形也朝你挥了挥手，算是打了个招呼。
+  <<set $maidtrust+=1>><span style="color:green;">+人形的信任</span>
+<<else>>
+你朝她们挥了挥手，那几个人形都转向你，她们都向你问好。
+<<set $maidtrust+=2>><span style="color:green;">+人形的信任</span>
+<</if>>
+
+<<else>>
+<<if _x<=50>>
+你朝她们挥了挥手，于是那个和你对视的人形也朝你挥了挥手，算是打了个招呼。
+<<elseif _x<=65>>
+其中一个你认识的人形——你们曾经在某次任务里短暂搭档过——朝你点了点头:"$playerName。"<br><br>
+其他人也跟着向你问好，交谈自然地岔开到别的话题上。<br><br>
+你离开的时候感觉一切如常，但你没办法确定之前她们在说什么。
+<<else>>
+你朝她们挥了挥手，那几个人形都转向你，她们都向你问好。
+<<set $maidtrust+=1>><span style="color:green;">+人形的信任</span>
+<</if>>
+<</if>>
+<br><br>
+<<link "继续">>
+  <<tick 10>>
+	<<goto $playerPos.block>>
+<</link>>
+
+
+:: 移开目光 {"position":"1700,625","size":"100,100"}
+你也迅速地移开目光。
+
+但那一瞬间的对视像是在你的处理器里留下了什么——她们在说你吗？还是这只是你恶意的揣测和臆想？
+
+你想不出答案，但这个问题迟迟没有离开你的处理器。
+<<set $chaos +=1>>
+<<link "离开">>
+	<<goto $playerPos.block>>
+<</link>>
+
+
+:: 战斗后清扫widget [widget nobr]
+<<widget "cleanbeforefight">>
+  <<set _now to $time.totalMinutes>>
+
+  /* 兼容历史数据：$aftermathpos 可能是字符串，也可能是 {layer, block}；
+     只要层级或区块任一不匹配，就不能算“刚打过仗”的同一位置。 */
+  <<set _afterBlock to (typeof $aftermathpos === "object" && $aftermathpos) ? $aftermathpos.block : ($aftermathpos ?? $aftermathblock ?? null)>>
+  <<set _afterLayer to (typeof $aftermathpos === "object" && $aftermathpos) ? $aftermathpos.layer : ($aftermathlayer ?? $playerPos.layer)>>
+
+  /* 两种触发场景：
+     A) _isOwnFight：玩家自己刚打完的这场仗（endfight 设置 $aftermathpos / $pendedtime）
+     B) _isPendingRaid：场外由 NPC/巡逻队处理的袭击（JS 的 activeAttack 系统设置
+        $pendingLayer / $pendingBlock），玩家只是走进了那个区块
+     两者互不冲突，用 OR 判断，命中哪个就用哪个的时间基准。重点修复：
+     这里必须同时比较 layer 和 block，不能只看 block 名称，否则同名区块在不同楼层也会误判。 */
+  <<set _isOwnFight to (_afterBlock && $playerPos.block == _afterBlock && $playerPos.layer == _afterLayer)>>
+  <<set _isPendingRaid to ($pendingBlock && $playerPos.block == $pendingBlock && $pendingLayer && $playerPos.layer == $pendingLayer)>>
+
+  <<if _isOwnFight || _isPendingRaid>>
+
+    <<set $fightpasttime to _now - ($pendedtime ?? _now)>>
+
+    /* 楼层号：优先用玩家亲自这场战斗记录下来的位置（$combat.posBeforeFight，
+       在 initCombat 里存的），场外袭击那种情况下没有 $combat 数据，
+       退回用 $pendingLayer；两者都拿不到就给个默认值 2，避免 NaN
+       导致所有判断恒为 false（这是你原代码在"玩家亲自打完仗"这条分支下
+       完全不会显示叙事文本的原因） */
+    <<if _isOwnFight && $combat && $combat.posBeforeFight && $combat.posBeforeFight.layer>>
+      <<set _layer to $combat.posBeforeFight.layer>>
+    <<elseif $pendingLayer>>
+      <<set _layer to $pendingLayer>>
+    <<else>>
+      <<set _layer to ($playerPos.layer ?? 2)>>
+    <</if>>
+
+    <<set $cleanercometime to Math.abs(_layer - 2) * 30>>
+    <<set $cleanercleaningtime to random(5, 30) * 20>>    /* 清道夫的 */
+    <<set $cleanercleaningtime2 to random(5, 15) * 30>>    /* 保洁部的 */
+
+    <<if $fightpasttime < $cleanercometime>>
+        这里刚刚经历过战斗，仍然是一片狼藉。怪物的躯体被随意地堆在一起，怪物血和从破损管道中流出的液体溅得到处都是。有几个在这里工作的人形正在试图从这片混乱中抢救出来一些东西。<br>
+    <<elseif $fightpasttime < $cleanercometime + $cleanercleaningtime>>
+        这里不久前经历过一场战斗，你看到清道夫正在移动怪物的尸体，燃烧蛋白质、金属和塑料的气味随着她们切割和搬运怪物尸体的动作蔓延开来。<br>
+    <<elseif $fightpasttime < $cleanercometime + $cleanercleaningtime + $cleanercleaningtime2>>
+        保洁部的人形正在清理先前战斗留下的污迹，不远处有一个圆柱形的自走雾化器正在往空气中喷出清洁空气的白雾。<br>
+    <<elseif $fightpasttime < $cleanercometime + $cleanercleaningtime + $cleanercleaningtime2+30>>
+        这里的战斗痕迹已经被清理干净，仿佛什么都没发生过。<br>
+    <</if>>
+  <</if>>
+<</widget>>

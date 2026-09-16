@@ -1,0 +1,901 @@
+:: StoryTitle
+乌托邦战线
+
+
+:: StoryData
+{
+  "ifid": "25A90B75-3699-4609-917F-C5612C695319",
+  "format": "SugarCube",
+  "format-version": "2.37.3",
+  "start": "开始",
+  "tag-colors": {
+    "functional": "blue",
+    "战斗回": "red"
+  },
+  "zoom": 0.6
+}
+
+
+:: 开始 {"position":"75,175","size":"100,100"}
+<<set $identityactivation=false>><<replace "#story-caption">><</replace>><img src="img\title.png" width="850px">
+<h1 style="text-align:center;font-size:2.5em;">乌托邦战线</h1><div style="text-align:center;margin:2em 0;">
+  作者：Meowpons
+  版本：v0.2.0-Alpha
+  <hr>
+  <p>免责声明：本游戏仅适合16岁以上的玩家游玩，并可能包含以下内容或表现形式：文字抖动、闪屏、屏幕故障模拟等效果。如您对可能会引发眩晕、头痛、癫痫的视觉刺激敏感或无法接受少部分剧情中可能造成的心理刺激，请谨慎游玩或立即停止游玩该游戏。本游戏制作方不对玩家因游玩产生的任何不适、心理压力或相关健康问题承担责任。
+本游戏纯属虚构，与现实世界的任何人物、事件、机构或社会组织无关。如有雷同，纯属巧合。游戏内设定、台词及角色行为均为剧情服务。请勿在现实环境中模仿、传播或鼓励任何相关行为。
+当您点击“新游戏”或“继续游戏“时，视为您已阅读并同意以上说明，并自行承担因游玩所产生的风险及后果。</p></div><center><link rel="stylesheet" href="triangle.css"><div class="triangle-down"></div>
+<<button "确认并开始新游戏" "初始片段">><</button>></center>
+
+<<include "NPCdaily">>
+
+:: AchievementGallery
+<div class="achievement-page">
+	<h1 class="achievement-page-title">成就墙 <span class="quest-count">(<<print Object.keys($achievements).length>>/<<print Object.keys(setup.achievementDefs).length>>)</span></h1>
+	<div class="achievement-grid">
+		<<include "AchievementListRender">>
+	</div>
+	<p><<link "返回" "开始">><</link>></p>
+</div>
+
+:: 初始片段 {"position":"175,175","size":"100,100"}
+欢迎游玩乌托邦战线！
+
+你需要身处于众多人形之中，击退威胁你和此地安全的敌人，了解你出身的秘密，直至揭开一切的真相。
+当然，就算你只是想单纯地和其他人形一起平静地在管理区工作和生活,那也不赖。
+
+[[继续|难度选择]]
+
+
+:: 难度选择
+点击下方的按钮，选择以哪种难度开始，''难度在游戏过程中无法更改''。
+<<timed 0.5s t8n>><<set $gameRunning = true>>
+<div class="vertical-btn-container">
+    <a class="vertical-btn" data-passage="0-0-0" data-set='{"$difficulty":"easy","$disastercountdown":240,"$maidtrust":60}' style="background-image: url('$btn1.image');">
+         <div class="glow-ring"></div>    
+        <div class="ripple"></div>        
+        <div class="text-mask"></div>  
+        <div class="tooltip">
+            <span class="tooltip-title">暴雨</span>
+            <div class="tooltip-divider"></div>
+            ''低难度''
+            灾变在两年后才会降临
+            人形对你普遍友好
+            怪物的数值被削弱
+        </div>
+        <span class="btn-text">暴雨</span>
+    </a>
+    <a class="vertical-btn" data-passage="0-0-0" data-set='{"$difficulty":"normal","$disastercountdown":120,"$maidtrust":50}' style="background-image: url('$btn2.image');">
+        <div class="glow-ring"></div>    
+        <div class="ripple"></div>        
+        <div class="text-mask"></div>  
+        <div class="tooltip">
+            <span class="tooltip-title">飓风</span>
+            <div class="tooltip-divider"></div>
+            ''普通难度''
+            灾变在一年后袭来
+            人形对你没有什么特别的看法
+            怪物的数值维持在均衡状态
+        </div>
+        <span class="btn-text">飓风</span>
+    </a>
+    <a class="vertical-btn" data-passage="0-0-0" data-set='{"$difficulty":"hard","$disastercountdown":60,"$maidtrust":30}' style="background-image: url('$btn3.image');">
+          <div class="glow-ring"></div>    
+          <div class="ripple"></div>       
+          <div class="text-mask"></div>  
+          <div class="tooltip">
+            <span class="tooltip-title">天灾</span>
+            <div class="tooltip-divider"></div>
+            ''高难度''
+            灾变仅在半年之后就将降临
+            人形们对你更加警惕
+            怪物的数值被强化
+            能力提升的效率更高
+        </div>
+        <span class="btn-text">天灾</span>
+    </a>
+</div>
+<</timed>>
+
+
+
+:: 0-0-0 {"position":"275,175","size":"100,100"}
+<<timed 0s t8n>><span class="glowBlur" style="--blur: 1.5px; --g-color: rgba(240,255,240,.80);">听觉模块首先苏醒，粘稠液体的抽取声像是心跳一般在耳边咕噜作响。</span><</timed>>
+
+<<timed 2s t8n>><span class="glowBlur" style="--blur: 1.4px; --g-color: rgba(240,255,240,.83);">黑暗当中，只有你身边的休眠仓里闪烁着淡色的荧光。</span><</timed>>
+
+<<timed 4s t8n>><span class="glowBlur" style="--blur: 1.2px; --g-color: rgba(240,255,240,.86);">在意识到‘你’的那一瞬，似乎有一点灵光自中心闪现，然后像是墨水扩散向四周一般迅速延展。</span><</timed>>
+
+<<timed 6s t8n>><span class="glowBlur" style="--blur: 1px; --g-color: rgba(240,255,240,.90);">先是躯干，</span><</timed>>
+
+<<timed 7s t8n>><span class="glowBlur" style="--blur: 0.8px; --g-color: rgba(240,255,240,.93);">后是四肢，</span><</timed>>
+
+<<timed 8s t8n>><span class="glowBlur" style="--blur: 0.5px; --g-color: rgba(240,255,240,.96);">最终是你的手足。</span><</timed>>
+
+<<timed 10s t8n>><span class="glowBlur" style="--blur: 0.2px; --g-color: rgba(240,255,240,1);">你能够控制它们了。</span><</timed>>
+
+<<timed 13s>>
+  <<goto "0-0-1">>
+<</timed>>
+:: 0-0-1
+随着最后一点液体被排出舱体和一阵气流从狭窄机械腔体释放的嘶嘶声，你面前的玻璃罩被打开了。你在周围点缀的微弱指示灯光中坐起来，残余的凝胶黏湿地挂在你身上。
+
+[[……发生了什么？|0-1-1]]
+[[离开休眠仓|0-1]]
+
+:: 0-1-1 {"position":"475,275","size":"100,100"}
+你努力回忆，但思绪中始终只有<span style="color: red;">一片空白</span>，你找不到任何可用的记忆碎片，可以用来解释你当前的状况。
+
+[[放弃|0-1]]
+[[我不信邪|0-1-1-1]]
+
+:: 0-1-1-1 [nobr] {"position":"475,175","size":"100,100"}
+<<if !$firstcount>>
+    <<set $firstcount = 1>>
+<</if>>
+你拼命回忆着，但你的处理器中仍然一片空白，并且边缘感到阵阵……刺痛？<br><br>
+<<set $firstcount++>>
+<<if $firstcount <= 2>>
+    [[放弃|0-1]]<br>
+    [[沿着那股刺痛追逐下去|0-1-1-1]]<br>
+<<elseif $firstcount<=3>>
+     你回忆起来了零散的片段。<br>
+     <span style="color:red;">+？？？</span><br> 
+    <span class="glowBlur" style="--blur: 1.5px; --g-color: rgba(248,248,255,.85);">你正被包裹在在无穷而粘稠的黑色液体中。</span><br><br>
+    <<set $superperception +=1>>
+     [[放弃|0-1]]<br>
+    [[沿着那股刺痛追逐下去|0-1-1-1]]<br>
+<<elseif $firstcount<=4>>
+   你回忆起来了零散的片段，疼痛在你的头部中蔓延。<br> 
+   <<set $superperception +=1>><span style="color:red;">+？？？</span><br>
+    <span class="glowBlur" style="--blur: 1.5px; --g-color: rgba(248,248,255,.85);">你正被包裹在在无穷而粘稠的黑色液体中。</span><br><br>
+    <span class="glowBlur" style="--blur: 1.5px; --g-color: rgba(248,248,255,.75);">你穿过一层膜状物体，来到了一个明亮的地方。</span><br><br>
+     
+     [[放弃|0-1]]<br>
+    [[沿着那股刺痛追逐下去|0-1-1-1]]<br>
+<<elseif $firstcount<=5>>
+   你回忆起来了零散的片段，疼痛在你的头部中蔓延。<br>
+     <<set $superperception +=1>><span style="color:red;">+？？？</span><br> 
+    <span class="glowBlur" style="--blur: 1.5px; --g-color: rgba(248,248,255,.85);">你正被包裹在在无穷而粘稠的黑色液体中。</span><br><br>
+    <span class="glowBlur" style="--blur: 1.5px; --g-color: rgba(248,248,255,.75);">你穿过一层膜状物体，来到了一个明亮的地方。</span><br><br>
+    <span class="glowBlur" style="--blur: 1.5px; --g-color: rgba(248,248,255,.65);">模糊的脸，金属碰撞声，你被控制在原地无法移动，你转动着眼睛试图向上看去……</span><br><br>
+    
+    [[放弃|0-1]]<br>
+    [[沿着那股刺痛追逐下去|0-1-1-1]]<br>
+<<else>>
+    你回忆起来了零散的片段，疼痛令你的头部抽痛不已。<br>
+     <<set $superperception +=1>><span style="color:red;">+？？？</span><br> 
+    <span class="glowBlur" style="--blur: 1.5px; --g-color: rgba(248,248,255,.85);">你正被包裹在在无穷而粘稠的黑色液体中。</span><br><br>
+    <span class="glowBlur" style="--blur: 1.5px; --g-color: rgba(248,248,255,.75);">你穿过一层膜状物体，来到了一个明亮的地方。</span><br><br>
+    <span class="glowBlur" style="--blur: 1.5px; --g-color: rgba(248,248,255,.65);">模糊的脸，金属碰撞声，你被控制在原地无法移动，你转动着眼睛试图向上看去……</span><br><br>
+     <span class="glowBlur" style="--blur: 1.5px; --g-color: rgba(248,248,255,.55);">紫色眼睛的主人审视着你，她转动了手中的武器，你的世界随即变得一片漆黑……</span><br><br>
+你猛然从幻象中抽离，颅上还残留着还没来得及散去的冗余电流，身上冰冷黏湿的触感提醒你已经脱离了那个危险的环境。但另外一种不安感警告你，你不能这个不知名的地方停留太久。<br><br>
+
+    [[离开休眠仓|0-1]]
+<</if>>
+
+
+
+
+:: 0-1 {"position":"575,175","size":"100,100"}
+你从休眠仓里爬出来。
+
+这里漆黑无光，你只能看到周围的休眠仓里被注满了发着弱光的淡色凝胶，一个个被特殊仪器盖住头部的人形被浸泡在其中，有一些深色液体从金属的缝隙里溢出来。
+
+[[摸索玻璃|0-1-0]]
+
+
+
+:: 0-1-0 [nobr] {"position":"675,175","size":"100,100"}
+你的手部贴上另一个休眠仓的表面，上面残留着些微的热度，像是内部刚经历了一次电击。当你靠近它时，你通过玻璃的反射头一次看到了“自己”。
+<br><br>
+于是你情不自禁地伸手，触碰你自己的虚像，陌生的喜悦感涌上了你的心头。
+<br><br>
+镜中的你是何种模样？
+<br><br>
+你是一个
+<<cycle "$bodyHeight" autoselect>>
+  <<option "高大" "高大">>
+  <<option "标准" "标准">>
+  <<option "矮小" "矮小">>
+<</cycle>>
+的人形，有着被
+ <span class="skinTone-<<print $skinTone>>">
+ <<cycle "$skinTone" autoselect>>
+  <<option "瓷白" "瓷白">>
+  <<option "象牙白" "象牙白">>
+  <<option "自然肤色" "自然肤色">>
+  <<option "小麦色" "小麦色">>
+  <<option "暖棕" "暖棕">>
+  <<option "冷灰" "冷灰">>
+  <<option "钛白" "钛白">>
+  <<option "石墨黑" "石墨黑">>
+<</cycle>></span> 的仿生皮肤覆盖的
+<<cycle "$faceType" autoselect>>
+  <<option "柔和" "柔和">>
+  <<option "犀利" "犀利">>
+  <<option "标准" "标准">>
+<</cycle>>
+面庞、
+ <span class="armorColor-$armorColor"><<cycle "$armorColor" autoselect>>
+  <<option "黑" "黑">>
+  <<option "白" "白">>
+  <<option "灰" "灰">>
+<</cycle>>
+</span>
+色的机械外甲，仿生虹膜呈现出
+<span class="eyeColor-$eyeColor">
+<<cycle "$eyeColor" autoselect>>
+  <<option "纯金" "纯金">>
+  <<option "金棕" "金棕">>
+  <<option "灰蓝" "灰蓝">>
+  <<option "冰蓝" "冰蓝">>
+  <<option "青蓝" "青蓝">>
+  <<option "钢青" "钢青">>
+  <<option "荧光绿" "荧光绿">>
+  <<option "橄榄绿" "橄榄绿">>
+  <<option "灰绿" "灰绿">>
+  <<option "紫罗兰" "紫罗兰">>
+  <<option "深紫" "深紫">>
+  <<option "玫红" "玫红">>
+  <<option "猩红" "猩红">>
+  <<option "石榴红" "石榴红">>
+  <<option "铁灰" "铁灰">>
+    <<option "银白" "银白">>
+  <<option "曜黑" "曜黑">>
+<</cycle>>
+</span>
+的颜色，
+
+充当发丝的
+<span class="hairColor-$hairColor">
+<<cycle "$hairColor" autoselect>>
+  <<option "纯金" "纯金">>
+  <<option "金棕" "金棕">>
+  <<option "灰蓝" "灰蓝">>
+  <<option "冰蓝" "冰蓝">>
+  <<option "青蓝" "青蓝">>
+  <<option "钢青" "钢青">>
+  <<option "荧光绿" "荧光绿">>
+  <<option "橄榄绿" "橄榄绿">>
+  <<option "灰绿" "灰绿">>
+  <<option "紫罗兰" "紫罗兰">>
+  <<option "深紫" "深紫">>
+  <<option "玫红" "玫红">>
+  <<option "猩红" "猩红">>
+  <<option "石榴红" "石榴红">>
+  <<option "铁灰" "铁灰">>
+    <<option "银白" "银白">>
+  <<option "曜黑" "曜黑">>
+<</cycle>>
+</span>
+色人造纤维自然地下垂在你的
+<<cycle "$hairFront" autoselect>>
+  <<option "额前" "额前">>
+  <<option "眉侧" "眉侧">>
+  <<option "鬓角" "鬓角">>
+  <<option "眼前" "眼前">>
+<</cycle>>
+和
+<<cycle "$hairBack" autoselect>>
+  <<option "后颈" "后颈">>
+  <<option "肩上" "肩上">>
+  <<option "背部" "背部">>
+<</cycle>>。
+<br><br>
+
+
+<em><span style="color: grey;">请点击标蓝的文字进行外观选择，以上所有数值都可以在后续游戏期间进行更改，但你对于体型的选择将会在游戏前期影响你的技能初始值。</span></em>
+<br><br>
+<<if $bodyHeight is "高大">>
+  <<set $hurt to 15>>
+  <<set $fighting to 15>>
+  <<set $evade to 10>>
+  <<set $hiding to 5>>
+<<elseif $bodyHeight is "标准">>
+  <<set $hurt to 10>>
+  <<set $fighting to 10>>
+  <<set $evade to 15>>
+  <<set $hiding to 10>>
+<<elseif $bodyHeight is "矮小">>
+  <<set $hurt to 5>>
+  <<set $fighting to 5>>
+  <<set $evade to 15>>
+  <<set $hiding to 20>>
+<</if>>
+
+[[我确信我就是这般模样]]
+
+:: 我确信我就是这般模样 {"position":"775,175","size":"100,100"}
+<em><span style="color: grey;">你的外貌已被记录，你仍然可以在后续游戏中更改它们。</span></em>
+你的目光在休眠仓的玻璃上停留了一会后又离开了，你还有更重要的事情去做。
+
+环顾四周，你发现不远处的底端有一条光线，想必那就是出口的位置。你花了点时间摸索到它的门把手。
+你贴近出口时，你能听到''杂乱''的声响从外面传来。
+
+[[犹豫->0-20]]
+[[不管它，出门|0-2]]
+[[从门缝下看出去|0-21]]
+
+
+
+
+
+:: 0-2 {"position":"875,200","size":"100,100"}
+在你正准备推开门时，有什么东西重重地敲在了门上，震得你被迫松开双手。
+
+灰尘和细小的光线随着一次次的重击落下，''门外的东西要闯进来了！''
+<em><span style="color: grey;">你的处理器中包含逻辑计算系统，它们会为你自动计算出冒险举动的近似成功率。</span></em>
+
+
+[[寻找掩体->0-2-1]]<span style="color: green;">（成功概率：100%）</span>
+[[寻找武器->0-2-2]]<span style="color: green;">（成功概率：100%）</span>
+[[什么都不做|0-2-3]]
+
+
+:: 0-21 {"position":"875,300","size":"100,100"}
+你小心地弯下腰，伏在地面上向外看去。
+
+门和地板间的缝隙太小了，你什么都看不清，但你能隐隐约约见到一些黑色的污渍散落在不远处，也有影子在你的视线中闪动着。
+
+有什么东西重重地敲在了门上，你吓得赶紧直起身子，看向你看不见的门外。
+
+灰尘和细小的光线随着一次次的重击落下，''门外的东西要闯进来了！''
+<em><span style="color: grey;">你的处理器中包含逻辑计算系统，它们会为你自动计算出冒险举动的近似成功率。</span></em>
+
+[[寻找掩体->0-2-1]]<span style="color: green;">（成功概率：100%）</span>
+[[寻找武器->0-2-2]]<span style="color: green;">（成功概率：100%）</span>
+[[什么都不做|0-2-3]]
+
+:: 0-2-1 {"position":"1000,100","size":"100,100"}
+你注意到玻璃仓之间的缝隙应该足够你隐藏，于是你小心地躲了进去，把手脚都缩好。<<set $hiding++>>
+<span style="color: green;">+观察</span>
+
+[[等待->0-2-0]]
+
+
+:: 0-2-2 {"position":"1000,200","size":"100,100"}
+你摸到墙上有一根管道，或许适合掰下来作为武器。
+ <<set $weaponList.push({  id:"ironpipe",  name:"铁管",  damageBonus:1,  wearReduction:1,  desc:"从墙上掰下的管道，你不会觉得它真能造成什么有效的伤害吧？"})>><<set $fighting++>>
+ 在一阵子的尝试之后，你终于找到一个合适的发力方式，足够让你把那根金属管掰下来。
+ <span style="color: green;">+力量</span>
+  <span style="color: grey;">【获得了 水管】</span>
+
+[[等待->0-2-0]]
+
+
+:: 0-2-3 {"position":"1000,300","size":"100,100"}
+你的处理器一片空白，根本想不出要做什么，只能干站着,等待外面的那个存在决定你的命运。
+
+[[等待->0-2-0]]
+
+
+:: 0-20 {"position":"875,100","size":"100,100"}
+在你尚在犹豫的时候，有什么东西重重地敲在了门上，将金属撞出了一个怪异的弧度。
+灰尘和细小的光线随着一次次的重击落下，'门外的东西要闯进来了！'
+<em><span style="color: grey;">你的处理器中包含逻辑计算系统，它们会为你自动计算出冒险举动的近似成功率。</span></em>
+
+[[寻找掩体->0-2-1]]<span style="color: green;">（成功概率：100%）</span>
+[[寻找武器->0-2-2]]<span style="color: green;">（成功概率：100%）</span>
+[[什么都不做|0-2-3]]
+
+
+:: 0-2-0 [nobr] {"position":"1125,200","size":"100,100"}
+''门被破开了，一只丑陋的黑色怪物撞开了门板，朝你伸出螯肢——''<br><br>
+但有东西比它的动作更快。在它靠近你之前，一把金属矛从怪物的头部贯穿而过，精准地刺穿了它的眼窝和上颚。温热的液体从它的创口中溅射出来，散发出一种介于铁锈和塑料燃烧之间的气味。<br>
+怪物在你面前抽搐着，口器疯狂地开合着想要咬住什么，尖锐的爪子刮擦地板发出刺耳的摩擦声。然而那把矛的存在就已经宣判了它的死亡，一切很快都随着它生命的流失归于寂静。<br><br>
+门口走出一个黑色的人影，她握住那根矛，俯下身观察那具瘫软的怪物尸体。<br>
+<<if $superperception >=4>>
+   <span style="color: red;">有什么在你的思维里尖叫着，但随着那个影子的靠近，这股噪音如同被吸入黑洞一般消失了。</span><br><br>
+<</if>>
+“威胁解除，通知清道夫，让她们来把这里收拾干……”<br>
+她的声音暂停了，你能看见她扫视着室内，然后将目光定格在你身上。<br>
+<<if $superperception >=4>>
+<span style="color: red;">她的眼睛是'紫色'的。</span><br>
+<</if>>
+<br>
+[[保持不动->0-3-1]]<br>
+<<if $weaponList.length > 0>>
+[[攻击她->0-3-2]]<span style="color: red;">（成功概率：0%）</span>
+<</if>>
+
+:: 0-3-1 {"position":"1225,275","size":"100,100"}
+你认为还是不要轻举妄动比较好，于是待在原地。那人形迟疑了一下，但还是朝你走来。她小心地抓住了你的手臂，把你拉起来，到到门外的亮光下。
+
+在短暂的适应后，你看清门外松散地围了一圈和你面前的人长得很相似的人形，地板上也有不少和刚才那只怪物相似的尸骸和飞散的新鲜血渍。
+
+她抓住你的肩膀，把你拉近——距离足够让你看清她紫色虹膜中央的微型摄像头——将你从头到脚打量了一遍。
+
+[[继续->0-3-0]]
+
+
+:: 0-3-2 {"position":"1225,175","size":"100,100"}
+你在看清她什么时候把金属矛从怪物的尸体上拔出来前，手中的管子就被大力击飞，而胸口也遭到重击，不受控制地倒下。而下一瞬，尖锐的矛尖就对准了你的脸。
+<span style="color: red;">++磨损</span>
+<<set $woreout+=3>>
+“……”
+你看到她紫色的双眼在你的面上聚焦、锁定，脸上冷酷的神情很快变成了困惑。她从你身上起来，抓住了你的手臂，把你拉到门外的亮光下。
+
+在短暂的适应后，你看清门外松散地围了一圈和你面前的人长得很相似的人形，地板上也有不少刚才那只怪物相似的尸骸和飞散的新鲜血渍。显然，这里刚刚经历了一场激烈的保卫战。
+
+[[继续->0-3-0]]
+
+
+
+:: 0-3-0 {"position":"1325,200","size":"100,100"}
+“Carmel！”她抬头喊。
+
+人群分开一条道，一个白蓝色的身影从外侧走了过来，她的手上还抓着一把残留着黑色油污的细长工具。
+
+“听您差遣，长官。”
+
+“给她做一个全身检查，看看是否有什么……异常。”
+
+被称为Camel的人形神色有些微妙，她的目光扫过你，最终说：“我会尽我所能。”
+
+“很好，我相信你的技术。”你面前的人侧开身子，回到那群手持武器的同伴中间，而其他人形也纷纷转身，跟着她一起离开了。很快就只剩下了你和Carmel还站在这片空地上。
+
+她叹了口气：“过来吧，我们没有很多时间浪费。”
+
+[[配合行动|0-3-0-1]]
+[[抗拒|0-3-0-12]]
+[[跑！！！|0-3-0-13]]<span style="color: red;">（成功概率：0%）</span>
+
+
+:: 0-3-0-1 {"position":"1425,150","size":"100,100"}
+你跟上Carmel的脚步。
+
+“你比我想象的听话一些。”她瞥了你一眼。
+
+[[继续->0-3-0-2]]
+
+
+:: 0-3-0-12 {"position":"1425,250","size":"100,100"}
+你后退一步，Carmel马上转过头，不悦地看着你，你注意到她捏紧了手上细长而锐利的物体，或许是一个切割工具。
+
+“你也看到了刚才Corrina是怎么对待那只怪物的了，不想踏出大门就被当做异己杀掉的话就给、我、过、来。”
+她的语气中充满了威胁。
+
+你别无选择，只能小心地跟着。但愿她不会把你大卸八块……
+
+[[继续->0-3-0-2]]
+
+
+:: 0-3-0-13 {"position":"1425,350","size":"100,100"}
+你无视了那个Carmel的话，转身就跑。
+
+废话！你连这里是哪都不知道，怎么能相信任何她嘴里的话？
+
+你确实不知道出口应该怎么走，但好在你面前的场地构成简单，只要你沿着路走就一定可以……
+<<set $woreout to 0>>
+[[哐！！！|0-3-0-13-1]]
+
+
+:: 0-3-0-13-1 {"position":"1575,350","size":"100,100"}
+你因为来自后方的一记重击失去了意识。朦胧中你听到自己断线般的身体倒地的声响，而一只手把你扯了起来，往某个方向走去。
+
+……
+
+你睁开眼睛时正躺在一张环绕着各种仪器的平台上，Carmel站在旁边看着你。显然，你的逃跑失败了。
+
+“我已经预料到我未来会多难过了。”Carmel绷着脸，将一个方块状的仪器移动到你的头部，“醒了？那就别乱动。接下来我会扫描你，以确保其他人形不会对你做出类似的事。”
+
+看起来一时半会是没有办法逃跑了……
+
+[[接受现实|checkin]]
+
+
+:: 0-3-0-2 {"position":"1600,200","size":"100,100"}
+你们来到了一个小房间内，你可以看到靠墙的床状平台周围放置和连接着复杂的仪器。
+<<roll $hiding>><<if $success>>
+你留意到上面残留着薄薄的灰尘，似乎已经有一段时间没有被使用了。
+<</if>>
+“躺上去。”Carmel站到了一台与仪器连接的显示屏前，指向平台并命令道，“接下来我会用设备扫描你，记录你的电波特征并且将你接入管理区的频道。”
+
+[[躺上维修台->checkin]]
+
+:: checkin {"position":"1725,200","size":"100,100"}
+你侧过头，看见你的各项数值显示在了一旁的黑底屏幕上。
+
+体型：$bodyHeight  
+脸模：$faceType  
+虹膜：$eyeColor  
+发色：$hairColor
+前发长：$hairFront  
+后发长：$hairBack  
+
+电量: $power          
+磨损度：$woreout      
+工分： $money
+
+敏捷：$evade
+力量：$fighting
+观察：$hiding
+
+“你有名字吗？”你听到Carmel的声音。
+“我总不能用‘喂’，‘你’来称呼另一个同事，显得我好像很没有礼貌。”
+
+输入你想被称呼的名字（后续不可更改）
+<<textbox "$playerName" "UG-3-019" autofocus>>
+<div id="error-message" style="color: red; display: none;"></div>
+
+<<button "确认">>
+  <<if $playerName.trim() === "">>
+    <<script>>
+      document.getElementById('error-message').innerText = "系统警告：名称不能为空！";
+      document.getElementById('error-message').style.display = 'block';
+    <</script>>
+  <<elseif $playerName.length > 10>>
+    <<script>>
+      document.getElementById('error-message').innerText = "系统警告：名称过长（最多10个字符）";
+      document.getElementById('error-message').style.display = 'block';
+    <</script>>
+  <<elseif $playerName.toLowerCase() === "carmel">>
+    <<script>>
+      document.getElementById('error-message').innerText = "……你在和我开玩笑吗？";
+      document.getElementById('error-message').style.display = 'block';
+    <</script>>
+  <<elseif $playerName.toLowerCase() === "corrina">>
+    <<script>>
+      document.getElementById('error-message').innerText = "这个不行，我不想再有第二个长官了。";
+      document.getElementById('error-message').style.display = 'block';
+    <</script>>
+  <<elseif $playerName.toLowerCase() === "pep" || $playerName.toLowerCase() === "eumen" || $playerName.toLowerCase() === "ada" || $playerName.toLowerCase() === "lodia" || $playerName.toLowerCase() === "lucy"|| $playerName.toLowerCase() === "sysin"|| $playerName.toLowerCase() === "rican"|| $playerName.toLowerCase() === "lilima"|| $playerName.toLowerCase() === "shaterra"|| $playerName.toLowerCase() === "mapka"|| $playerName.toLowerCase() === "quintina">>
+    <<script>>
+      document.getElementById('error-message').innerText = "名字已经被占用了。";
+      document.getElementById('error-message').style.display = 'block';
+    <</script>>
+  <<else>>
+    <<goto "0-3-0-4">>
+  <</if>>
+<</button>>
+
+
+:: 0-3-0-4 [nobr] {"position":"1875,200","size":"100,100"}
+<<set $identityactivation=true>>
+<<replace "#story-caption">>
+<</replace>>
+<span id="notice"></span>
+<<set $playerPos to {layer:5, block:"维修部"}>>
+<<contactsAdd "carmel" "Carmel-卡梅尔" "维修部|领班" "Carmel对你尚存疑虑。" "内线 003">>
+  <<set $npc.carmel.like to 25>> 
+<<contactsAdd "corrina" "Corrina-科琳娜" "长官？" "Corrina视你如同其他人形。" "内线 001">>
+<<set $npc.corrina.like to 50>> 
+“好的，我会上传它们。然后激活你的终端。”Carmel点击着屏幕。<br><br>
+在几秒后，一种奇妙的感觉在你脑中蔓延开来，仿佛头一次感觉到这个世界的色彩一般，一切都变得更加立体和……复杂。数据流窸窸窣窣地流过，给你的处理器带来了第一缕规律而非混乱的噪声。<br>
+<em><span style="color:grey;">你现在可以使用你终端的大部分功能了！包括查看个人状态、日志、通讯录和警报系统，后者会实时播报这里发生的重大安全事件，请善加利用。</em>
+</span><br><br>
+“没有问题，你可以走了，$playerName。”
+<br><br>
+[[走出->0-3-0-5]]<br>
+/*<<link "skip">>
+<<tick 30>>
+<<goto "0-6-0-1">>
+<</link>>*/
+
+
+:: 0-3-0-5 {"position":"2000,200","size":"100,100"}
+门口的通讯器发出哔哔两声，你听到的声音带着滋滋的混响：
+“Carmel，不介意我打扰吧？”
+“完全不，Pep。”Camel继续摆弄着显示屏，“我只希望你没有带来什么坏消息。”
+
+随着门的打开，一个有着黑色长发的人形走了进来，你注意到她的身后绑着两把交叉的长刀。她靠近Carmel说了些什么，随后转向了你。
+
+“嘿。”她琥珀色的虹膜闪闪发光，“你就是$playerName吗？我刚刚从云端上看到了你的名字，真酷！”
+“对了，我是Pep，我们之前见过。”
+<span style="color: gray;"><em>你想起来了，你确实在你刚刚离开的房间外见过她。</em></span>
+
+“长官让我带一套制服给你，这样会更方便些。”她递给你一套整齐叠着的服装。<<contactsAdd "pep" "Pep-佩普" "巡逻队|机动领班" "Pep视你为需要照顾的新人。" "内线 102">><<set $npc.pep.like to 35>> 
+
+[[接过并且穿上->0-5-1]]
+[[接过但是不穿->0-4-1]]
+
+
+:: 0-4-1 {"position":"2300,275","size":"100,100"}
+你接过了衣服，但并没有穿上。只是让黑色布料自然地在你的手上随着重力下垂。<br>
+<<set _newCloth to {
+  name: "普通后勤部门制服",
+  stats: {
+    hemIdx: 5,
+    slvIdx: 4,
+    fabIdx: 2,
+    overskirt: false
+  },
+  intro: "轻便实用的后勤制服，来自一位领班的赠品。",
+  clothdirty: 0,
+  clothworeout: 0,
+  maxworeout: 31
+}>>
+<<run $wardrobe.push(_newCloth)>>
+
+<em>获得了新衣物： ''<<print _newCloth.name>>''。</em><br>
+
+“……算了，倒也不是什么很重要的事情。”Pep见你一时半会没有穿上的意思，叹了口气，双手无处安放一般拍了拍身侧，“不说这些了，你现在需要一份工作。来吧，我带你去。”
+<br><br>
+[[工作？->0-5-0-1]]
+
+
+
+:: 0-5-0-1 {"position":"2500,200","size":"100,100"}
+“嗯，对的，在这里的所有人形都需要工作，不能闲下来没事情干。”
+
+[[如果没有工作会怎么样？->0-5-012]]
+
+
+
+:: 0-5-012 {"position":"2700,200","size":"100,100"}
+''“你会被取消所有的资格，连存在的意义都不被承认。在你放弃工作的那一刻，你就不被我们视为同类了。”''
+Camel平静的声音在你们头上响起：“我不苛求你现在就能理解我说的话，但你应该意识到，在管理区失去了群体的认可是一件多么可怕的事情。”
+
+<em><span style="color: gray;">如果你没有在每周的工分结算前挣到被允许的最低值，你可能会被降级——或者失去人形群体的信任。</span></em>
+
+Pep对此不可置否地耸肩，说：“其实大多数人形都不会沦落到那种地步。来吧，$playerName，别想这些了，我们去外面如何？”
+
+[[继续->0-6]]
+
+
+:: 0-5-1[nobr] {"position":"2300,75","size":"100,100"}
+你接过并且穿上这套制服。<br>
+
+<<set _newCloth to {
+  name: "普通后勤部门制服",
+  stats: {
+    hemIdx: 5,
+    slvIdx: 4,
+    fabIdx: 2,
+    overskirt: false
+  },
+  intro: "轻便实用的后勤制服，来自一位领班的赠品。",
+  clothdirty: 0,
+  clothworeout: 0,
+  maxworeout: 31
+}>>
+<<set $equippedCloth to _newCloth>>
+
+<em>获得了新衣物： ''<<print _newCloth.name>>''。</em><br>
+
+这套制服是黑色的，并且出乎意料地合身。你留意到腰部和前胸的布料上有一些金属的圆环，可能是为了方便目前不存在的带子穿过去。<br>
+
+“awwwww……你看上去真可爱。”Pep双手合十碰在嘴上，“不说这些了，你现在需要一份工作。来吧，我带你去。”<br>
+<br>
+[[工作？->0-5-0-1]]<br>
+[[不提问，跟上Pep的脚步|0-6]]
+
+
+:: 0-6 {"position":"2900,200","size":"100,100"}
+你和Pep一起走出房间，门外的一切展现在你的面前，而你第一次有闲暇去仔细地观察它。
+这里像是一个巨大的冷库，苍白的、不含温度的光从头顶照射下来。周围有和你相似的人形在忙碌着，你可以看清它们身上都穿着制服。
+
+“欢迎来到管理区！这里是所有人形——至少是所有愿意待在地下的人形的家。”
+
+[[人形？|0-6-2]]
+[[管理区？->0-6-1]]
+[[只是点头->0-6-0]]
+
+
+
+
+:: 0-6-1 {"position":"3125,175","size":"100,100"}
+“嗯，我们现在所在的维修部，就是它的一部分。管理区几乎无边无际，这样才能容纳得下非常全面的部门。“
+
+”对了，如果你想要充电、休息之类的，可以之后<span style="color: green;">坐电梯下行到10L的后勤部门休息区</span>。如果你之后更换了主职业，比如成为了巡逻队成员或者清道夫，则需要到对应的休息区……”
+
+Pep开始对管理区的规则滔滔不绝，绝大多数内容你一时半会都没法理解。
+
+[[对她说的话不感兴趣，稍微附和一下->0-6-1-1]]
+[[结束这段对话|0-6-0]]
+[[问问Pep什么是人形|0-6-2]]
+
+
+
+:: 0-6-1-1 {"position":"3250,175","size":"100,100"}
+你附和着她的话，她对此感到很高兴，但是你没有得知什么有用的信息。
+
+<em><span style="color: green;">++Pep对你的好感</span></em>
+<<set $npc.pep.like +=3>>
+[[继续|0-6-0]]
+
+
+:: 0-6-2 {"position":"3125,300","size":"100,100"}
+"对，像是仿生人、机器人之类的——长得像是人类，身体内部也主要是各种电子元件的具身智能，就被统称为人形。“Pep伸出手张合了两下，展示上面的机械结构，“管理区除了1L作为和地面流通区域外，其他地方只允许人形通行。”
+
+“管理区里已经很久没有产生新的人形了，说实话，来些新面孔也挺好。”
+
+[[人类？|0-6-3]]
+[[问问Pep管理区的事情|0-6-1]]
+[[结束这段对话|0-6-0]]
+
+
+:: 0-6-3
+“曾经研究出我们的碳基生命体。曾经他们役使我们做各种事，但现在人形和人类平分这个世界。人类在地上，我们在地下。”
+
+Pep随意地把衣服上的带子卷在手指上又松开：“具体的内容涉及到很多协议之类的，现在讲太复杂了……但总之我们现在不受人类管理，和他们是平等的合作关系。”
+
+[[问问Pep管理区的事情|0-6-1]]
+[[结束这段对话|0-6-0]]
+
+
+:: 0-6-0 [nobr] {"position":"3500,200","size":"100,100"}
+<<tick 10>>
+Pep带着你穿过人群，走到一排巨大的电梯门前。<br>
+“这就是大电梯，我们可以通过它前往各个楼层。”她带着你，从鱼贯而出的人形旁边挤进去，“我们去<span style="color: green;">6L的洗衣部</span>，用你的内置终端就可以选中你要去的地方。”
+<br><br>
+[[通过内置终端使用大电梯->电梯测试]]
+
+
+:: 电梯测试 {"position":"3625,200","size":"100,100"}
+一排相当大的电梯，进入其中可以去到任何一个层级。你注意到每个层级的旁边都标注了它拥有的一部分部门和功能。
+“我们要去6L的洗衣部，别忘了。”
+<<set $playerPos to {layer:5, block:"流通走廊"}>><<set $playerPos.block to "电梯">><<set $movelayer to 5>>
+L1（流通区域）
+L2（看守部、巡逻队休息室）
+L3（清道夫休息室）
+L4（化工部、锻造部）
+L5（维修部、工程部）
+[[L6（洗衣部、保洁部）->L6地图测试]]
+L7（人事部、食品部）
+L8（垂直农场）
+L9（会议室）
+L10（后勤部门休息区、商店）
+
+:: 0-6-0-1 {"position":"3925,200","size":"100,100"}
+Pep和你走过走廊，来到了一片区域。<<tick 20>><<set $playerPos to {layer:6, block:"洗衣部"}>>
+一眼望不到头的白漆金属架上摆放着大量的清洗机器，空气有些湿乎乎的。你能看到有几个和你一样穿着简单的人形在把制服塞进清洗机里。
+
+“洗衣部工作简单，适合你这样的新手，有什么不懂的事情都可以问这里的领班。”Pep指向一个乳白色头发的人形。那个人形正坐在一个金属架低矮的空位上，上面的清洗机看上去不翼而飞了。
+
+“哟，新人？真是稀客啊。”她注意到你们，挥挥手，自我介绍道，”我是Lodia，洗衣部的领班。”
+
+“希望我们没有打扰到你宝贵的休息。”
+
+“哪里哪里，我正准备上工呢。”Lodia站起来伸了个懒腰。
+
+“那就交给你了。”Pep摸了一下她头侧的机械结构，“我得抓紧时间回巡逻队去，回见！”
+
+“看来不只有我的休息时间结束了啊，回见~”
+<<contactsAdd "lodia" "Lodia-洛迪娅" "洗衣部|领班" "Lodia视你为需要照顾的新人。" "内线 016">><<set $npc.lodia.like to 35>> 
+[[继续->寻求工作测试]]  
+
+
+:: 寻求工作测试 {"position":"3125,4800","size":"100,100"}
+“好吧，让我姑且称呼你为……$playerName？”Lodia转向你，放下双手，“我猜Pep大概希望你在洗衣部工作，那么我先来简单介绍一下洗衣部的工作内容吧。”
+
+“污损会影响衣服的寿命，所以我们日常的工作就是把送来的制服放进洗衣机清洗。在最高效率下，整个洗衣部一天能够处理成千上万件衣服。”
+
+“洗衣部没有固定的工作时间，你可以随时过来工作。你可以一天工作12小时，也可以一整天都不来干活。”
+
+“因此，得到的工分多少取决于你的工作量，每搬运一桶衣服，你就能获得5分。”
+
+“你愿意做这份工作吗？”
+
+[[愿意|愿意1]]
+[[不愿意|不愿意1]]
+
+:: 愿意1 {"position":"3000,4925","size":"100,100"}
+“嘿，这可太好了！”Lodia侧身让出一条路，“既然话都说到这了，想不想先试试手？”
+<<set $workplace to "laundry">>
+洗衣部里的节奏很稳定，没有人形的工作因为你的出现被打断。你轻而易举地融入了她们之间。
+
+[[继续|carry]]
+
+:: 不愿意1 {"position":"3200,4950","size":"100,100"}
+“哦……好吧。”
+
+Lodia看上去有些失望：“那你需要我帮忙介绍一下吗？我的意思是，你可能需要去一趟人事部，看看有没有适合你的其他工作。”
+<<set $task1 to true>><<questunlock "task1">><<set $enterpersonnel to false>>
+<span style="color: gray;"><em>这件日程已经被添加到你的处理器日志中，你可以通过左侧下方的【任务日志】查看你已有的日志。</em></span>
+
+[[继续->洗衣部]] 
+
+:: 告知 {"position":"2550,5725","size":"100,100"}
+“你是$playerName吗？”在你走到门口附近的时候，有个正在门口埋头整理衣服的人形突然从旁边探出身子来。
+
+“Lodia领班让我提醒你，最好去一趟7L的人事部，可能是要和你介绍一些……规章制度吧。”
+<<set $task1 to true>><<questunlock "task1">><<set $enterpersonnel to false>>
+<span style="color: gray;"><em>这件日程已经被添加到你的处理器日志中，你可以通过左侧下方的【任务日志】查看你已有的日志。“</em></span>
+
+[[找我？]]
+[[好的|洗衣部]]
+
+:: 找我？ {"position":"2550,5825","size":"100,100"}
+“可能是Corrina长官……或者什么其他负责管理区规则的人形。”
+
+她耸耸肩，又开始整理传送带上被烘干的衣服：“你去了就知道了。”
+
+[[好吧|洗衣部]]
+
+
+
+:: 0-6-7 {"position":"2325,6650","size":"100,100"}
+当你走出人事部的大门时，看到了一个熟悉的身影正站在门口，是Corrina。<<set $notfight to true>>
+<<set $getitemtimecheck to 1>>
+她看起来并不意外于你的出现，只是平淡地向你打招呼：“部门的入职如何，$playerName？”
+
+[[表示入职很顺利|0-6-7-1]]
+[[抱怨|0-6-7-2]]
+[[表达你对于公分审查的担忧|0-6-7-3]]
+
+
+:: 0-6-7-1 [nobr]{"position":"2175,6825","size":"100,100"}
+“是吗？那就好。”她拿出一个盒子放到你手上，“我把你的事情和领班们说了，她们应该会稍微关照你一下。”<br><br>
+<<set $corrinagift to true>>
+你打开盒子，里面有几样物品。<br>
+<span style="color: gray;"><em>获得了 应急充电包x1 关节油剂x1 橡胶手套x1</em></span><br>
+<<if $getitemtimecheck>0>><<gainItem "jointoil" 1>><<gainItem "powerbag" 1>><<gainItem "gloves" 1>><<set $getitemtimecheck to 0>>
+<</if>>
+[[道谢|0-6-7-2-2]]<br>
+[[只是收下|0-6-7-2-1]]<br>
+[[询问她是否能帮助自己规避公分审核|0-6-7-2-3]]<br>
+[[请求她给你一些建议|0-6-7-2-4]]
+
+
+:: 0-6-7-2[nobr] {"position":"2000,6825","size":"100,100"}
+“这样啊，那么我希望这些能帮上你。”她拿出一个盒子放到你手上，“我把你的事情和领班们说了，她们应该会稍微关照你一下。”<br><br>
+<<set $corrinagift to true>>
+你打开盒子，里面有几样物品。<br>
+<span style="color: gray;"><em>获得了 应急充电包x1 关节油剂x1 橡胶手套x1</em></span><br>
+<<if $getitemtimecheck>0>><<gainItem "jointoil" 1>><<gainItem "powerbag" 1>><<gainItem "gloves" 1>><<set $getitemtimecheck to 0>>
+<</if>>
+[[道谢|0-6-7-2-2]]<br>
+[[只是收下|0-6-7-2-1]]<br>
+[[询问她是否能帮助自己规避公分审核|0-6-7-2-3]]<br>
+[[请求她给你一些建议|0-6-7-2-4]]
+
+
+
+:: 0-6-7-2-1 {"position":"1900,6650","size":"100,100"}
+“那么我先走了，有空闲的话去每个部门都看看吧，或许能找到自己的方向呢？”
+
+在你还想再寻找Corrina的身影时，她已经消失在了流通走廊内并不密集的人群中。
+
+<span style="color: gray;">【工分审查作为重要的长期任务，会显示在左侧边栏的上方，你可以随时查看】</span>
+<<set $notfight to false>><<set $corrinagift to true>>
+[[继续|L7流通走廊]]
+
+
+:: 0-6-7-2-2 {"position":"2025,6650","size":"100,100"}
+“没必要向我道谢，我的分内之事而已。”
+<<set $npc.corrina.like +=1>>
+<span style="color: green;">+Corrina的好感</span>
+
+[[继续|0-6-7-2-1]]
+[[请求她给你一些建议|0-6-7-2-4]]
+
+
+:: 0-6-7-2-3 {"position":"2150,6650","size":"100,100"}
+“抱歉，$playerName，所有在管理区的人形都必须接受工分审查。”Corrina摇头。
+
+“我知道你对此感到困扰，但不论如何，规矩就是规矩。”
+
+[[好吧|0-6-7-2-1]]
+[[请求她给你一些建议|0-6-7-2-4]]
+
+
+
+:: 0-6-7-3[nobr] {"position":"2300,6825","size":"100,100"}
+"审查不是为了淘汰任何人形。它只是让我们知道你需要什么，是合适的工作，还是一次指导。没有人形会因为一次审查就被放弃，而且七天的时间完全足够你在不玩忽职守的情况下达成这个目标。"
+<br>
+她拿出一个盒子放到你手上，“我把你的事情和领班们说了，她们应该会稍微关照你一下。”<br><br>
+<<set $corrinagift to true>>
+你打开盒子，里面有几样物品。<br>
+<span style="color: gray;"><em>获得了 应急充电包x1 关节油剂x1 橡胶手套x1</em></span><br><br>
+<<if $getitemtimecheck>0>><<gainItem "jointoil" 1>><<gainItem "powerbag" 1>><<gainItem "gloves" 1>><<set $getitemtimecheck to 0>>
+<</if>>
+[[道谢|0-6-7-2-2]]<br>
+[[只是收下|0-6-7-2-1]]<br>
+[[询问她是否能帮助自己规避公分审核|0-6-7-2-3]]<br>
+[[请求她给你一些建议|0-6-7-2-4]]
+
+
+:: 0-6-7-2-4
+“我的建议是，”Corrina说，“首先，找一份工作，并且获取尽可能多的公分。”
+
+“其次，注意你的<em>电量</em>和<em>磨损值</em>状况。它们低于50时，你就需要留意了。你可以在<em>10L处后勤部的休息室</em>里免费充电，也可以去维修部的维修处修复你身上的所有磨损。但注意，维修处的维修是需要消耗公分的。这也是我先前建议你努力工作的原因。“
+
+“第三，你或许已经注意到管理区内时常会有怪物袭击。有关袭击的讯息会在你视窗上方的消息栏里实时更新。在袭击结束之前，踏进被袭击的区域会导致你变成被怪物袭击的对象，你将不得不与怪物战斗，直到巡逻队前来处理掉怪物。因此，我建议你有意地远离被怪物入侵的区域。”
+
+“如果你有足够的勇气和怪物对抗，可以先去<em>L2的模拟格斗室</em>练习你的战斗技巧，然后再尝试正面迎击怪物。”
+
+“最后，遵守管理区的规则。不要偷窃，不要对其他人形施加暴力，不要杀死除了怪物以外的任何存在。以上三条是你不能违反的死线。”
+
+[[好的|0-6-7-2-1]]

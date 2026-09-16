@@ -1,0 +1,220 @@
+:: 锻造部 {"position":"2925,4075","size":"100,100"}
+你脚下的钢板随着你的踏入微微颤动，空气中弥漫着灼烫的金属气味，隐隐约约可见中央的巨大装置不断迸发出一波波火星。
+<<set $playerPos to {layer:4, block:"锻造部"}>><<tick 30>>
+被融化作液体的金属顺着无数半开放的管道流淌，亮光让悬在空中的大灯都黯然失色。一旁穿着沉重防护装置的人形正在把黑色的粉末从一个大桶里撒进其中一些管道中。
+
+[[购买武器]]
+[[订制武器]]
+[[武器存放处]] 
+[[返回走廊|L4流通走廊]]
+
+
+:: 订制武器
+你可以在这里依照你的需求订制你想要的专属武器，它们能更有效地减少磨损和打出更高的伤害。但价格上，它们就没那么美丽了。
+同时，你也可以在这里通过他人给你的配方打造武器
+小型武器可分配点数：8
+中型武器可分配点数：10
+大型武器可分配点数：12
+
+
+[[放弃|锻造部]]
+
+:: 购买武器[nobr]
+一些依照模板打制的现成武器正倚靠在一旁的金属架上。有人形时不时地过去给它们掸灰。<br>
+<div class="shop-container">
+
+  <<if $shopMessage>>
+    <div class="transaction-msg <<= $shopMessageType>>">
+      <<= $shopMessage>>
+    </div>
+    <<set $shopMessage = "">>
+    <<set $shopMessageType = "">>
+  <</if>>
+
+  <<set _weaponIds = Object.keys($shopWeaponDefs)>>
+  <<for _i = 0; _i < _weaponIds.length; _i++>>
+    <<set _weaponId = _weaponIds[_i]>>
+    <<set _weaponDef = $shopWeaponDefs[_weaponId]>>
+    <<set _canEquip = canUseWeapon(_weaponDef)>>
+    <<set _owned = isWeaponOwned(_weaponId)>>
+
+    <div class="weapon-entry shop-card <<if !_canEquip.can>>locked-item<</if> <<if _owned>>owned-item <</if>" >
+      <div class="weapon-header">
+        <span class="weapon-name">
+          <<= _weaponDef.name>>
+          <<if !_canEquip.can>>
+            <span class="weapon-tag tag-restricted">限制</span>
+          <<elseif _owned>>
+            <span class="weapon-tag tag-owned">已持有</span>
+          <</if>>
+        </span>
+      </div>
+
+      <div class="weapon-meta">
+        <span class="weapon-stat">伤：<<= _weaponDef.damageBonus>></span>
+        <span class="weapon-stat">耐：<<= _weaponDef.wearReduction>></span>
+        <span class="weapon-price"><<= _weaponDef.basePrice.toLocaleString()>> 💰</span>
+      </div>
+
+      <<if _weaponDef.sizeLimit.includes($playerSize)>>
+        <div class="weapon-req">
+          ⚠ 体型限制：禁止 <<= $playerSize === $SIZE_SMALL ? "小" : $playerSize === $SIZE_MEDIUM ? "中" : "大">>体型
+        </div>
+      <</if>>
+      <<if _weaponDef.combatReq > $playerCombat>>
+        <div class="weapon-req">
+          ⚠ 战斗技能要求：<<= _weaponDef.combatReq>>+ （当前 <<= $playerCombat>>）
+        </div>
+      <</if>>
+
+      <div class="weapon-desc">» <<= _weaponDef.desc>> «</div>
+
+      <div class="weapon-actions">
+        <<if _owned>>
+          [[已在库中|武器存放处][$lastViewedWeaponId = _weaponId]]
+        <<elseif $money >= _weaponDef.basePrice && _canEquip.can>>
+          <<capture _weaponId>>
+            [[购买|购买武器][$shopMessage = buyWeapon(_weaponId); $shopMessageType = "msg-success"; $lastViewedWeaponId = _weaponId]]
+          <</capture>>
+        <<elseif !_canEquip.can>>
+          <span class="btn-buy disabled">不符合条件</span>
+        <<else>>
+          <span class="btn-buy disabled">资金不足</span>
+        <</if>>
+        [[参考|武器存放处][$lastViewedWeaponId = _weaponId]]
+      </div>
+    </div>
+  <</for>>
+</div>
+
+[[放弃|锻造部]]
+
+:: ShopFunctions [script]
+/* 检查玩家是否能使用某武器 */
+window.canUseWeapon = function(weaponDef) {
+  var result = { can: true, reasons: [] };
+  
+  if (!weaponDef) {
+    result.can = false;
+    result.reasons.push("武器定义缺失");
+    return result;
+  }
+
+  if (weaponDef.sizeLimit && weaponDef.sizeLimit.length > 0) {
+    if (weaponDef.sizeLimit.includes(State.variables.playerSize)) {
+      result.can = false;
+      result.reasons.push("体型不符");
+    }
+  }
+  
+  if (weaponDef.combatReq && weaponDef.combatReq > 0) {
+    if (State.variables.playerCombat < weaponDef.combatReq) {
+      result.can = false;
+      result.reasons.push("战斗技能不足");
+    }
+  }
+  
+  return result;
+};
+
+window.isWeaponOwned = function(weaponId) {
+  var list = State.variables.weaponList || [];
+  for (var i = 0; i < list.length; i++) {
+    if (list[i] && list[i].id === weaponId) {
+      return true;
+    }
+  }
+  return false;
+};
+
+window.getWeaponBasePrice = function(weaponId) {
+  var defs = State.variables.shopWeaponDefs;
+  return defs[weaponId] ? defs[weaponId].basePrice : 100;
+};
+
+window.getWeaponRef = function(weaponId) {
+  var defs = State.variables.shopWeaponDefs || {};
+  if (defs[weaponId]) {
+    return defs[weaponId];
+  }
+
+  var list = State.variables.weaponList || [];
+  for (var i = 0; i < list.length; i++) {
+    if (list[i] && list[i].id === weaponId) {
+      return list[i];
+    }
+  }
+
+  return null;
+};
+
+window.buyWeapon = function(weaponId) {
+  var defs = State.variables.shopWeaponDefs;
+  var weaponDef = defs[weaponId];
+
+  if (!weaponDef) {
+    return "【错误】武器不存在。";
+  }
+
+  if (window.isWeaponOwned(weaponId)) {
+    return "【已持有】你已经获得过这把武器了。";
+  }
+
+  var check = canUseWeapon(weaponDef);
+  if (!check.can) {
+    return "【无法装备】" + check.reasons.join("，");
+  }
+
+  if (State.variables.money < weaponDef.basePrice) {
+    return "【资金不足】需要 " + weaponDef.basePrice + " 信用点。";
+  }
+
+  if (State.variables.weaponList.length >= State.variables.maxWeaponSlots + 10) {
+    return "【背包已满】先处理掉一些武器再来吧。";
+  }
+
+  State.variables.money -= weaponDef.basePrice;
+
+  State.variables.weaponList.push({
+    id: weaponDef.id,
+    name: weaponDef.name,
+    damageBonus: weaponDef.damageBonus,
+    wearReduction: weaponDef.wearReduction,
+    desc: weaponDef.desc,
+    basePrice: weaponDef.basePrice,
+    sizeLimit: weaponDef.sizeLimit || [],
+    combatReq: weaponDef.combatReq || 0
+  });
+
+  return "✓ 成功购买「" + weaponDef.name + "」，花费 " + weaponDef.basePrice + " 信用点。";
+};
+
+/* 出售武器 */
+window.sellWeapon = function(playerIndex, sellPrice) {
+  var weaponList = State.variables.weaponList;
+  var weapon = weaponList[playerIndex];
+  
+  if (!weapon) {
+    return "【错误】武器不存在。";
+  }
+  
+  // 如果正装备着，先卸下
+  if (State.variables.equippedWeapon === weapon.id) {
+    State.variables.equippedWeapon = "";
+  }
+  
+  // 清空所有存放该武器的槽位
+  for (var slot = 1; slot <= 9; slot++) {
+    if (State.variables.weaponSlots[slot] === weapon.id) {
+      State.variables.weaponSlots[slot] = "";
+    }
+  }
+  
+  // 加钱
+  State.variables.money += sellPrice;
+  
+  // 从背包删除
+  weaponList.deleteAt(playerIndex);
+  
+  return "✓ 成功出售「" + weapon.name + "」，获得 " + sellPrice + " 信用点。";
+};

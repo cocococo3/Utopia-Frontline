@@ -1,0 +1,1577 @@
+:: AutoBattleResolver [战斗回] {"position":"3575,650","size":"100,100"}
+<<set _e = $autoBattleEvent>>
+
+/* 1. 首次检定：小队 vs 怪物 */
+<<set _roll1 = random(1,100) + _e.squadForce>>
+<<set _roll2 = random(1,100) + _e.monsterForce>>
+
+<<if _roll1 >= _roll2>>
+    /* 胜利 —— 计算耗时（简单：战力差越大越快）*/
+    <<set _duration = Math.max(5, 30 - Math.floor((_roll1-_roll2)/5))>>
+    经过 <<print _duration>> 分钟激战，<<print _e.squadName>> 成功消灭了 <<print _e.monster>>！
+<<else>>
+    /* 失败 —— 请求支援 */
+    <<set _nearestForce = _e.squadForce + ($npcForce[_e.squadName] || 60)/2>>
+    <<set _roll3 = random(1,100) + _nearestForce>>
+    <<set _roll4 = random(1,100) + _e.monsterForce>>
+    
+    <<if _roll3 >= _roll4>>
+        <<set _duration = Math.max(10, 40 - Math.floor((_roll3-_roll4)/5))>>
+        在 <<print _e.squadName>> 与最近援军合力下，<<print _duration>> 分钟后 <<print _e.monster>> 被镇压。
+    <<else>>
+        很遗憾，连援军也未能击退 <<print _e.monster>>，现场形势恶化！
+    <</if>>
+<</if>>
+
+:: 怪物入场 [战斗回 nobr] {"position":"3875,475","size":"100,100"}
+正当你准备做你想做的事时，你脚下的地板震颤起来，这个空间正在被以一种令人作呕的方式扭曲。<br><br>
+金属和碳纤维构成的墙壁和天花板在你眼前融化，粘稠地混合在一起，散发出某种令你恍惚的气味。在你的视觉中，世界正在以一种诡异又合理的方式重组。<br><br>
+当你再次集中注意力时，一只闪烁着金属光泽的怪物已然在你的面前成型。<br><br>
+<span style="color: red;">''红色警报灯闪烁，你正处于怪物袭击区域！''</span><br><br>
+<<set $posbeforefight to $posbeforefight ?? $playerPos>>
+<<if $difficulty == "easy">>
+  <<set _patrolTurn to random(3,8)>>
+  <<elseif $difficulty =="difficult">>
+    <<set _patrolTurn to random(7,12)>>
+    <<else>>
+       <<set _patrolTurn to random(5,10)>>
+<</if>>
+
+/* 生成怪物：目前仍是单只，用数组包起来即可支持以后一次刷多只，
+   只要在这里往数组里多 push 几个 spawnEnemyGen 生成的对象 */
+<<pickDamageCombo>>
+<<decideMainAI>>
+<<buildMonsterProfileByCombo>>
+<<set _enemyObj to {
+  id:"genMonster",
+  name:$profile.name,
+  hp:$profile.hp,
+  maxHp:$profile.maxHp,
+  atk:$profile.atk,
+  ai:$profile.ai,
+  aiFrom:$profile.aiFrom,
+  aiTags:$profile.aiTags,
+  armor:0,
+  stunned:0,
+  debuff:0,
+  loot:[],
+  techResist:0
+}>>
+
+<<set _enemiesArr to [_enemyObj]>>
+<<set _alliesArr to []>>
+<<initCombat _enemiesArr _alliesArr _patrolTurn>>
+
+/* $activeAttack 已升级为数组 $activeAttacks[]，这里进战斗时用的具体
+   袭击对象是 $pendingAttack（由 JS 的 :passagestart 拦截器在玩家撞见
+   场外袭击时锁定并存入）；如果是玩家自己随机遭遇的野生怪物
+   （不是场外袭击系统触发的），$pendingAttack 会是空，这里的同步
+   就跳过，不影响正常战斗 */
+<<if $pendingAttack>>
+  <<set $pendingAttack.monster to $enemy.name>>
+<</if>>
+
+<<if $firstfight == true>>
+  <em>管理区不时会有怪物入侵，虽然巡逻队能够清理它们，但是她们赶到现场仍然需要时间。在此期间，你需要保护好自己！<br>
+  你可以战斗、闪避或保持隐匿。三者的成功率都取决于你对应的技能。如果你成功击退了怪物，那么你的战斗技能值会获得较大的提升，也可能获得巡逻队的认可。</em>
+<</if>>
+<br><br>
+[[进入战斗|CombatMain]]
+
+
+:: CombatMain [战斗回 nobr] {"position":"3925,650","size":"100,100"}
+<<if !$combat || !$combat.active>>
+  战斗已结束。
+  <<set $dirtyZone to $posbeforefight>>
+<<else>>
+<div id="combat-root">
+  <<include "CombatRootRender">>
+</div>
+<</if>>
+
+
+:: CombatRootRender [nobr]{"position":"3925,750","size":"100,100"}
+<<syncEquippedWeapon>>
+<<run window.refreshSidebarProgressBars()>>
+/* 顶部状态栏：怪物列表 + 队伍列表，多目标时这里天然可以显示多行 */
+<<aliveEnemies>>
+<b>【怪物】</b><br>
+<<for _i = 0; _i < $combat.enemies.length; _i++>>
+  <<set _e to $combat.enemies[_i]>>
+  <<if _e.alive>>
+    · <<print _e.name>>（AI：<<print _e.ai>>） HP: <<print _e.hp>> / <<print _e.maxHp>><br>
+  <<else>>
+    · <span style="color:grey;"><<print _e.name>>（已击败）</span><br>
+  <</if>>
+<</for>>
+<b>【队伍】</b><br>
+· $playerName 磨损：$woreout / 100<br>
+<<for _i = 0; _i < $combat.allies.length; _i++>>
+  <<set _a to $combat.allies[_i]>>
+  <<if _a.alive>>
+    · <<print _a.name>> HP: <<print _a.hp>> / <<print _a.maxHp>><br>
+  <</if>>
+<</for>>
+
+<<switch $combat.phase>>
+
+<<case "enemyAttack">>
+  <<tick 5>>
+  <div id="combat-enemy-log">
+    <<if !$protectionoilon>>
+      <span style="color: red;">你的思考暴露在怪物的影响之下，你的攻击效率大幅下降了。</span><br>
+      <<set $superperception+=1>> <span style="color: red;">+？？？</span><br>
+    <</if>>
+    <<if $debuffevade>>
+      <span style="color: red;">你的闪避受到了影响。</span><br>
+    <</if>>
+    <<if $debuffhiding>>
+      <span style="color: red;">你的隐匿受到了影响。</span><br>
+    <</if>>
+    <<combatEnemyPhaseResolve>>
+  </div>
+  <<combatCheckVictory>>
+  <<if $combat.active>>
+    <<set _realturn to $combat.patrolTurn - 1>>
+    【巡逻队还有 <<print _realturn>> 回合到达】<br>
+    <<link "继续">>
+      <<set $combat.phase to "playerAction">>
+      <<replace "#combat-root">><<include "CombatRootRender">><</replace>>
+    <</link>>
+  <</if>>
+
+<<case "playerAction">>
+
+<<if $posbeforefight=='看守部'>>
+  随着枪声响起，怪物狼狈地闪避了某个方向一下，你得以看清墙上的活板门已经划开，露出了装载在里面的自动枪口。
+
+<</if>>
+"现在是你的回合！"<br>
+  <div id="combat-options">
+    <<link "强力攻击">><br>
+      <<replace "#combat-result">>
+        <<if !$protectionoilon>><<roll_hard $fighting>><<else>><<roll $fighting>><</if>>
+        <<if $success>>
+          <<combatPlayerAttack 2>>
+        <<else>>
+          你发起了攻击，<span style="color: red;">但并没有击中对方……</span>
+          <<set $woreout+=1>>
+        <</if>>
+        <<combatCheckVictory>>
+        <<if $combat.active>>
+          <<link "结束回合">>
+            <<set $combat.phase to "enemyAttack">>
+            <<replace "#combat-root">><<include "CombatRootRender">><</replace>>
+          <</link>>
+        <</if>>
+      <</replace>>
+    <</link>><<prob $fighting>><br>
+
+    <<link "普通攻击">><br>
+      <<replace "#combat-result">>
+        <<if !$protectionoilon>><<roll_hard $fighting>><<else>><<roll $fighting>><</if>>
+        <<if $success>>
+          <<combatPlayerAttack 1.5>>
+        <<else>>
+          你发起了攻击，<span style="color: red;">但并没有击中对方……</span>
+        <</if>>
+        <<combatCheckVictory>>
+        <<if $combat.active>>
+          <<link "结束回合">>
+            <<set $combat.phase to "enemyAttack">>
+            <<replace "#combat-root">><<include "CombatRootRender">><</replace>>
+          <</link>>
+        <</if>>
+      <</replace>>
+    <</link>><<prob $fighting>><br>
+
+    <<link "保守攻击">><br>
+      <<replace "#combat-result">>
+        <<if !$protectionoilon>><<roll_hard $fighting>><<else>><<roll $fighting>><</if>>
+        <<if $success>>
+          <<combatPlayerAttack 0.5>>
+        <<else>>
+          你发起了攻击，<span style="color: red;">但并没有击中对方……</span>
+        <</if>>
+        <<combatCheckVictory>>
+        <<if $combat.active>>
+          <<link "结束回合">>
+            <<set $combat.phase to "enemyAttack">>
+            <<replace "#combat-root">><<include "CombatRootRender">><</replace>>
+          <</link>>
+        <</if>>
+      <</replace>>
+    <</link>><<prob $fighting>><br>
+
+    
+    <<if $skill_lodia>>
+      <<link "使用【战技：屏息凝神】" >>
+      <<replace "#combat-result">>
+        <<if $hiddenstate>>
+          <<set _target to $combat.enemies[0]>>
+          <<if _target and _target.alive>>
+            <<set $baseDamage to (Number($hurt) || 0) * 1.25 + ($player.weapon?.damageBonus ?? 0)>>
+            <<if _target.armor > 0>>
+              <<set $baseDamage to Math.max(0, $baseDamage - _target.armor)>>
+            <</if>>
+            <<set _target.hp -= $baseDamage>>
+            <<set $hiddenstate to false>>
+            你屏息凝神，瞄准最薄弱的破绽，造成 <<=$baseDamage>> 点伤害！
+            <<if _target.hp <= 0>>
+              <<set _target.hp to 0>>
+              <<set _target.alive to false>>
+              <br><span style="color: green;"><<print _target.name>> 被击倒了！</span>
+            <</if>>
+            <<set $finalWear to Math.max(0, 0.5 - ($player.weapon?.wearReduction ?? 0))>>
+            <<set $woreout += $finalWear>>
+            本次行动磨损 <<=$finalWear>>。
+          <<else>>
+            当前没有可攻击目标。
+          <</if>>
+        <<else>>
+          你还没有处于隐蔽状态，无法发动【屏息凝神】。
+        <</if>>
+        <<combatCheckVictory>>
+        <<if $combat.active>>
+          <<link "结束回合">>
+            <<set $combat.phase to "enemyAttack">>
+            <<replace "#combat-root">><<include "CombatRootRender">><</replace>>
+          <</link>>
+        <</if>>
+      <</replace>>
+    <</link>>
+    <<else>>
+        <span style="color: grey;">不满足使用【战技：屏息凝神】的前置条件，需要处于隐蔽状态！</span>
+    <</if>><br>
+
+
+    <<if $skill_execute>>
+        <<link "使用【战技：处决技】" >>
+      <<replace "#combat-result">>
+        <<if $enemy and $enemy.alive and $enemy.hp <= 20>>
+          <<set $enemy.hp to 0>>
+          <<set $enemy.alive to false>>
+          <<set $finalWear to Math.max(0, 0.5 - ($player.weapon?.wearReduction ?? 0))>>
+          <<set $woreout += $finalWear>>
+          你发动了【处决技】，直接斩下 <<print $enemy.name>> 还未闭合的生命线！
+          本次行动磨损 <<=$finalWear>>。
+        <<else>>
+          你必须在对手 HP 低于 20 时才能使用【处决技】。
+        <</if>>
+        <<combatCheckVictory>>
+        <<if $combat.active>>
+          <<link "结束回合">>
+            <<set $combat.phase to "enemyAttack">>
+            <<replace "#combat-root">><<include "CombatRootRender">><</replace>>
+          <</link>>
+        <</if>>
+      <</replace>>
+    <</link>>
+    <<else>>
+        <span style="color: grey;">不满足使用【战技：处决技】的前置条件，对手的hp需要低于20！</span>
+    <</if>><br>
+
+      <<if $skill_electric>>
+        <<link "使用【战技：放电】" >>
+      <<replace "#combat-result">>
+        <<if $power >= 20>>
+          <<set _target to $combat.enemies[0]>>
+          <<if _target and _target.alive>>
+            <<set _s to random(1,5)>>
+            <<set _target.stunned to _s>>
+            <<set $power -= 20>>
+            <<set $baseDamage to (Number($hurt) || 0) * 0.8 + ($player.weapon?.damageBonus ?? 0)>>
+            <<if _target.armor > 0>>
+              <<set $baseDamage to Math.max(0, $baseDamage - _target.armor)>>
+            <</if>>
+            <<set _target.hp -= $baseDamage>>
+            你所释放的电流击中了怪物，造成 <<=$baseDamage>> 点伤害，并令它麻痹了 <<print _s>> 回合！
+            <<if _target.hp <= 0>>
+              <<set _target.hp to 0>>
+              <<set _target.alive to false>>
+              <br><span style="color: green;"><<print _target.name>> 被电流击倒了！</span>
+            <</if>>
+            <<set $finalWear to Math.max(0, 0.5 - ($player.weapon?.wearReduction ?? 0))>>
+            <<set $woreout += $finalWear>>
+            本次行动磨损 <<=$finalWear>>。
+          <<else>>
+            当前没有可攻击目标。
+          <</if>>
+        <<else>>
+          你的电量不足，无法发动【放电】。
+        <</if>>
+        <<combatCheckVictory>>
+        <<if $combat.active>>
+          <<link "结束回合">>
+            <<set $combat.phase to "enemyAttack">>
+            <<replace "#combat-root">><<include "CombatRootRender">><</replace>>
+          <</link>>
+        <</if>>
+      <</replace>>
+    <</link>>
+    <<else>>
+        <span style="color: grey;">不满足使用【战技：放电】的前置条件</span>
+    <</if>><br>
+
+    <<link "隐匿">>
+      <<replace "#combat-result">>
+        <<set $hiddenstateTurns to Number($hiddenstateTurns) || 0>>
+        <<if $hiddenstate && $hiddenstateTurns > 0>>
+          你继续藏在原来的阴影中，<span style="color: green;">保持躲藏状态</span>。<br>
+          怪物暂时仍无法找到你，剩余 <<print $hiddenstateTurns>> 个敌方回合。<br>
+        <<else>>
+          你在躲避攻击的空档观察四周，寻找着合适的藏身地……<br>
+          <<if !$debuffhiding>><<roll $hiding>><<else>><<roll_hard $hiding>><</if>>
+          <<if $success>>
+            你藏身于周围的机器造成的阴影中，<span style="color: green;">怪物没有发现你</span>。<br>
+            <<set $hiddenstate to true>>
+            <<set $hiddenstateTurns to random(1,3)>>
+            <span style="color: green;">接下来 <<print $hiddenstateTurns>> 个敌方回合开始时，怪物都无法找到你。</span><br>
+          <<else>>
+            隐匿失败！怪物发现了你！<br>
+          <</if>>
+          <<if $hiding<=85>>
+            <span style="color: grey;"><em>借助此次经历稍微学会了一些隐匿的技巧。</em></span><br>
+            <<set $hiding += 2>><span style="color: green;">+隐匿</span><br>
+          <<else>>
+            <span style="color: grey;"><em>这样简单的经历已经不会再对你的技巧起到精进作用。</em></span><br>
+          <</if>>
+        <</if>>
+        <<combatCheckVictory>>
+        <<if $combat.active>>
+          <<link "结束回合">>
+            <<set $combat.phase to "enemyAttack">>
+            <<replace "#combat-root">><<include "CombatRootRender">><</replace>>
+          <</link>>
+        <</if>>
+      <</replace>>
+    <</link>><<if $hiddenstate && ($hiddenstateTurns ?? 0) > 0>>（保持躲藏）<<else>><<prob $hiding>><</if>>
+  </div>
+  <div id="combat-result"></div>
+
+  <<if $enemy.stunned>0&&!$firstfight>>
+    <<link "逃走" >>
+      <<if !$debuffevade>>
+        <<roll $evade>>
+        <<set _chance to $evade>>
+      <<else>>
+        <<roll_hard $evade>>
+        <<set _chance to $evade/2>>
+      <</if>>
+      <<if $success>>
+        <<if $debuffhiding>>
+          <<roll_hard $hiding>>
+          <<set _chance to _chance*$hiding/2/100>>
+        <<else>>
+          <<roll $hiding>>
+          <<set _chance to _chance*hiding/100>>
+        <</if>>
+        <<if $success>>
+          你成功在怪物清醒之前逃出了这个区域！
+          /*玩家单方面结束战斗但是不结束战斗事件*/
+        <<else>>
+          你没能找到离开这里的通道！
+          <<if $combat.active>>
+          <<link "结束回合">>
+            <<set $combat.phase to "enemyAttack">>
+            <<replace "#combat-root">><<include "CombatRootRender">><</replace>>
+          <</link>><<prob _chance>>
+        <</if>>
+        <</if>>
+        <<else>>
+          你试图逃出这个区域，但是你的速度还不够快！
+        <<combatCheckVictory>>
+        <<if $combat.active>>
+          <<link "结束回合">>
+            <<set $combat.phase to "enemyAttack">>
+            <<replace "#combat-root">><<include "CombatRootRender">><</replace>>
+          <</link>>
+        <</if>>
+      <</if>>
+
+
+
+    <</link>>
+  <</if>>
+
+<</switch>>
+
+
+:: AfterCombat [战斗回 nobr] {"position":"4025,650","size":"100,100"}
+随着怪物倒下，你的战斗告一段落。<br>
+- 你当前磨损：$woreout / 100<br>
+<<combatDropLoot>>
+<<endfight>>
+
+<<if $firstfight==true>>
+  在拼尽全力的战斗之后，你松了一口气，看向你面前的死物。
+  <br><br>
+在怪物的尸体中有什么吸引着你——堆叠而令人作呕的肉块突然变得十分诱人，你情不自禁地往那里迈出一步。
+<<set $firstfight to false>>
+<br><br>
+[[控制住自己，不要再靠近了]]
+[[放任自己，触碰怪物的尸体]]
+ <<else>>
+ <<if $posbeforefight =="洗衣部">>
+ "哎呀，$playerName！刚刚可真是吓人啊，不过没办法呢，有的时候确实会出现这种情况！"Lodia在一片乱七八糟中朝你挥挥手，"看起来我们得叫设备部和保洁部的人形来一趟。"<br>
+  <<set $npc.lodia.like += 5>>
+<em>因为你的支援，Lodia和你更熟悉了。</em>
+  <<elseif $posbeforefight =="看守部">>
+ "多谢你搭把手，"Eumen整理了一下她衣服上的拘束带，你注意到它们被松开了，"要是让它们碰到人类那可就糟糕了。"<br>
+ <<set $npc.eumen.like += 5>>
+<em>因为你的支援，Eumen和你更熟悉了。</em>
+   <<elseif $posbeforefight =="化工部">>
+ "啊，你来得正是时候。再迟一点怪物就要把化合罐推倒，然后引发足以让半个管理区停摆的大爆炸了。"Quintina出现在一片冷却剂释放形成的烟雾边缘，手里拿着一个空了的灭火器。<br>
+  <<set $npc.quintina.like += 5>>
+<em>因为你的支援，Quintina和你更熟悉了。</em>
+   <<elseif $posbeforefight =="保洁部">>
+ "……又有的忙了。"你看到Lucy在一片混乱中叹着气自言自语，她四周的自动清洁机在血泊中走出一条又一条透出地板的直线。<br>
+   <<set $npc.lucy.like += 4>>
+<em>因为你的支援，Lucy和你更熟悉了。</em>
+    <<elseif $posbeforefight =="食品部-生产车间">>
+    "就这啊？"Mapka叉着腰，用园艺铲随手拨拉着四周的怪物，"我还寻思能多干一会儿呢。"<br>
+      <<set $npc.mapka.like += 2>>
+<em>因为你的支援，Mapka和你更熟悉了。</em>
+    <<elseif $posbeforefight =="食品部-生产车间-垂直农场">>
+     "不是吧，这就结束了？"Mapka叉着腰，用园艺铲随手拨拉着四周的怪物。<br>
+         <<set $npc.mapka.like += 2>>
+<em>因为你的支援，Mapka和你更熟悉了。</em>
+ <</if>><br>
+<<link "继续">><<goto $posbeforefight.block>><</link>>
+<</if>>
+
+
+:: defeat [战斗回] {"position":"4225,650","size":"100,100"}
+<<endfight>>
+<<if $firstfight>>
+  <<set $firstfight to false>>
+<<goto "firstdream">>
+  <<else>>
+  <<goto "重启">>
+<</if>>
+
+
+:: fightwidget [widget nobr 战斗回] {"position":"4125,650","size":"100,100"}
+<<widget "pickDamageCombo">>
+  <<set $comboKey to $dmgComboKeys[random(0, $dmgComboKeys.length - 1)]>>
+  <<set $dmgList to clone($dmgCombos[$comboKey].dmg)>>
+<</widget>>
+
+
+<<widget "decideMainAI">>
+  <<set $mainAi to "aggressive">>
+  <<set $mainFrom to "物理">>
+
+  <<for $p = 0; $p < $aiPriority.length; $p++>>
+    <<set $cand to $aiPriority[$p]>>
+    <<if $dmgList.includes($cand)>>
+      <<set $mainFrom to $cand>>
+      <<set $mainAi to $aiTagByDmg[$cand].style>>
+      <<break>>
+    <</if>>
+  <</for>>
+<</widget>>
+
+
+<<widget "buildMonsterProfileByCombo">>
+  /* n 型 */
+  <<set $n to $dmgList.length>>
+  <<set $cn to $cnNumMap[$n]>>
+
+  /* 名字关键词拼接 */
+  <<set $kw to $dmgList.join("")>>
+  <<set $name to $cn + "型" + $kw + "伤害怪物">>
+
+  /* 数值 */
+  <<set $rule to $byN[$n]>>
+  <<set $hp to $rule.baseHp + random(0, $rule.hpRange)>>
+  <<set $atk to $rule.baseAtk + random(0, $rule.atkRange)>>
+
+  /* AI：主AI */
+  <<decideMainAI>>
+
+  /* AI 标签列表（保留给你未来做混合行为） */
+  <<set $aiTags to []>>
+  <<for $i = 0; $i < $dmgList.length; $i++>>
+    <<set $d to $dmgList[$i]>>
+    <<set $aiTags.push({
+      dmg:$d,
+      style:$aiTagByDmg[$d].style,
+      note:$aiTagByDmg[$d].note
+    })>>
+  <</for>>
+
+  <<set $profile to {
+    name:$name,
+    nType:$n,
+    dmgTypes:$dmgList,
+    hp:$hp,
+    maxHp:$hp,
+    atk:$atk,
+    ai:$mainAi,
+    aiFrom:$mainFrom,
+    aiTags:$aiTags
+  }>>
+<</widget>>
+
+
+/* ====================== 1) 通用：骰子检定 ====================== */
+<<widget "roll">>
+   <span style="color: grey;">【进行了一次检定】</span>
+  <<set $roll to random(1,100)>>
+  <<set $success to ($roll <= $args[0])>>
+<</widget>>
+
+<<widget "roll_hard">>
+   <span style="color: grey;">【进行了一次困难检定】</span>
+  <<set $roll to random(1,100)>>
+  <<set $target to Math.trunc($args[0] / 2)>>
+  <<set $success to ($roll <= $target)>>
+<</widget>>
+
+<<widget "roll_extreme">>
+   <span style="color: grey;">【进行了一次极难检定】</span>
+  <<set $roll to random(1,100)>>
+  <<set $target to Math.trunc($args[0] / 6)>>
+  <<set $success to ($roll <= $target)>>
+<</widget>>
+
+<<widget "prob">>
+  <<set _probValue to Number($args[0]) || 0>>
+  <<set _probValue to Math.max(0, Math.min(100, _probValue))>>
+  <<set _probText to "（成功概率：" + Math.round(_probValue) + "%）">>
+  <<if _probValue >= 70>>
+    <span style="color: green;"><<print _probText>></span>
+  <<elseif _probValue <= 30>>
+    <span style="color: red;"><<print _probText>></span>
+  <<else>>
+    <span style="color: yellow;"><<print _probText>></span>
+  <</if>>
+<</widget>>
+
+<<widget "prob_hard">>
+  <<set _probValue to Number($args[0]) || 0>>
+  <<set _probValue to Math.max(0, Math.min(100, Math.trunc(_probValue / 2)))>>
+  <<set _probText to "（成功概率：" + Math.round(_probValue) + "%）">>
+  <<if _probValue >= 70>>
+    <span style="color: green;"><<print _probText>></span>
+  <<elseif _probValue <= 30>>
+    <span style="color: red;"><<print _probText>></span>
+  <<else>>
+    <span style="color: yellow;"><<print _probText>></span>
+  <</if>>
+<</widget>>
+
+<<widget "prob_extreme">>
+  <<set _probValue to Number($args[0]) || 0>>
+  <<set _probValue to Math.max(0, Math.min(100, Math.trunc(_probValue / 6)))>>
+  <<set _probText to "（成功概率：" + Math.round(_probValue) + "%）">>
+  <<if _probValue >= 70>>
+    <span style="color: green;"><<print _probText>></span>
+  <<elseif _probValue <= 30>>
+    <span style="color: red;"><<print _probText>></span>
+  <<else>>
+    <span style="color: yellow;"><<print _probText>></span>
+  <</if>>
+<</widget>>
+
+<<widget "probability">>
+  <<prob $args[0]>>
+<</widget>>
+
+
+/* ====================== 2) 生成敌人（供 spawnRaidSC 生成场外袭击的
+   怪物数值预览使用；不直接参与玩家的实时战斗——实时战斗的怪物由
+   "怪物入场" passage 里单独调用 buildMonsterProfileByCombo 生成并
+   通过 initCombat 放进 $combat.enemies[]，两边互不干扰） ====================== */
+
+<<widget "spawnEnemyGen">>
+  <<pickDamageCombo>>
+  <<buildMonsterProfileByCombo>>
+
+  <<set $enemy to {
+    id:"genMonster",
+    name:$profile.name,
+
+    hp:$profile.hp,
+    maxHp:$profile.maxHp,
+    atk:$profile.atk,
+
+    /* 组合信息（战斗系统可用） */
+    nType:$profile.nType,
+    dmgTypes:$profile.dmgTypes,
+
+    /* 主AI（注意：你的 enemyTurn 里用 $enemy.ai） */
+    ai:$profile.ai,
+    aiFrom:$profile.aiFrom,
+    aiTags:$profile.aiTags,
+
+    /* 战斗字段 */
+    armor:0,
+    stunned:0,
+    debuff:0,
+
+    loot:[],
+    techResist:0
+  }>>
+<</widget>>
+
+/* ====================== 3) 通信阻断：随机增加巡逻回合数 ====================== */
+<<widget "applyCommunicationJam">>
+  /* 增加 1~3 回合；上限 8（可调） */
+  <<set $add to random(1,3)>>
+  <<set $max to 8>>
+  <<set $patrolTurn to Math.min($patrolTurn + $add, $max)>>
+
+  <<set $actionLog.push("通信阻断：巡逻倒计时 +" + $add)>>
+  你的屏幕闪过一阵雪花，你意识到怪物<span style="color: red;">刚刚释放了一种奇怪的电波</span>。<br>
+  通信被干扰，巡逻队到达时间被延后（+<<=$add>>）。
+<</widget>>
+
+
+/* ====================== 4) 敌人攻击：对玩家造成磨损 ====================== */
+<<widget "enemyAttack">>
+  <<set $wear to Math.round(((Number($enemy.atk) || 0) + 1e-9) * 100) / 100>>
+
+  <<set $player.armor to 0>>
+  <<if $equippedCloth != null>>
+    <<set _remainDurability to Math.round((($equippedCloth.maxworeout - $equippedCloth.clothworeout) + 1e-9) * 100) / 100>>
+    <<if _remainDurability > 0>>
+      <<set $player.armor to _remainDurability>>
+    <</if>>
+  <</if>>
+
+  <<if $enemy.debuff > 0>>
+    <<set $wear to Math.max(0, Math.round((($wear - 3) + 1e-9) * 100) / 100)>>
+  <</if>>
+
+  <<set _absorbed to 0>>
+  <<if $player.armor > 0>>
+    <<set _absorbed to Math.round((Math.min($wear, $player.armor) + 1e-9) * 100) / 100>>
+    <<set $wear to Math.max(0, Math.round((($wear - $player.armor) + 1e-9) * 100) / 100)>>
+  <</if>>
+
+  <<if isNaN($wear)>>
+    <<set $wear to 0>>
+  <</if>>
+
+  <<set $woreout += $wear>>
+  <<set $actionLog.push($enemy.name + " 攻击：磨损 +" + $wear)>>
+  $enemy.name 攻击你，造成 <<=$wear>> 点磨损。
+
+  <<if $equippedCloth != null and _absorbed > 0>>
+    <<set $equippedCloth.clothworeout += _absorbed>>
+    你的衣服为你减少了 <<=_absorbed>> 点磨损。
+    <<if $equippedCloth.clothworeout >= $equippedCloth.maxworeout>>
+      <<set $equippedCloth.clothworeout to $equippedCloth.maxworeout>>
+      你的衣服在承受了这一击后失去了为你抵挡伤害的功能。
+    <</if>>
+  <</if>>
+<</widget>>
+
+/* ====================== 5) 敌人回合：根据 $enemy.ai 行动 ====================== */
+<<widget "enemyTurn">>
+  <<set _r to random(1, 100)>>
+        <<if $debuffevade>>
+          <<roll_hard $evade>>
+        <<else>>
+          <<roll $evade>>
+        <</if>>
+  <<if $enemy.stunned > 0>>
+    <<set $enemy.stunned -= 1>>
+    <<set $actionLog.push($enemy.name + " 眩晕中")>>
+    $enemy.name 被眩晕，无法行动！
+  <<elseif $success>>
+    <<set $actionLog.push($enemy.name + " 攻击被闪避")>>
+    $enemy.name攻击了你，但被你灵巧地闪开了。
+       <<if $hiding<=85>>
+          <span style="color: grey;"><em>借助此次经历稍微学会了一些闪避的技巧。</em></span><br>
+          <<set $evade += 2>><span style="color: green;">+敏捷</span><br>
+        <<else>>
+          <span style="color: grey;"><em>这样简单的经历已经不会再对你的技巧起到精进作用。</em></span><br>
+        <</if>>
+  <<else>>
+    <<switch $enemy.ai>>
+
+      <<case "aggressive">>
+        
+        <<if _r <= 20>>
+          <<enemyAttack>>
+          <<set _extra to Math.floor(($enemy.atk || 0) * 0.6)>>
+
+          /* 额外一击同样走护甲（衣物耐久）减免、并让衣物承受磨损，和普通攻击保持一致 */
+          <<set $player.armor to 0>>
+          <<if $equippedCloth != null>>
+            <<set _remainDurability to Math.round((($equippedCloth.maxworeout - $equippedCloth.clothworeout) + 1e-9) * 100) / 100>>
+            <<if _remainDurability > 0>>
+              <<set $player.armor to _remainDurability>>
+            <</if>>
+          <</if>>
+
+          <<set _absorbed to 0>>
+          <<if $player.armor > 0>>
+            <<set _absorbed to Math.round((Math.min(_extra, $player.armor) + 1e-9) * 100) / 100>>
+            <<set _extra to Math.max(0, Math.round(((_extra - $player.armor) + 1e-9) * 100) / 100)>>
+          <</if>>
+          <<if isNaN(_extra)>>
+            <<set _extra to 0>>
+          <</if>>
+          <<set $woreout += _extra>>
+
+          <<if $equippedCloth != null and _absorbed > 0>>
+            <<set $equippedCloth.clothworeout to Math.min($equippedCloth.maxworeout, Math.round((($equippedCloth.clothworeout + _absorbed) + 1e-9) * 100) / 100)>>
+          <</if>>
+
+          <<set $actionLog.push($enemy.name + " 连击：磨损 +" + _extra)>>
+          $enemy.name 挥动它的复数肢体砍击你，额外造成 <<=_extra>> 点磨损！
+        <<elseif _r <= 40>>
+        <<set _a to random(1,10)>>
+          <<set $enemy.armor += _a>>
+          <<set $actionLog.push($enemy.name + " 获得护甲 +"+_a)>>
+          甲壳状的硬块从$enemy.name的皮肤下浮现。
+          $enemy.name 获得 _a 点护甲（当前护甲：$enemy.armor）。
+          <<enemyAttack>>
+        <<else>>
+          <<enemyAttack>>
+        <</if>>
+
+      <<case "toxic">>
+        <<set _r to random(1, 100)>>
+        <<if _r <= 35>>
+          <<set _corrodeArmor to Math.floor(($enemy.atk || 0) * 0.5)>>
+          <<if isNaN(_corrodeArmor)>>
+            <<set _corrodeArmor to 0>>
+          <</if>>
+
+          <<set $player.armor to 0>>
+          <<if $equippedCloth != null>>
+            <<set _remainDurability to Math.round((($equippedCloth.maxworeout - $equippedCloth.clothworeout) + 1e-9) * 100) / 100>>
+            <<if _remainDurability > 0>>
+              <<set $player.armor to _remainDurability>>
+            <</if>>
+          <</if>>
+
+          <<if $player.armor > 0>>
+            /* 酸液腐蚀衣物：永久性增加衣物磨损，相当于真正削弱护甲；同时造成少量额外磨损 */
+            <<set $equippedCloth.clothworeout to Math.min($equippedCloth.maxworeout, Math.round((($equippedCloth.clothworeout + _corrodeArmor) + 1e-9) * 100) / 100)>>
+            <<set _wear to Math.floor((($enemy.atk || 0) * 0.5) + 1e-9)>>
+            <<if isNaN(_wear)>>
+              <<set _wear to 0>>
+            <</if>>
+            <<set $woreout += _wear>>
+            $enemy.name 分泌的酸液随着动作泼溅到了你的身上，好在挡在你和酸液之间的衣服稍微代替了你被融化的命运。
+            浸染了酸液的衣服的强度下降了 <<=_corrodeArmor>> 点，造成了 <<=_wear>> 点磨损！
+            <<if $equippedCloth.clothworeout >= $equippedCloth.maxworeout>>
+              你衣服的布料在怪物酸液的侵蚀下变得软塌且一扯即破，失去了为你抵挡伤害的功能。
+            <</if>>
+          <<else>>
+            <<set _wear to Math.round((($enemy.atk || 0) + _corrodeArmor + 1e-9) * 100) / 100>>
+            <<if $equippedCloth is null>>
+              <<set $woreout += _wear>>
+              $enemy.name 的酸液随着动作泼溅到了你的身上，你身上的护甲被融化了一部分，随着酸液的流淌嘶嘶作响。
+            <<else>>
+              /* 衣服已经没有耐久可挡，但布料本身仍能略微减缓一点酸液伤害 */
+              <<set _fabIdx to 0>>
+              <<if $equippedCloth.stats>>
+                <<set _fabIdx to $equippedCloth.stats.fabIdx ?? $equippedCloth.stats.fabric ?? 0>>
+              <</if>>
+              <<set _wear to Math.max(0, _wear - _fabIdx * 2)>>
+              <<if isNaN(_wear)>>
+                <<set _wear to 0>>
+              <</if>>
+              <<set $woreout += _wear>>
+              $enemy.name 的酸液随着动作泼溅到了你已经失去防护能力的衣服上，你身上的护甲被融化了一部分。
+            <</if>>
+            造成了 <<=_wear>> 点磨损。
+          <</if>>
+
+        <<elseif _r <= 65>>
+          <<if $posbeforefight is "洗衣部" or $posbeforefight is "保洁部">>
+            怪物的动作激起了泡沫，从损坏机器中溢出的肥皂水和怪物滑溜溜的粘液像是潮水一样朝你袭来。
+            <<roll $evade>>
+            <<if $success>>
+              你在滑液浸到你脚前眼疾手快地爬上了周边的机器，那些滑液从机器下流了过去，并没有拖慢你的脚步。
+            <<else>>
+              你一下子滑倒在地，当你抖掉一身的泡泡起来的时候，你不听使唤的双脚又绊了一下。
+              <span style="color: red;">在这种情况下，你闪避的效果变差了。</span>
+              <<set $debuffevade to true>>
+            <</if>>
+
+          <<elseif $posbeforefight is "食品部-生产车间-垂直农场">>
+            怪物喷吐出一大口酸液，命中了你周围的植物，它们在腐蚀下立刻变得焦黄或者漆黑，因失去支撑力而萎缩倒塌下去<span style="color: red;">你的藏身点变少了</span>。
+            <<set $debuffhiding to true>>
+
+          <<elseif $posbeforefight != "化工部">>
+            怪物喷吐出一大口酸液，命中了你周围的机器，随着它们被嘶嘶地融化，<span style="color: red;">你的藏身点变少了</span>。
+            <<set $debuffhiding to true>>
+
+          <</if>>
+
+        <<else>>
+          <<enemyAttack>>
+        <</if>>
+
+      <<case "errorization">>
+        <<if random(1,100) <= 40>>
+          <<set _heal to random(8, 20)>>
+          <<set $enemy.hp to Math.min($enemy.hp + _heal, $enemy.maxHp)>>
+          $enemy.name 正在逐渐同化周围的物体，被吸收的物体重新铸成了它的血肉。怪物回复了 <<=_heal>> 点 HP。
+        <<else>>
+          <<enemyAttack>>
+        <</if>>
+
+      <<case "jammer">>
+        <<if random(1,100) <= 20>>
+          <<applyCommunicationJam>>
+        <<else>>
+          <<enemyAttack>>
+        <</if>>
+
+      <<default>>
+        <<enemyAttack>>
+
+    <</switch>>
+  <</if>>
+<</widget>>
+
+/* advanceCombat 已删除：原来调用的 <<patrolTick>>/<<checkVictory>> 这两个
+   widget 名字在数组化重构里已经被 combatPatrolTick / combatCheckVictory
+   取代，留着这个旧 widget 只会在被调用时报错。现在的战斗步进完全走
+   CombatRootRender 的 "enemyAttack" 分支：combatEnemyPhaseResolve
+   （内部会自动调用 combatPatrolTick）+ combatCheckVictory。
+   如果你项目里还有别处在调用 <<advanceCombat>>，需要改成上面这套。 */
+
+
+:: timeWidget [widget nobr] {"position":"925,850","size":"100,100"}
+/* =================  1. 时间推进 ================= */
+
+<<widget "advanceTime">>
+  <<silently>>
+    <<set _cost to 2>>
+    <<if typeof $args !== "undefined" && $args.length > 0>>
+      /* 关键修复①：强制取整，杜绝以后再有小数被写进 totalMinutes */
+      <<set _cost to Math.round(Number($args[0]))>>
+    <</if>>
+    /* 关键修复②：is NaN 永远为 false，必须用 isNaN() */
+    <<if isNaN(_cost) or _cost <= 0>>
+      <<set _cost to 0>>
+    <</if>>
+
+    <<set _debug to false>>
+    <<if $args.length > 2>>
+      <<set _debug to $args[2] is true>>
+    <</if>>
+
+    <<if !$time>>
+      <<set $time to { day: 1, hour: 8, minute: 0, totalMinutes: 480 }>>
+    <</if>>
+    <<if $time.totalMinutes is undefined>>
+      <<set $time.totalMinutes to ($time.hour * 60 + $time.minute)>>
+    <</if>>
+    /* 关键修复③：一次性扶正历史脏数据（如果之前已经被污染成 x.5，这里清掉） */
+    <<set $time.totalMinutes to Math.round($time.totalMinutes)>>
+
+    <<set _oldDay = $time.day>>
+    <<set _oldHour = $time.hour>>
+    <<set _oldMinute = $time.minute>>
+
+    <<set $time.totalMinutes = $time.totalMinutes + _cost>>
+    <<set _total = $time.totalMinutes>>
+
+    <<set $time.day = Math.floor(_total / 1440) + 1>>
+    <<set _remainingMinutes = _total % 1440>>
+    <<set $time.hour = Math.floor(_remainingMinutes / 60)>>
+    <<set $time.minute = _remainingMinutes % 60>>
+
+    <<if typeof addLog is "function">>
+      <<set _hh to String($time.hour).padStart(2,"0")>>
+      <<set _mm to String($time.minute).padStart(2,"0")>>
+      <<run addLog(`时间推进：+${_cost} 分钟（现在：第 ${$time.day} 天 ${_hh}:${_mm}）`)>>
+    <</if>>
+
+    <<if _cost > 0>>
+      <<if Story.has && Story.has("timeTick")>>
+        <<timeTick>>
+      <<else>>
+        <<timeTick>>
+      <</if>>
+    <</if>>
+
+    <<set _debugText to "时间推进: Day " + _oldDay + " " + _oldHour + ":" + _oldMinute +
+      " + " + _cost + "分钟 = Day " + $time.day + " " + $time.hour + ":" + $time.minute>>
+    <<set $lastAdvanceTimeDebug to _debugText>>
+  <</silently>>
+
+  <<if $args.length > 2 and $args[2] is true>>
+    <<print $lastAdvanceTimeDebug>>
+  <</if>>
+<</widget>>
+
+/* ================= 2. NPC 位置刷新 ================= */
+<<widget "refreshNpc">>
+  <<silently>>
+    <<set _now to $time ? $time.totalMinutes : 480>>
+    <<set _schedules to $npcSchedule || []>>
+    <<set $currentNpc to null>>
+    
+    <<for _i, _schedule range _schedules>>
+      <<if _now >= _schedule.start && _now <= _schedule.end>>
+        <<set $currentNpc to _schedule>>
+        <<break>>
+      <</if>>
+    <</for>>
+  <</silently>>
+<</widget>>
+
+/* ================= 3. 侧边栏重绘 ================= */
+<<widget "refreshSide">>
+  <<silently>>
+    <<if $("#side-refresh").length > 0>>
+      <<replace "#side-refresh">>
+        <<include "StoryCaptionRefresh">>
+      <</replace>>
+    <</if>>
+  <</silently>>
+<</widget>>
+
+
+/* 削减电量（支持自定义步长） */
+<<widget "decreasePower">>
+  /* 参数1：步长，省略则默认 1 */
+  <<set _step = $args[0] ?? 1>>
+  <<if $power gt 0>>
+    <<set $power = Math.max(0, $power - _step)>>
+
+  <</if>>
+<</widget>>
+
+/* 增加磨损度（支持自定义步长） */
+<<widget "increaseWore">>
+  <<if $oilused>>
+  <<set _step = Number($args[0]) || 0.25>>
+    <<else>>
+       <<set _step = Number($args[0]) || 0.5>> 
+  <</if>>
+
+  <<if isNaN($woreout)>>
+    <<set $woreout to 0>>
+  <</if>>
+  <<set $woreout = Math.min(100, $woreout + _step)>>
+<</widget>>
+
+
+/* ================= 4. 一键时间推进 ================= */
+<<widget "tick">>
+  <<silently>>
+    <<set $debug_timeTickCount = ($debug_timeTickCount ?? 0) + 1>>
+    <<set _minutes to 2>>
+    <<if typeof $args !== "undefined" && $args.length > 0>>
+      <<set _minutes to Math.round(Number($args[0]))>>
+    <</if>>
+    <<if isNaN(_minutes) || _minutes <= 0>>
+      <<set _minutes to 2>>
+    <</if>>
+
+    <<set _combat to ($combat && $combat.active is true)>>
+
+    <<decreasePower>>
+    <<increaseWore>>
+    <<increaseClothDirty>>
+    <<refreshSide>>
+    <<advanceTime _minutes>>
+
+    <<if !_combat>>
+      <<refreshNpc>>
+      /*<<refreshSide>> */
+    <</if>>
+
+    <<if !_combat and typeof window.checkAttackSchedule is "function">>
+      <<run window.checkAttackSchedule()>>
+    <</if>>
+
+    <<if typeof window.checkDirtyAutoClean is "function">>
+      <<run window.checkDirtyAutoClean()>>
+    <</if>>
+  <</silently>>
+<</widget>>
+
+<<widget "timeTick">>
+  <<silently>>
+    <<if typeof window.checkAttackSchedule is "function">>
+      <<run window.checkAttackSchedule()>>
+    <</if>>
+    <<if typeof window.checkDirtyAutoClean is "function">>
+      <<run window.checkDirtyAutoClean()>>
+    <</if>>
+  <</silently>>
+<</widget>>
+
+
+
+
+:: 固定敌人widget [widget] {"position":"4250,850","size":"100,100"}
+<<widget "spawnFixedEnemy">>
+  <<set $enemy to {
+    id: $args[0].id,
+    name: $args[0].name,
+    hp: $args[0].maxHp,
+    maxHp: $args[0].maxHp,
+    atk: $args[0].atk,
+    ai: $args[0].ai,
+    armor: ($args[0].armor ? $args[0].armor : 0),
+    stunned: 0,
+    debuff: 0,
+    loot: ($args[0].loot ? $args[0].loot : []),
+    techResist: ($args[0].techResist ? $args[0].techResist : 0)
+  }>>
+<</widget>>
+
+
+
+:: 巡逻队救场 [nobr]{"position":"4550,725","size":"100,100"}
+   <<set $patrolarrive to [
+      "瞥见你的后方有一个影子一闪而过，你下意识地侧身闪避，看到一把被发射的渔枪样武器已经深深地嵌进了怪物的头骨里。",
+      "随着一声巨响，你旁边的怪物被一个高大的身影击退出去一小段距离。你看到她调整了握持巨盾的姿势，再次推进向前，将怪物逼向远离你的后方。",
+      "几声被消音器过滤后的枪响传入你的听觉接收器中，在你反应过来之前，弹形炸弹便已引爆，将怪物身上的血肉四散推离。"
+    ]>>
+    <<print either($patrolarrive)>><br><br>
+    很快，你面前的怪物就在支援的攻势中倒下。更多的巡逻队成员一拥而上，切开怪物的血管和肌肉。随着最后一丝体液的流失，怪物最后抽搐了两下，就不再动弹了。<br>
+你松了一口气。<br>
+    <<endfight>>
+    <<if $firstfight==true>>
+     [[继续|吸引]] <br> 
+    <<else>>
+      <<link "继续">>
+        <<goto $posbeforefight.block>>
+      <</link>><br>
+    <</if>>
+
+
+
+
+:: 总结传递战斗信息widget [widget nobr] {"position":"4125,550","size":"100,100"}
+
+<<widget "spawnRaidSC">>
+  /* 1) 随机地点：layer/block */
+  <<set _map to $map>>
+  <<set _layers to Object.keys(_map)>>
+  <<if _layers.length is 0>>
+    <<run console.warn("spawnRaidSC: $map 为空")>>
+    <<return>>
+  <</if>>
+
+  <<set _layer to _layers.random()>>
+  <<set _blocks to _map[_layer].blocks>>
+  <<if !_blocks || _blocks.length is 0>>
+    <<set _block to "未知区块">>
+  <<else>>
+    <<set _block to _blocks.random()>>
+  <</if>>
+/* 修复：原来这里写的是 _blocks（整个区块数组），应该是随机抽中的
+   那一个 _block（字符串），不然 $posbeforefight 会被设成一个数组，
+   后面所有 <<if $posbeforefight == "xxx">> 的字符串比较全都不会命中 */
+<<set $posbeforefight to _block>>
+
+/* 2) 抽怪物：由组合表生成器直接产出 $enemy（这里只是为了拿数值去拼
+   payload，不是玩家实际要打的那个怪物实例，实际战斗的怪物在
+   "怪物入场" passage 里重新生成） */
+<<spawnEnemyGen>>
+
+<<set _name to $enemy.name>>
+<<set _hp to $enemy.hp>>
+<<set _atk to $enemy.atk>>
+
+
+  /* 3) 应对小队：按 block 的 dept 拼小队名（沿用你原逻辑），并取战力 */
+  <<set _dept to _block.includes("-") ? _block.split("-")[0] : _block>>
+  <<set _squadName to _dept + "附近的小队">>
+  <<set _squadForce to $npcForce[_squadName] ?? 60>>
+
+  /* 4) 打包传给 JS */
+  <<set $raidPayload to {
+    layer: _layer,
+    block: _block,
+    monsterName: _name,
+    monsterHP: _hp,
+    monsterATK: _atk,
+    squadName: _squadName,
+    squadForce: _squadForce
+
+  }>>
+
+  <<run setup.beginRaidFromSC($raidPayload)>>
+<</widget>>
+
+
+
+:: 战后widget_多目标版 [widget nobr] {"position":"4450,725","size":"100,100"}
+<<widget "endfight">>
+  <<set $inCombat to false>>
+  <<set $hiddenstate to false>>
+  <<set $hiddenstateTurns to 0>>
+  <<set $debuffevade to false>>
+  <<set $debuffhiding to false>>
+  <<if $combat>>
+    <<set $combat.active to false>>
+  <</if>>
+  <<run exitCombatState()>>
+  /* $aftermathpos 记为“玩家亲自打完这场仗的实际位置”，
+     同时保存 layer 和 block，避免不同楼层出现同名区块被误判成刚打过仗；
+     这能和 cleanbeforefight 的“双重校验”保持一致。 */
+  <<set $aftermathpos to {
+    layer: $playerPos.layer,
+    block: $playerPos.block
+  }>>
+  /* 兼容旧脚本：有些地方仍可能读字符串/时间值，保留原变量名 */
+  <<set $aftermathblock to $playerPos.block>>
+  <<set $aftermathlayer to $playerPos.layer>>
+  <<set $pendedtime to $time.totalMinutes>>
+<</widget>>
+
+:: 战斗后掉落_多目标版 [widget 战斗回] {"position":"4325,750","size":"100,100"}
+<<widget "combatDropLoot">>
+  /* 遍历本场战斗里所有敌人（不管是本场唯一的一只，还是以后同时刷的多只），
+     只对刚刚被打死的（hp<=0）结算掉落，避免重复结算 */
+  <<for _k = 0; _k < $combat.enemies.length; _k++>>
+    <<set _e to $combat.enemies[_k]>>
+    <<if _e.hp <= 0 and !_e.lootResolved>>
+      <<set _e.lootResolved to true>>
+      掉落（来自 <<print _e.name>>）：
+      <<set _dropped to []>>
+      <<if _e.aiTags and _e.aiTags.length>>
+        /* 新版数据结构：aiTags 是数组，每个 tag 里有 style 字段 */
+        <<for _i = 0; _i < _e.aiTags.length; _i++>>
+          <<set _style to _e.aiTags[_i].style>>
+          <<set _pool to $aiDropPool[_style]>>
+          <<if _pool>>
+            <<set _dropCount to (_style == 4) ? random(2,4) : random(1,2)>>
+            <<for _j = 0; _j < _dropCount; _j++>>
+              <<set _lootID to _pool[random(0, _pool.length - 1)]>>
+              <<set _dropDef to $itemMaster[_lootID]>>
+              <<if _dropDef>>
+                <<set _item to {
+                  id: _lootID,
+                  uid: "drop_" + Date.now() + "_" + Math.round(Math.random() * 100000),
+                  name: _dropDef.name,
+                  desc: _dropDef.desc,
+                  icon: _dropDef.icon ?? "📦",
+                  type: _dropDef.type ?? "material",
+                  price: _dropDef.price ?? 0,
+                  effect: _dropDef.effect ?? "material",
+                  wear: _dropDef.wear ?? null
+                }>>
+                <<run $inventory.push(_item)>>
+                <<set _dropped.push(_dropDef.name + (_dropDef.desc ? "（" + _dropDef.desc + "）" : ""))>>
+              <</if>>
+            <</for>>
+          <</if>>
+        <</for>>
+      <</if>>
+      <<if _dropped.length>>
+        <<= _dropped.join("、")>><br>
+      <<else>>
+        （无）<br>
+      <</if>>
+    <</if>>
+  <</for>>
+<</widget>>
+
+
+:: 每日结算 [functional widget nobr] {"position":"1025,850","size":"100,100"}
+/* 静默跨天结算：不跳转、不弹窗 */
+<<widget "silentDayRoll">>
+  /* 参数可省略 */
+  <<set _powerCost = $args[0] ?? 0>>
+  <<set _woreInc   = $args[1] ?? 1>>
+
+  /* 安全初始化日期变量 */
+  <<if typeof $gameDate === "undefined">>
+    <<set $gameDate = new Date()>>
+  <</if>>
+  
+  <<if typeof $lastCheckDate === "undefined">>
+    <<set $lastCheckDate = new Date()>>
+  <</if>>
+
+  /* 确保是有效的 Date 对象 */
+  <<set _now = new Date($gameDate)>>
+  <<set _last = new Date($lastCheckDate)>>
+  
+  /* 检查日期有效性 */
+  <<if isNaN(_now.getTime())>>
+    <<set _now = new Date()>>
+  <</if>>
+  <<if isNaN(_last.getTime())>>
+    <<set _last = new Date()>>
+  <</if>>
+
+  /* 转换为日期字符串进行比较 */
+  <<set _nowDateStr = _now.toISOString().slice(0, 10)>>
+  <<set _lastDateStr = _last.toISOString().slice(0, 10)>>
+  
+  /* 如果日期不同，说明跨天了 */
+  <<if _nowDateStr !== _lastDateStr>>
+    /* 计算实际跨越的天数 */
+    <<set _daysPassed = Math.floor((_now - _last) / (24 * 60 * 60 * 1000))>>
+    
+    <<if _daysPassed > 0>>
+      /* 一次性扣/加，避免逐日循环 */
+      <<set $power = Math.max(0, $power - _powerCost * _daysPassed)>>
+      <<set $woreout = Math.min(100, $woreout + _woreInc * _daysPassed)>>
+      <<if $settled>>
+        <<set $settled to false>>
+      <</if>>
+      /* 记录本次已结算到的日期 */
+      <<set $lastCheckDate = new Date(_now)>>
+    <</if>>
+  <</if>>
+<</widget>>
+
+:: combatDataWidget [widget nobr 战斗回] {"position":"3575,650","size":"100,100"}
+/* =====================================================================
+ *  数据结构：
+ *  $combat = {
+ *    active: true,
+ *    phase: "enemyAttack" | "playerAction" | "resolved",
+ *    round: 1,
+ *    patrolTurn: N,
+ *    posBeforeFight: ...,
+ *    enemies: [ {id,name,hp,maxHp,atk,ai,aiFrom,aiTags,armor,stunned,
+ *                debuff,loot,techResist,alive:true}, ... ],
+ *    allies:  [ 同结构占位，供未来队友使用，目前默认 [] ],
+ *    party:   [ {id:"player", name:$playerName, isPlayer:true, alive:true} ]
+ *              /* 玩家本体的属性仍然读取原有的全局变量
+ *                 （$fighting/$evade/$hiding/$woreout/$equippedCloth 等），
+ *                 party[0] 只是用来做"目标选择/存活判定"的轻量引用，
+ *                 不重复存数值，避免和你游戏里其它大量直接读取
+ *                 $woreout 等变量的代码冲突。
+ *                 以后加队友时，往 party 里 push 一个包含自己独立
+ *                 hp/属性字段的对象即可，UI 和目标选择逻辑天然支持。 */
+ *    log: []
+ *  }
+ * ===================================================================== */
+
+<<widget "initCombat">>
+  /* args[0] = enemies 数组（必填，至少一个）
+     args[1] = allies 数组（可选，默认空数组）
+     args[2] = patrolTurn 数值 */
+  <<set _enemies to $args[0] ?? []>>
+  <<set _allies to $args[1] ?? []>>
+  <<set _patrolTurn to $args[2] ?? random(5,10)>>
+
+  <<if $posbeforefight is "看守部">>
+    <<set _gunCount to random(1,3)>>
+    <<set _watchGuns to []>>
+    <<set _watchGunNames to ["看守部防御型自动枪口", "看守部补给型自动枪口", "看守部重装型自动枪口"]>>
+    <<for _g = 0; _g < _gunCount; _g++>>
+      <<set _gunName to _watchGunNames[_g] ?? ("看守部自动枪口 " + (_g + 1))>>
+      <<set _watchGuns.push({
+        id:"watch-autogun-" + _g,
+        name:_gunName,
+        type:"autogun",
+        hp:20,
+        maxHp:20,
+        armor:0,
+        alive:true,
+        destroyed:false,
+        lockChance: random(25,45),
+        damage:random(4,9),
+        note:"看守部临时援助装置"
+      })>>
+    <</for>>
+    <<set _allies to _allies.concat(_watchGuns)>>
+  <</if>>
+
+  <<for _i = 0; _i < _enemies.length; _i++>>
+    <<set _enemies[_i].alive to true>>
+  <</for>>
+  <<for _i = 0; _i < _allies.length; _i++>>
+    <<set _allies[_i].alive to true>>
+  <</for>>
+
+  <<set $combat to {
+    active: true,
+    phase: "enemyAttack",
+    round: 1,
+    patrolTurn: _patrolTurn,
+    posBeforeFight: $posbeforefight ?? $playerPos,
+    enemies: _enemies,
+    allies: _allies,
+    party: [{ id:"player", name:$playerName, isPlayer:true, alive:true }],
+    log: []
+  }>>
+
+  /* 向后兼容：保留 $enemy 指向第一只怪物 */
+  <<set $enemy to $combat.enemies[0]>>
+  <<set $inCombat to true>>
+  <<if $actionLog is undefined>>
+    <<set $actionLog to []>>
+  <</if>>
+<</widget>>
+
+/* 每次改动 enemies 数组内容后调用，保持旧代码里 $enemy 的兼容性 */
+<<widget "syncEnemyAlias">>
+  <<set $enemy to $combat.enemies[0]>>
+<</widget>>
+
+/* 存活目标筛选 */
+<<widget "aliveEnemies">>
+  <<set $_aliveEnemies to $combat.enemies.filter(function(e){ return e.alive && e.hp > 0; })>>
+<</widget>>
+
+<<widget "alivePartyTargets">>
+  /* 玩家 + 存活的 allies，合并成一个"可被怪物攻击的目标列表" */
+  <<set _list to []>>
+  <<set _list.push({ kind:"player", ref:null, name:$playerName })>>
+  <<for _i = 0; _i < $combat.allies.length; _i++>>
+    <<if $combat.allies[_i].alive>>
+      <<set _list.push({ kind:"ally", ref:$combat.allies[_i], name:$combat.allies[_i].name })>>
+    <</if>>
+  <</for>>
+  <<set $_aliveTargets to _list>>
+<</widget>>
+
+<<widget "resolveAutoGunFire">>
+  <<if !$combat || !$combat.allies>>
+    <<return>>
+  <</if>>
+
+  <<for _i = 0; _i < $combat.allies.length; _i++>>
+    <<set _a to $combat.allies[_i]>>
+    <<if _a and _a.type is "autogun" and _a.alive>>
+      <<aliveEnemies>>
+      <<if $_aliveEnemies.length gt 0>>
+        <<set _target to $_aliveEnemies[random(0, $_aliveEnemies.length - 1)]>>
+        <<set _gunDamage to Number(_a.damage) || 6>>
+        <<if _target.armor > 0>>
+          <<set _gunDamage to Math.max(0, _gunDamage - _target.armor)>>
+        <</if>>
+        <<set _target.hp to Math.max(0, (_target.hp || 0) - _gunDamage)>>
+        <<if _target.hp <= 0>>
+          <<set _target.hp to 0>>
+          <<set _target.alive to false>>
+          <<print _a.name>> 以密集火力压制，命中 <<print _target.name>>，造成 <<print _gunDamage>> 点伤害。<br>
+          <span style="color: green;"><<print _target.name>> 被击倒了！</span><br>
+        <<else>>
+          <<print _a.name>> 以密集火力压制，命中 <<print _target.name>>，造成 <<print _gunDamage>> 点伤害。<br>
+        <</if>>
+      <</if>>
+    <</if>>
+  <</for>>
+<</widget>>
+
+
+:: combatResolveWidget [widget nobr 战斗回] {"position":"3700,650","size":"100,100"}
+/* ===================== 怪物攻击阶段：遍历所有存活怪物 ===================== */
+<<widget "combatEnemyPhaseResolve">>
+  <<set $combat.log to []>>
+  <<aliveEnemies>>
+
+  <<if $hiddenstate>>
+    <<set $hiddenstateTurns to Number($hiddenstateTurns) || 0>>
+    <<if $hiddenstateTurns > 0>>
+      <<set $hiddenstateTurns -= 1>>
+      你借着阴影和机械的遮蔽，怪物这一轮都没能找到你。<br>
+      <<if $hiddenstateTurns <= 0>>
+        <<set $hiddenstate to false>>
+        但它已经重新开始搜索你的位置，下一回合你就不能继续躲藏了。<br>
+      <</if>>
+    <<else>>
+      <<set $hiddenstate to false>>
+    <</if>>
+    <<syncEnemyAlias>>
+    <<combatPatrolTick>>
+  <<else>>
+    <<resolveAutoGunFire>>
+    <<for _i = 0; _i < $_aliveEnemies.length; _i++>>
+      <<set _e to $_aliveEnemies[_i]>>
+      <<alivePartyTargets>>
+      <<if $_aliveTargets.length gt 0>>
+        <<set _target to either($_aliveTargets)>>
+        <<if _target.kind is "player">>
+          <<enemyTurnFor _e>><br>
+          <<set $combat.log.push({enemy:_e.name, target:$playerName})>>
+        <<else>>
+          <<enemyTurnForAlly _e _target.ref>><br>
+          <<set $combat.log.push({enemy:_e.name, target:_target.name})>>
+        <</if>>
+      <</if>>
+    <</for>>
+
+    <<syncEnemyAlias>>
+    <<combatPatrolTick>>
+  <</if>>
+<</widget>>
+
+/* 怪物攻击玩家：沿用原来的 enemyTurn 逻辑，只是把目标怪物作为参数传入，
+   不再依赖全局单一 $enemy（内部临时把 $enemy 指过去以复用原有分支逻辑） */
+<<widget "enemyTurnFor">>
+  <<set _prevEnemy to $enemy>>
+  <<set $enemy to $args[0]>>
+  <<enemyTurn>>
+  <<set $enemy to _prevEnemy>>
+<</widget>>
+
+/* 怪物攻击队友（预留，目前 allies 为空数组不会触发，结构先搭好） */
+<<widget "enemyTurnForAlly">>
+  <<set _e to $args[0]>>
+  <<set _ally to $args[1]>>
+  <<set _wear to Number(_e.atk) || 0>>
+
+  <<if _ally.type is "autogun">>
+    <<if random(1,100) <= (_ally.lockChance ?? 35)>>
+      <<set _ally.alive to false>>
+      <<set _ally.destroyed to true>>
+      <<print _e.name>> 识破并锁定了 <<print _ally.name>> 的火控链路，枪口被击穿、过热，最终失去射击能力，坍塌在地上。<br>
+      <span style="color: red;"><<print _ally.name>> 已被摧毁，无法再造成伤害。</span>
+    <<else>>
+      <<if _ally.armor>>
+        <<set _wear to Math.max(0, _wear - _ally.armor)>>
+      <</if>>
+      <<set _ally.hp to Math.max(0, (_ally.hp ?? _ally.maxHp) - _wear)>>
+      <<if _ally.hp <= 0>>
+        <<set _ally.alive to false>>
+        <<set _ally.destroyed to true>>
+        <<print _e.name>> 以高压冲击打在 <<print _ally.name>> 上，造成 <<print _wear>> 点伤害，并将它摧毁。<br>
+        <span style="color: red;"><<print _ally.name>> 已被摧毁，无法再造成伤害。</span>
+      <<else>>
+        <<print _e.name>> 直接打在 <<print _ally.name>> 上，造成 <<print _wear>> 点伤害。<br>
+      <</if>>
+    <</if>>
+  <<else>>
+    <<if _ally.armor>>
+      <<set _wear to Math.max(0, _wear - _ally.armor)>>
+    <</if>>
+    <<set _ally.hp to Math.max(0, (_ally.hp ?? _ally.maxHp) - _wear)>>
+    <<if _ally.hp <= 0>>
+      <<set _ally.alive to false>>
+    <</if>>
+    <<print _e.name>> 攻击了 <<print _ally.name>>，造成 <<print _wear>> 点伤害。
+  <</if>>
+<</widget>>
+
+/* ===================== 巡逻倒计时 / 胜负判定（多目标版） ===================== */
+<<widget "combatPatrolTick">>
+  <<set $combat.patrolTurn to Number($combat.patrolTurn) - 1>>
+  <<if $combat.patrolTurn <= 0>>
+    <<set $combat.active to false>>
+    <<set $inCombat to false>>
+    <<run $actionLog.push("巡逻队到达：战斗强制结束")>>
+    <<goto "巡逻队救场">>
+  <</if>>
+<</widget>>
+
+<<widget "combatCheckVictory">>
+  <<aliveEnemies>>
+  <<if $_aliveEnemies.length is 0>>
+    <<set $combat.active to false>>
+    <<set $inCombat to false>>
+    <<set $actionLog.push("战斗胜利")>>
+    你击败了所有怪物！
+    <<goto "AfterCombat">>
+  <<elseif $woreout >= $maxWoreout>>
+    <<set $combat.active to false>>
+    <<set $inCombat to false>>
+    <<set $actionLog.push("战斗失败：磨损极限")>>
+    你的磨损达到极限，无法继续战斗……
+    <<link "好的">>
+      <<goto "defeat">>
+    <</link>>
+  <</if>>
+  /* $activeAttack 已升级为 $activeAttacks[] 数组，这一场战斗具体对应
+     数组里的哪一个由 $pendingAttack 指向（JS :passagestart 拦截器
+     进战斗时锁定的） */
+  <<if $pendingAttack>>
+    <<set $pendingAttack.resolved to true>>
+  <</if>>
+<</widget>>
+
+/* ===================== 玩家攻击（多目标版）===================== */
+<<widget "combatPlayerAttack">>
+  /* args[0] = actionWear（沿用原来强力/普通/保守的耗损权重）
+     args[1] = 目标在 $combat.enemies 中的下标，缺省则打第一个存活的 */
+  <<set $actionWear to Number($args[0]) || 0>>
+  <<set _targetIdx to $args[1] ?? -1>>
+
+  <<aliveEnemies>>
+  <<if _targetIdx gte 0 and $combat.enemies[_targetIdx] and $combat.enemies[_targetIdx].alive>>
+    <<set _target to $combat.enemies[_targetIdx]>>
+  <<else>>
+    <<set _target to $_aliveEnemies[0]>>
+  <</if>>
+
+  <<if !_target>>
+    没有可以攻击的目标了。
+  <<else>>
+    <<set $baseDamage to $hurt>>
+    <<set $hpDamage to $baseDamage + ($player.weapon?.damageBonus ?? 0)>>
+
+    <<if _target.armor > 0>>
+      <<set $hpDamage to Math.max(0, $hpDamage - _target.armor)>>
+    <</if>>
+
+    <<set _target.hp -= $hpDamage>>
+    你对 <<print _target.name>> 造成 <<=$hpDamage>> 点 HP 伤害！
+    <<if _target.hp <= 0>>
+      <<set _target.hp to 0>>
+      <<set _target.alive to false>>
+      <br><span style="color: green;"><<print _target.name>> 被击败了！</span>
+    <</if>>
+
+    <<set $finalWear to $actionWear>>
+    <<if ($player.weapon?.wearReduction ?? 0) > 0>>
+      <<set $finalWear to Math.max(0, $finalWear - $player.weapon.wearReduction)>>
+    <</if>>
+    <<if isNaN($finalWear)>>
+      <<set $finalWear to 0>>
+    <</if>>
+    <<set $woreout += $finalWear>>
+    本次行动磨损 <<=$finalWear>>。
+
+    <<set $actionLog.push("你攻击 " + _target.name + "：HP伤害 " + $hpDamage + " | 磨损 +" + $finalWear)>>
+    <<if $fighting<=95>>
+    <span style="color: grey;"><em>借助此次经历稍微学会了一些战斗的技巧。</em></span><br>
+    <<set $fighting += 2>><span style="color: green;">+力量</span><br><br>
+    <<else>>
+
+
+    <</if>>
+  <</if>>
+
+  <<syncEnemyAlias>>
+<</widget>>
+
+
+/* =====================================================================
+ *  清道夫任务提示（Twine 侧，替代原来 JS 里强制 Engine.play("清理确认")
+ *  的做法）
+ *
+ *  设计：JS 那边（袭击系统_完整版.js）只负责在袭击解决后往
+ *  $dirtyZones 里写 {layer, block, since, autoCleanAt}，不再关心
+ *  谁是清道夫、要不要提示。是否显示、怎么显示，全部交给这里。
+ *
+ *  用法：在侧边栏刷新（refreshSide / StoryCaptionRefresh）或者
+ *  常驻的页头位置 <<include "清道夫任务提示">> 即可。
+ * ===================================================================== */
+
+:: 清道夫任务提示 [nobr] {"position":"4650,950","size":"100,100"}
+<<if $playerJob == "清道夫" && $dirtyZones && $dirtyZones.length>>
+  <div class="scavenger-alert">
+    <b>【待清理现场】</b><br>
+    <<for _i = 0; _i < $dirtyZones.length; _i++>>
+      <<set _z to $dirtyZones[_i]>>
+      <<set _remain to Math.max(0, Math.ceil((_z.autoCleanAt - $time.totalMinutes)))>>
+      · <<print _z.layer>>层「<<print _z.block>>」
+      <<if _remain > 0>>
+        （还有 <<print _remain>> 分钟后无人处理会自动清理，去了有额外收获）
+      <<else>>
+        （已经拖太久，可能马上被自动清理掉）
+      <</if>>
+      <<link "前往处理">>
+        <<run startCleaningScene(_z.layer, _z.block)>>
+      <</link>><br>
+    <</for>>
+  </div>
+<</if>>
+
+

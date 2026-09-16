@@ -1,0 +1,166 @@
+:: 休息[no-history] {"position":"2625,4650","size":"100,100"}
+现在的时间是：<<showTime>>
+你准备在充电仓里休息多久？如果躺得够久的话充电仓会开启简单的保养模式。
+<<set $money -=10>>
+[[1h]]
+[[2h]]
+[[4h]]
+[[6h]]
+<<link "不休息">>
+<<set $money +=10>>
+<<goto "休眠仓">>
+<</link>>
+
+:: 1h [nobr no-history] {"position":"3475,4225","size":"100,100"}
+<<tick 60>><<set $power+=10>>
+<<if $power > 100>><<set $power to 100>><</if>>
+<<if $chaos >=100 && !$prosuperperception>>
+<<goto "prochaosdecide">>
+<</if>>
+你躺进空置的休眠仓里，几乎是马上就进入了休眠模式。<br><br>
+你稍微休息了一会，感觉到电量水平有所上升。<br><br>
+目前电量水平：$power
+<br><br>
+<<link "从充电仓里起来">>
+	<<goto $playerPos.block>>
+<</link>>
+
+:: 2h [nobr no-history] {"position":"3475,4325","size":"100,100"}
+<<tick 120>><<set $power+=25>>
+<<if $power > 100>><<set $power to 100>><</if>>
+你躺进空置的休眠仓里，几乎是马上就进入了休眠模式。<br><br>
+你稍微休息了一会，感觉到电量水平有所上升。<br><br>
+目前电量水平：$power
+<br><br>
+<<link "从充电仓里起来">>
+	<<goto $playerPos.block>>
+<</link>>
+
+
+:: 4h [nobr no-history] {"position":"3475,4425","size":"100,100"}
+<<tick 240>><<set $power+=55>>
+<<if $power > 100>><<set $power to 100>><</if>>
+你躺进空置的休眠仓里，几乎是马上就进入了休眠模式。<br><br>
+你安静地休息了一会，感觉到电量水平恢复了至少一半。<br><br>
+目前电量水平：$power
+<br><br>
+<<link "从充电仓里起来">>
+	<<goto $playerPos.block>>
+<</link>>
+
+
+
+:: 6h [nobr no-history] {"position":"3475,4525","size":"100,100"}
+<<tick 360>><<set $power to 100>><<set $woreout-=10>>
+<<if $woreout < 0>><<set $woreout to 0>><</if>>
+<<if $power > 100>><<set $power to 100>><</if>>
+你躺进空置的休眠仓里，几乎是马上就进入了休眠模式，充电仓中的器械活动起来，开始修复你躯体上的一些轻微刮痕。<br><br>
+你的电量完全恢复了，目前电量水平：$power
+<br><br>
+
+<<link "从充电仓里起来">>
+	<<goto $playerPos.block>>
+<</link>>
+
+
+
+:: 休息1[nobr] {"position":"2900,1275","size":"100,100"}
+<<if $playerJob != "巡逻队">>
+你需要成为巡逻队的成员才能使用巡逻队休息室的充电仓。
+<br><br>
+[[离开|巡逻队休息室]]
+<<else>>
+<<if $power>=99&&$woreout<=1>>
+你的状态很好，短时间内没有再去休息一次的必要。<br>
+<<if $superperception>=5>>
+	你的处理器异常地跳动着，强制你打了一个哈欠，让你的下颚零件都因为过度的张开而咯咯作响。<br>
+	<span style="color: red;">+？？？</span><<set $superperception+=1>><br>
+	过于饱满的状态下闲着似乎会导致你的处理器产生异常的速度更快，还是四处走走吧。<br>
+<</if>>
+<br>
+[[离开|巡逻队休息室]]
+<</if>>
+现在的时间是：<<showTime>><br>
+你准备在充电仓里休息多久？如果够久的话充电仓会开启简单的保养模式。<br><br>
+
+[[2h]]<br>
+[[4h]]<br>
+[[6h]]<br>
+[[不休息|巡逻队休息室]]
+<</if>>
+
+
+:: 休息2 [no-history nobr]{"position":"2375,3500","size":"100,100"}
+<<if $playerJob != "清道夫">>
+你需要成为清道夫才能使用清道夫休息室的充电仓。
+<br><br>
+[[离开|清道夫休息室]]
+
+<<else>>
+<<if $power>=99&&$woreout<=1>>
+你的状态很好，短时间内没有再去休息一次的必要。<br>
+<<if $superperception>=5>>
+	你的处理器异常地跳动着，强制你打了一个哈欠，让你的下颚零件都因为过度的张开而咯咯作响。<br>
+	<span style="color: red;">+？？？</span><<set $superperception+=1>><br>
+	过于饱满的状态下闲着似乎会导致你的处理器产生异常的速度更快，还是四处走走吧。<br>
+<</if>>
+<br>
+[[离开|清道夫休息室]]
+<</if>>
+现在的时间是：<<showTime>><br>
+你准备在充电仓里休息多久？如果躺得够久的话充电仓会开启简单的保养模式。
+<br><br>
+[[2h]]<br>
+[[4h]]<br>
+[[6h]]<br>
+[[不休息|清道夫休息室]]<br>
+<</if>>
+
+
+:: 休息3 [no-history nobr]{"position":"2725,8775","size":"100,100"}
+<<if $playerJob != "后勤">>
+你需要称为后勤部门的一员才能使用后勤部门休息区的充电仓。<br><br>
+
+[[离开|后勤休息区]]
+
+<<else>>
+
+<<if $power>=99&&$woreout<=1>>
+你的状态很好，短时间内没有再去休息一次的必要。<br>
+<<if $superperception>=5>>
+	你的处理器异常地跳动着，强制你打了一个哈欠，让你的下颚零件都因为过度的张开而咯咯作响。<br>
+	<span style="color: red;">+？？？</span><<set $superperception+=1>><br>
+	过于饱满的状态下闲着似乎会导致你的处理器产生异常的速度更快，还是四处走走吧。<br>
+<</if>>
+<br>
+[[离开|后勤休息区]]
+<</if>>
+现在的时间是：<<showTime>><br>
+你准备在充电仓里休息多久？如果躺得够久的话充电仓会开启简单的保养模式。<br>
+<br>
+[[2h]]<br>
+[[4h]]<br>
+[[6h]]<br>
+[[不休息|后勤休息区]]
+
+
+<</if>>
+
+:: 睡眠
+你躺进充电仓，尽量让自己的思绪平静下来，直到它陷入深沉的黑暗当中。
+……
+<<set _pasttime to random(100,370)>>
+<<set _addpower to random(1,70)>>
+<<set _cure to random(1,40)>>
+<<tick _pasttime>>
+<<set $power+=_addpower>>
+<<set $woreout-=_cure>>
+<<if $woreout < 0>><<set $woreout to 0>><</if>>
+<<if $power > 100>><<set $power to 100>><</if>>
+睡眠稍微恢复了你的精力。
+你的伤痛在你的自愈力量下恢复了。
+因为你的构造和其他人形有显著差别，你的充电效率变差了。
+
+<<link "从充电仓里起来">>
+	<<goto $playerPos.block>>
+<</link>>

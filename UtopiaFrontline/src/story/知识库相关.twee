@@ -1,0 +1,153 @@
+:: lore-detail {"position":"475,1400","size":"100,100"}
+\:: lore_detail
+<<set _group to $lore[$currentLoreGroup]>>
+<<set _entry to _group.entries[$currentLoreEntry]>>
+
+<div class="lore-detail">
+  <h3><<print _entry.title>></h3>
+
+  <div class="lore-content">
+    <<print _entry.content.replace(/\n/g,"<br>")>>
+  </div>
+
+  <<button "返回条目列表">>
+    <<run Dialog.close()>>
+    <<run Dialog.setup(_group.title,"lore_group")>>
+    <<run Dialog.open()>>
+  <</button>>
+</div>
+
+
+
+:: lore-list {"position":"375,1400","size":"100,100"}
+<<set _lib to $lore>>
+
+<div class="lore-list">
+  <h2> 知识库</h2>
+
+  <ul>
+    <<for _gk, _g range _lib>>
+      <li>
+        <strong><<print _g.title>></strong><br>
+        <small><<print _g.desc>></small><br>
+
+        <<button "打开">>
+          <<set $currentLoreGroup = _gk>>
+          <<run Dialog.close()>>
+          <<run Dialog.setup(_g.title, "lore_group")>>
+          <<run Dialog.open()>>
+        <</button>>
+      </li>
+    <</for>>
+  </ul>
+
+  <<button "关闭">><<run Dialog.close()>><</button>>
+</div>
+
+
+
+:: lore_entry {"position":"475,1500","size":"100,100"}
+<<set _group to $lore[$currentLoreGroup]>>
+<<set _entry to _group.entries[$currentLoreEntry]>>
+
+<h3><<print _entry.title>></h3>
+<p><<print _entry.content>></p>
+
+<<button "返回">>
+  <<run Dialog.close()>>
+  <<run Dialog.setup(_group.title,"lore_group")>>
+  <<run Dialog.open()>>
+<</button>>
+
+
+
+:: lore_group {"position":"375,1500","size":"100,100"}
+\:: lore_group
+<<set _group to $lore[$currentLoreGroup]>>
+
+<div class="lore-group">
+  <h2><<print _group.title>></h2>
+  <p><<print _group.desc>></p>
+
+  <ul>
+    <<for _ek, _e range _group.entries>>
+      <li>
+        <strong><<print _e.title>></strong><br>
+        <small><<print _e.summary>></small><br>
+
+        <<button "查看">>
+          <<set $currentLoreEntry = _ek>>
+          <<run Dialog.close()>>
+          <<run Dialog.setup(_e.title, "lore_detail")>>
+          <<run Dialog.open()>>
+        <</button>>
+      </li>
+    <</for>>
+  </ul>
+
+  <<button "返回知识库">>
+    <<run Dialog.close()>>
+    <<run Dialog.setup("知识库","lore_list")>>
+    <<run Dialog.open()>>
+  <</button>>
+</div>
+
+
+:: 查看工序合集 {"position":"550,1275","size":"100,100"}
+<<set $lore = {
+  chemistry_basic: {
+    title: "基础化工与日用品",
+    desc: "用于维持设施运作与人类基本生活的化学制品目录。",
+    entries: {
+
+      soap: {
+        title: "肥皂",
+        summary: "低成本、易生产的基础清洁用品。",
+        content: "易于制作、造价低廉的清洁用品。既作为洗衣部的消耗品提供，也作为人类的必需品供给。\n\n工序：碱性水解 → 过滤干燥 → 造粒包装"
+      },
+
+      adipic_acid: {
+        title: "己二酸",
+        summary: "多用途工业原料。",
+        content: "用途广泛的化学品，主要用作尼龙和工程塑料的原料，也是各种医药用品乃至香料产品的原料之一。\n\n工序：氧化反应 → 蒸馏结晶 → 喷雾干燥"
+      },
+
+      aspirin: {
+        title: "阿司匹林",
+        summary: "重要的功能性药物。",
+        content: "又名乙酰水杨酸，是一种有机化合物，主要供应于人类，作为重要的镇痛退热和防止血栓的功能药。\n\n工序：酯化反应 → 萃取重结晶 → 注塑成型"
+      },
+
+      pla: {
+        title: "聚乳酸",
+        summary: "可降解的生物塑料。",
+        content: "生物可降解塑料，由植物淀粉发酵制成。多用于可循环包装、医用缝合线和 3D 打印材料。\n\n工序：碱性水解 → 蒸馏结晶 → 注塑成型"
+      },
+
+      hydrogen_peroxide: {
+        title: "过氧化氢",
+        summary: "高活性氧化剂。",
+        content: "俗称双氧水，高效消毒剂。高浓度版本需特殊储存，常加工为固体过碳酸钠便于运输。\n\n工序：氧化反应 → 萃取重结晶 → 造粒包装"
+      },
+
+      ethyl_acetoacetate: {
+        title: "乙酰乙酸乙酯",
+        summary: "重要的有机合成中间体。",
+        content: "重要的有机合成中间体，用于生产解热镇痛药、染料和香料。液态产品常喷雾干燥为粉末以提高稳定性。\n\n工序：酯化反应 → 过滤干燥 → 喷雾干燥"
+      },
+
+      sodium_caseinate: {
+        title: "酪蛋白酸钠",
+        summary: "食品级蛋白添加剂。",
+        content: "从牛奶提取的食品添加剂，作为蛋白质强化剂和乳化剂用于冰淇淋、咖啡伴侣等，速溶粉末形态更易混合。\n\n工序：碱性水解 → 萃取重结晶 → 喷雾干燥"
+      },
+
+      polyaniline: {
+        title: "聚苯胺",
+        summary: "功能性导电材料。",
+        content: "导电高分子材料，用于制造防静电涂层、柔性电极和智能纺织品，需注塑成型为特定电子元件形状。\n\n工序：氧化反应 → 过滤干燥 → 注塑成型"
+      }
+
+    }
+  }
+}>>

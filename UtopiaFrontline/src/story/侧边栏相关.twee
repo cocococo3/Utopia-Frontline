@@ -1,0 +1,604 @@
+
+:: StoryCaption [functional nobr] {"position":"1075,1050","size":"100,100"}
+<<if $gameRunning>>
+	<<if $identityactivation===true>>
+    <span style="color:yellow;"><<tasklist>></span><br>
+  内置时钟：<<showTime>><br>
+  当前位置：第 $playerPos.layer 层，$playerPos.block<br>
+  工分：$money<br>
+ <<progressbar $power 100 "normal" "电量">>
+<br>
+  <<progressbar $woreout 100 "reverse" "磨损度">>
+<br>
+ 
+<br>
+  		<<if $playerJob === "leader">>
+        管理区状态
+        <progress value="$surroundingsituation" max="200" @value="$surroundingsituation"></progress><br>
+          <</if>>
+
+<em><<print either( $systemmention )>></em><br>
+
+  <</if>>
+<<else>>
+  <div class="main-menu-ui">
+    [[关于作者|About]] <br><br>
+    [[成就|AchievementGallery]]<br><br>
+  </div>
+<</if>>
+<<silentDayRoll>>
+
+:: PassageReady
+<<if $power <= 0&&!$priorpassage>>
+  <<set $priorpassage to true>>
+    /* 先重置，防止循环 */
+    <<goto "lackpower">>
+<<elseif $woreout >= 100 &&!$inCombat&&!$priorpassage>>
+<<set $priorpassage to true>>
+  <<set $woreout to 100>>
+    <<goto "fullworeout">>
+<<elseif $woreout >= 100 &&!$inCombat&&!$priorpassage&&$prosuperperception>>
+  <<goto "解除超感知">>
+<<elseif $superperception > 100&&!$priorpassage>>
+  <<set $prosuperperception to true>>
+<</if>>
+<<set $superperception to Math.min($superperception, 100)>>
+<<if $checktime <= 0 and !$settled>>
+    <<goto "公分审查结算">>
+<</if>>
+<<if $protectionoilon&&$time.day>=$protectionoilondate+5>>
+  <<notify 1.5s>>你身上的防护漆化为粉末脱落了……<</notify>>
+  <<if $equippedCloth!=null>>
+    <<set $equippedCloth.clothdirty+=10>>
+  <</if>>
+  <<set $protectionoilon to false>>
+<</if>>
+<<if $shoot<=Math.floor($fighting/3+$evade/3+$hiding/3)>>
+    <<set $shoot to Math.floor($fighting/3+$evade/3+$hiding/3)>>
+<</if>>
+
+:: StoryCaptionRefresh {"position":"1375,1050","size":"100,100"}
+<<silently>>
+/* 这里只放需要即时显示的变量 / 宏调用 */
+<<set _now = Date.now()>>
+<<print _now>>
+<</silently>>
+
+
+:: StoryHeader [functional nobr] {"position":"1175,1050","size":"100,100"}
+<script>
+$(document).on(':passagedisplay', function () {
+  // 每次 Passage 显示后刷新右侧信息栏
+  if (State.variables.timeText)
+    $('#info-time').text(State.variables.timeText);
+  if (State.variables.power !== undefined)
+    $('#info-power').text(State.variables.power);
+
+  if (typeof window.refreshSidebarProgressBars === 'function') {
+    window.refreshSidebarProgressBars();
+  }
+});
+</script>
+
+:: StoryMenu [functional nobr] {"position":"875,1050","size":"100,100"}
+<style>
+  .menu-entry-disabled {
+    display: inline-block;
+    color: #7a7a7a;
+    opacity: 0.65;
+    cursor: not-allowed;
+    pointer-events: none;
+    user-select: none;
+    text-decoration: none;
+  }
+</style>
+<<if $identityactivation===true>>
+  <img src="img\icon.png" width="250px">
+<<if $inCombat>>
+<span class="menu-entry-disabled" title="战斗中不可使用">个人状态</span><br>
+<span class="menu-entry-disabled" title="战斗中不可使用">任务日志</span><br>
+<span class="menu-entry-disabled" title="战斗中不可使用">通讯录</span><br>
+<<if $possessingEquipment ===true>>
+<span class="menu-entry-disabled" title="战斗中不可使用">电子书</span><br>
+<</if>>
+<<else>>
+[[个人状态|角色总览]]
+[[任务日志|QuestListRender]]
+[[通讯录]]
+<<if $possessingEquipment ===true>>
+[[电子书]]
+<</if>>
+<</if>>
+<<link "设置">>
+  <<run Dialog.setup("设置","settings")>>
+   <<run$(Dialog.body()).empty()>>    
+<<run Dialog.wiki(Story.get("settings").processText())>>
+  <<run Dialog.open()>>
+<</link>>*/
+<</if>>
+
+
+:: StorySubtitle [functional] {"position":"1275,1050","size":"100,100"}
+v0.2.0-Alpha
+
+
+:: 角色总览widget[nobr widget]
+/* 小工具：一张数值卡片，减少重复代码。若别处也要用，建议挪到你已有的 widget 专用 passage 里 */
+/* 卡片 widget：名称+数值同行，进度条作为背景填充，不再单独占一行高度 */
+<<widget "sCard">>
+  <<set _n to $args[0]>>
+  <<set _v to $args[1]>>
+  <<set _m to $args[2] ?? 100>>
+  <<set _cls to $args[3] ?? "">>
+  <<set _pct to (typeof _m === "number" && _m > 0) ? Math.min(100, Math.max(0, (_v / _m) * 100)) : 0>>
+  <div class="stat-card <<= _cls>>">
+    <div class="stat-card__fill" style="width:<<= _pct>>%"></div>
+    <div class="stat-card__name"><<= _n>></div>
+    <div class="stat-card__value"><<= _v>><<if typeof _m === "number">> / <<= _m>><</if>></div>
+  </div>
+<</widget>>
+
+
+:: 角色总览 [nobr no-history]
+<style>
+.ov{display:flex;flex-direction:column;gap:16px;font-family:sans-serif;color:#eee;}
+.ov .panel{background:#2b2b2b;border:1px solid #555;border-radius:8px;padding:12px;box-sizing:border-box;}
+
+/* ===== 第一行：三个板块，顶部对齐 ===== */
+.ov .top-row{display:flex;gap:16px;align-items:flex-start;}
+
+/* 左/右数值板块：固定宽高，内部两个子块各占一半 */
+.ov .stat-panel{
+  flex:0 0 300px;
+  height:300px;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+/* 子块（如"电量/磨损"）：固定占父容器一半高度，内部卡片纵向排列 */
+.ov .stat-group{
+  flex:1 1 50%;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  padding:8px;
+  overflow:hidden;      /* 兜底防溢出，正常情况下卡片会精确铺满不会触发 */
+}
+.ov .stat-group + .stat-group{border-top:1px solid #555;}
+
+/* 卡片：flex:1 1 0 让同组内所有卡片等分剩余高度 —— 卡片数量变化 = 卡片高度变化，而不是滚动 */
+.ov .stat-card{
+  position:relative;
+  flex:1 1 0;
+  min-height:0;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:0 10px;
+  border:1px solid #666;
+  border-radius:6px;
+  background:#3a3a3a;
+  overflow:hidden;
+}
+/* 进度条改为卡片内的背景填充层，不占用额外的行高 */
+.ov .stat-card__fill{
+  position:absolute;
+  left:0;top:0;bottom:0;
+  width:0%;
+  background:rgba(255,255,255,0.10);
+  transition:width .2s ease;
+}
+.ov .stat-card--red .stat-card__fill{background:rgba(255,80,80,0.18);}
+.ov .stat-card--green .stat-card__fill{background:rgba(80,255,120,0.18);}
+
+.ov .stat-card__name{
+  position:relative;font-size:0.85em;color:#ccc;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.ov .stat-card__value{
+  position:relative;font-weight:bold;font-size:0.9em;
+  white-space:nowrap;flex:0 0 auto;
+}
+
+/* 中间纸娃娃+名字：固定尺寸，和左右板块高度一致 */
+.ov .doll-panel{flex:0 0 220px;height:300px;display:flex;flex-direction:column;align-items:center;}
+.ov .doll-area{width:100%;flex:1;background:#3a3a3a;border:1px solid #666;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;color:#888;}
+.ov .doll-name{margin-top:8px;width:100%;text-align:center;border-top:1px solid #555;padding-top:6px;flex:0 0 auto;}
+
+/* ===== 第二行：目前穿着衣物信息 ===== */
+.ov .cloth-title{font-weight:bold;margin-bottom:8px;}
+.ov .cloth-desc{margin-bottom:12px;line-height:1.6;padding:8px;background:#333;border-radius:6px;}
+.ov .slot-row{display:flex;flex-wrap:wrap;gap:12px;}
+.ov .slot-row [id^="wardrobeSlot_"]{
+  flex:0 0 auto;min-width:180px;background:#3a3a3a;border:1px solid #666;border-radius:6px;padding:8px 12px;
+}
+.ov .slot-row [id^="wardrobeSlot_"] h3{margin:0 0 6px 0;font-size:0.95em;}
+
+/* ===== 第三行：持有物，向下延伸 ===== */
+.ov .inv-title{font-weight:bold;margin-bottom:8px;}
+.ov #consumableBox{display:flex;flex-direction:column;gap:6px;}
+.ov #consumableBox > div{display:flex;justify-content:space-between;align-items:center;
+  background:#333;border-radius:6px;padding:6px 10px;}
+
+@media (max-width:760px){
+  .ov .top-row{flex-direction:column;}
+  .ov .stat-panel, .ov .doll-panel{flex:0 0 auto;width:100%;height:auto;max-height:300px;}
+}
+</style>
+
+
+<div class="ov">
+
+  <!-- ============ 第一行 ============ -->
+  <div class="top-row">
+
+    <div class="stat-panel">
+      <div class="stat-group">
+      <<if $alienlike>>
+        <<sCard>>
+         <<sCard "饱食" $power 100>>
+         <<sCard "伤病" $woreout 100>>
+      <<else>>
+        <<sCard "电量" $power 100>>
+        <<sCard "磨损" $woreout 100>>
+       <</if>> 
+       <<sCard "公分" $money "???">>
+      </div>
+      <div class="stat-group">
+        <<sCard "信用" $maidtrust 100>>
+        <<sCard "混乱" $chaos 100>>
+        <<if $superperception>0 && !$protectionoilon>>
+          <<sCard "？？？" $superperception "？？？" "stat-card--red">>
+        <<elseif $protectionoilon>>
+          <<sCard "？？？" $superperception "？？？" "stat-card--green">>
+        <</if>>
+      </div>
+    </div>
+
+    <div class="panel doll-panel">
+      <div class="doll-area">
+        纸娃娃占位
+      </div>
+      <div class="doll-name">
+        名字：<<print $playerName ?? "未命名">>
+      </div>
+    </div>
+
+    <div class="stat-panel">
+      <div class="stat-group">
+        <<sCard "力量" $fighting 100>>
+        <<sCard "敏捷" $evade 100>>
+        <<sCard "观察" $hiding 100>>
+      </div>
+      <div class="stat-group">
+        <<sCard "维修技能" $repair>>
+        <<sCard "清扫技能" $cleaning>>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============ 第二行：目前穿着衣物信息 ============ -->
+  <div class="panel">
+    <div class="cloth-title">关于你的信息</div>
+    <div class="cloth-desc">
+你现在是一个$bodyHeight的人形，有着$faceType的面庞， $eyeColor色的双眼，$skinTone的皮肤以及$hairColor的头发。你的外甲是 $armorColor的。<br>
+你的工作等级是$workgrade级，
+<<if $playerJob=="后勤">>
+你目前在后勤部门中的
+<<if $workplace=="cleaning">>
+  保洁部
+  <<elseif $workplace=="chemical">>
+  化工部
+  <<elseif $workplace=="laundry">>
+  洗衣部
+  <<elseif $workplace=="detention">>
+  看守部
+  <<elseif $workplace=="planting">>
+  食品部生产车间
+  <<else>>
+    未知部门
+<</if>>
+工作。<br>
+<<elseif $playerJob=="巡逻队">>
+  你目前在巡逻队工作。<br>
+<<elseif $playerJob=="清道夫">>
+  你目前是清道夫的一员。<br>
+   <<else>>
+  你目前还没有工作。<br>
+<</if>>
+    <<if $equippedCloth is null>>
+你现在没穿任何衣服。
+<<else>>
+你现在穿着： **<<print $equippedCloth.name>>**:<<print $equippedCloth.intro>><br>
+耐久： <<print Math.round((($equippedCloth.clothworeout || 0) + 1e-9) * 100) / 100>> / <<print Math.round((($equippedCloth.maxworeout || 0) + 1e-9) * 100) / 100>>
+脏污： <<print Math.round((($equippedCloth.clothdirty || 0) + 1e-9) * 100) / 100>>
+<</if>>
+    </div>
+
+    <div class="slot-row">
+      <<set _slotList to []>>
+      <<if $beasttrait>>
+        <<run _slotList.push("嘴部")>>
+      <<else>>
+        <<run _slotList.push("双手")>>
+      <</if>>
+      <<for _s range _slotList>>
+        <<wardrobeSlot _s>>
+      <</for>>
+    </div>
+  </div>
+
+  <!-- ============ 第三行：持有物 ============ -->
+  <div class="panel">
+    <div class="inv-title">持有物内容（背包物品）</div>
+    <<consumableList>>
+  </div>
+
+</div>
+[[查看你现在拥有的所有物品]]<br>
+<<creturn 返回>>
+
+:: 进度条widget[widget nobr]
+<<widget "progressbar">>
+	<<set _val = $args[0]>>
+	<<set _max = $args[1]>>
+	<<set _mode = $args[2]>>
+	<<set _label = $args[3]>>
+	<<set _percent = Math.round(Math.clamp((_val / _max) * 100, 0, 100))>>
+
+	<<set _color = "">>
+	<<if _mode is "reverse">>
+		<<if _percent <= 30>>
+			<<set _color = "bar-green">>
+		<<elseif _percent <= 60>>
+			<<set _color = "bar-yellow">>
+		<<else>>
+			<<set _color = "bar-red">>
+		<</if>>
+	<<else>>
+		<<if _percent >= 60>>
+			<<set _color = "bar-green">>
+		<<elseif _percent >= 30>>
+			<<set _color = "bar-yellow">>
+		<<else>>
+			<<set _color = "bar-red">>
+		<</if>>
+	<</if>>
+
+	<div class="progress-wrap">
+		<div class="progress-label">_label：_percent%</div>
+		<div class="progress-bar">
+			<<print '<div class="progress-fill ' + _color + '" style="width:' + _percent + '%"></div>'>>
+		</div>
+	</div>
+<</widget>>
+
+
+
+:: About[no-history] {"position":"850,1300","size":"100,100"}
+
+文案+代码：小大崛工作室
+
+代码支援感谢：云千羽
+
+教程参考：钢铁空关、熔岩泡芙
+
+代码参考：洛可可-进度条/武器柜功能/按键盘数字键跳转系统、爬修女-部分UI美化、佚名-音频系统
+
+音频来源：Pixbay-freesound_community
+
+测试感谢：🍊光中行，☁️端云，🐟️云千羽，🐦鸦青
+<<set $fromPassage to previous()>>
+<<if $fromPassage>>
+  <<link "返回">>
+    <<goto $fromPassage>>
+  <</link>>
+<</if>>
+
+
+:: 知识库[no-history nobr] {"position":"550,1175","size":"100,100"}
+<<set $fromPassage to previous()>>
+[[化工部制造工序|查看工序合集]]
+
+
+:: 电子书[no-history nobr] {"position":"625,1575","size":"100,100"}
+<div class="ebook-panel">
+  <div class="ebook-header">
+    <span class="ebook-header__title">电子档案</span>
+    <span class="ebook-header__meta"><<= $ebookUnlocked ? $ebookUnlocked.length : 0>> / <<print Object.keys($ebookDB || {}).length>></span>
+  </div>
+
+  <<if !$ebookUnlocked || $ebookUnlocked.length == 0>>
+    <div class="ebook-empty">
+      <div class="ebook-empty__icon">◌</div>
+      <div>你的芯片库是空的。</div>
+    </div>
+  <<else>>
+    <div class="ebook-list">
+      <<for _i = 0; _i < $ebookUnlocked.length; _i++>>
+        <<set _id to $ebookUnlocked[_i]>>
+        <<set _b to $ebookDB[_id]>>
+        <<if _b>>
+          <<capture _id, _b>>
+            <div class="ebook-item">
+              <div class="ebook-item__tag">记录</div>
+              <div class="ebook-item__title"><<link _b.title>><<goto _b.passage>><</link>></div>
+              <div class="ebookDesc"><<= _b.desc>></div>
+            </div>
+          <</capture>>
+        <<else>>
+          <<run console.warn("电子书条目缺失: " + _id)>>
+        <</if>>
+      <</for>>
+    </div>
+  <</if>>
+</div>
+
+<br>
+<<creturn 返回>>
+
+
+
+:: 电子书解锁widget [widget nobr no-history] {"position":"725,1475","size":"100,100"}
+<<widget "unlockEbook">>
+  <<set _id to $args[0]>>
+  <<set _quiet to $args[1] ?? false>>
+  <<set $ebookUnlocked to $ebookUnlocked ?? []>>
+  <<if !$ebookDB[_id]>>
+    <<run console.warn("unlockEbook: 未找到条目 " + _id)>>
+  <<else>>
+    <<if !$ebookUnlocked.includes(_id)>>
+      <<set $ebookUnlocked.push(_id)>>
+      <<if !_quiet>>
+        你已解锁：''$ebookDB[_id].title''。<br>
+      <</if>>
+    <<else>>
+      <<if !_quiet>>
+        （该电子书已在你的芯片库中。）<br>
+      <</if>>
+    <</if>>
+  <</if>>
+<</widget>>
+
+
+
+
+
+:: settings[no-history] {"position":"1050,1225","size":"100,100"}
+<div class="settings-panel">
+
+  <div class="toggle-row">
+    <div class="toggle-label">侧边栏任务提示</div>
+
+    <div class="toggle-right">
+      <span class="toggle-ui js-optTaskHint-toggle"
+        onclick="
+          const v = SugarCube.State.variables;
+
+          v.optTaskHint = !v.optTaskHint;
+          this.classList.toggle('on', !!v.optTaskHint);
+
+          const s = this.parentElement.querySelector('.toggle-state');
+          if (s) s.textContent = v.optTaskHint ? 'ON' : 'OFF';
+
+          if (window.UI && UI.update) UI.update();
+        ">
+      </span>
+
+      <span class="toggle-state js-optTaskHint-state">OFF</span>
+    </div>
+  </div>
+
+  <div class="toggle-row">
+    <div class="toggle-label">音频总开关</div>
+
+    <div class="toggle-right">
+      <span class="toggle-ui js-optAudio-toggle"
+        onclick="
+          const v = SugarCube.State.variables;
+          v.optAudio = !v.optAudio;
+          this.classList.toggle('on', !!v.optAudio);
+
+          const s = this.parentElement.querySelector('.toggle-state');
+          if (s) s.textContent = v.optAudio ? 'ON' : 'OFF';
+          if (typeof window.syncAudioSystemState === 'function') window.syncAudioSystemState();
+          if (window.UI && UI.update) UI.update();
+        ">
+      </span>
+
+      <span class="toggle-state js-optAudio-state">ON</span>
+    </div>
+  </div>
+
+  <div class="toggle-row">
+    <div class="toggle-label">播放背景音乐</div>
+
+    <div class="toggle-right">
+      <span class="toggle-ui js-optBgm-toggle"
+        onclick="
+          const v = SugarCube.State.variables;
+          v.optBgm = !v.optBgm;
+          this.classList.toggle('on', !!v.optBgm);
+
+          const s = this.parentElement.querySelector('.toggle-state');
+          if (s) s.textContent = v.optBgm ? 'ON' : 'OFF';
+
+          if (typeof window.syncAudioSystemState === 'function') {
+            window.syncAudioSystemState();
+          } else if (typeof SimpleAudio !== 'undefined') {
+            if (v.optAudio !== false && v.optBgm) {
+              SimpleAudio.play('bgm_main');
+            } else {
+              SimpleAudio.stop('bgm_main');
+            }
+          }
+
+          if (window.UI && UI.update) UI.update();
+        ">
+      </span>
+
+      <span class="toggle-state js-optBgm-state">ON</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  const v = SugarCube.State.variables;
+
+  if (typeof v.optTaskHint === 'undefined') v.optTaskHint = false;
+  if (typeof v.optAudio === 'undefined') v.optAudio = true;
+  if (typeof v.optBgm === 'undefined') v.optBgm = true;
+
+  const taskToggle = document.querySelector('.js-optTaskHint-toggle');
+  const taskState  = document.querySelector('.js-optTaskHint-state');
+  const audioToggle = document.querySelector('.js-optAudio-toggle');
+  const audioState  = document.querySelector('.js-optAudio-state');
+  const bgmToggle = document.querySelector('.js-optBgm-toggle');
+  const bgmState  = document.querySelector('.js-optBgm-state');
+
+  if (taskToggle) taskToggle.classList.toggle('on', !!v.optTaskHint);
+  if (taskState)  taskState.textContent = v.optTaskHint ? 'ON' : 'OFF';
+  if (audioToggle) audioToggle.classList.toggle('on', !!v.optAudio);
+  if (audioState)  audioState.textContent = v.optAudio ? 'ON' : 'OFF';
+  if (bgmToggle) bgmToggle.classList.toggle('on', !!v.optBgm);
+  if (bgmState)  bgmState.textContent = v.optBgm ? 'ON' : 'OFF';
+
+  if (typeof window.syncAudioSystemState === 'function') {
+    window.syncAudioSystemState();
+  } else if (typeof SimpleAudio !== 'undefined') {
+    if (v.optAudio !== false && v.optBgm) {
+      SimpleAudio.play('bgm_main');
+    } else {
+      SimpleAudio.stop('bgm_main');
+    }
+  }
+})();
+</script>
+
+
+
+:: 设置widget [widget nobr] {"position":"1050,1325","size":"100,100"}
+<<widget "toggleTaskHint">>
+  <<silently>>
+    <<set $optTaskHint to !$optTaskHint>>
+    <<run typeof UI !== "undefined" && UI.update && UI.update()>>
+  <</silently>>
+<</widget>>
+
+<<widget "toggleBgm">>
+  <<silently>>
+    <<set $optBgm to !$optBgm>>
+    <<if $optBgm>>
+      <<run if (typeof SimpleAudio !== "undefined") { SimpleAudio.play("bgm_main"); }>>
+      <<else>>
+      <<stopsounds>>
+    <</if>>
+  <</silently>>
+<</widget>>

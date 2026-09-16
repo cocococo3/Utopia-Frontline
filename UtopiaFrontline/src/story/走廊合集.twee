@@ -1,0 +1,235 @@
+:: L1流通走廊 [nobr]{"position":"1950,875","size":"200,200"}
+<<set $playerPos to {layer:1, block:"L1流通走廊"}>><<set $electcrosstime = Math.abs($movelayer - 1)>><<tick $electcrosstime * 15>>
+<<if $enterl1 ==false>>
+L1是管理区最繁忙的地段之一，属于人类的吵闹声涌入耳畔，煤炭和汽油的味道比管理区内重上百倍。被整理装载完备的设备、日用品和食品和巨大的平台一起被巨大的液压机向上运输。过大的箱子在这里被拆解，成为方便被地面载具运输的尺寸。从头顶微微隆起的玻璃穹顶往上仰视，可以看见地面上的天气如何。<br><br>
+“嗨。”你听到有一个声音在招呼你，是一个约莫十几岁的人类女孩，她的眼睛直勾勾地看着你。见你也把视线投向她，她也挥了挥手。<br>
+“我之前没见过你，你是新来的吗？”<br><br>
+[[是]]<br>
+[[不是]]<br>
+[[你猜]]<br>
+
+
+<<set $enterl1 to true>>
+<<else>>
+L1是管理区最繁忙的地段之一，被整理装载完备的设备、日用品和食品和巨大的平台一起向上运输，过大的箱子在这里被拆解，成为方便被地面载具运输的尺寸。从头顶微微隆起的玻璃穹顶往上仰视，可以看见地面上的天气如何。<br>
+<<cleanbeforefight>>
+<<seasonText>>看起来现在是人类会认为的<<print _season>>季。<br><br>
+[[寻找]]<br>
+[[尝试离开]]<br>
+[[返回电梯->电梯]]<br>
+<</if>>
+
+:: 尝试离开 {"position":"2600,600","size":"100,100"}
+你小心走向出口，没有人类或者人形发现你。但在你即将跨出门口的一刻，你的内置系统触发了警告，禁用了你的移动方式。你不得不小心地挪回管理区的界限内。
+
+[[回去|L1流通走廊]]
+
+
+
+:: seasonwidget [widget nobr] {"position":"2350,550","size":"100,100"}
+<<widget "seasonText">>
+	<<set _day = $time.day>>
+	<<set _yearLength = 120>>
+	<<set _seasonDay = ((_day - 1) % _yearLength) + 1>>
+
+	<<if _seasonDay <= 30>>
+		<<set _season = "春">>
+		<<set _descList = [
+			"花瓣和泥土一起黏着在玻璃的边缘。"
+		]>>
+	<<elseif _seasonDay <= 60>>
+		<<set _season = "夏">>
+		<<set _descList = [
+			"你可以看见生机盎然的绿色植物。"
+		]>>
+	<<elseif _seasonDay <= 90>>
+		<<set _season = "秋">>
+		<<set _descList = [
+			"已经开始腐烂的棕色落叶盖住了一小部分玻璃。"
+		]>>
+	<<else>>
+		<<set _season = "冬">>
+		<<set _descList = [
+			"薄雪和泥泞覆盖住了玻璃。"
+		]>>
+	<</if>>
+
+	<<set _desc = _descList.random()>>
+
+	<p>
+		<<print _desc>>
+	</p>
+<</widget>>
+
+
+
+
+:: L2流通走廊 [nobr] {"position":"1950,1725","size":"200,200"}
+L2几乎是千篇一律的灰白色走道和墙面被板块之间规律的黑线分开，如果没有内置的定位仪和时钟，在这里迷路几乎是必然的。<br>
+<span style="color:yellow;">可以帮助你提升战斗相关技能的模拟格斗室就在这一层。</span><br><br>
+<<totalcorridorwidget>><<set $electcrosstime = Math.abs($movelayer - 2)>><<tick $electcrosstime * 15>><<set $playerPos to {layer:2, block:"L2流通走廊"}>><<print either( $textList )>><br><br>
+
+可前往：<br>
+[[看守部]]<br>
+<<if $playerJob == "巡逻队">>[[巡逻队休息室]]<<else>>巡逻队休息室的门并没有向你开启，你需要成为巡逻队的一员才能进入。<</if>><br>
+[[模拟格斗室]]<br>
+[[教化司]]<br>
+[[返回电梯->电梯]]<br>
+
+
+:: L3流通走廊 [nobr] {"position":"1900,3025","size":"200,200"}
+L3的地面使用了深色的建材板铺设地面和墙壁，两侧的排水口也比其他层级宽了不少。地面凹凸不平，遍布刮痕和腐蚀造成的小型坑洼。<br>
+<<totalcorridorwidget>><<set $electcrosstime = Math.abs($movelayer - 3)>><<tick $electcrosstime * 15>><<set $playerPos to {layer:3, block:"L3流通走廊"}>>
+<<print either( $textList )>><br><br>
+
+可前往：<br>
+[[安息之地]]<br>
+<<if $task3||!$task2.cleaners>>[[清道夫休息室|判定]]<<elseif $playerJob == "清道夫">>[[清道夫休息室]]<<else>>清道夫休息室的门并没有向你开启，你需要成为清道夫的一员才能进入。<</if>><br>
+[[处理间]]<br>
+[[返回电梯->电梯]]<br>
+
+:: 判定
+<<if $task3>>清道夫休息室的门并没有向你开启，你需要成为清道夫的一员才能进入。
+
+当你正盯着门口上的那个红叉看时，后面传来一阵脚步声。你转过身，看到一个黑发的人形在你身后，下半脸被特殊的结构所遮盖，她右脸上的三只复眼随着你的动作而眨动了一下。
+
+她复眼中央代替了瞳孔的红圈移动着，最终聚焦在你身上。
+
+[[打招呼|ricanmeet1]]
+<<else>>
+清道夫休息室的门并没有向你开启，你需要成为清道夫的一员才能进入。
+
+当你正盯着门口上的那个红叉看时，后面传来一阵脚步声。你转过身，看到一个黑发的人形在你身后，下半脸被特殊的结构所遮盖，她右脸上的三只复眼随着你的动作而眨动了一下。
+
+她复眼中央代替了瞳孔的红圈移动着，最终聚焦在你的身上。
+
+[[打招呼|ricanmeet3]]
+
+<</if>>
+
+:: L4流通走廊 [nobr] {"position":"1900,3675","size":"200,200"}
+L4排风系统的轰鸣声从你走出电梯的那刻起就在你的听觉系统里萦绕。<br>
+<<totalcorridorwidget>>
+<<set $electcrosstime = Math.abs($movelayer - 4)>><<tick $electcrosstime * 15>><<print either( $textList )>>
+<<set $playerPos to {layer:4, block:"L4流通走廊"}>><br><br>
+<<script>>
+  window.playOneShot("audio/data_pion-st1-footstep-sfx-323053.mp3", 1);
+<</script>>
+可前往：<br>
+[[化工部]]<br>
+[[锻造部]]<br>
+[[返回电梯->电梯]]<br>
+
+
+:: L5流通走廊 [nobr] {"position":"1550,4525","size":"200,200"}
+L5的地面板材被精心调制成了一种正好介于金属和油液中间的颜色，使得以上的任何一种落在地上都不至于被忽略。空间的气体中混杂着焊锡和其他金属的味道。<br>
+<<totalcorridorwidget>>
+<<set $electcrosstime = Math.abs($movelayer - 5)>><<tick $electcrosstime * 15>><<print either( $textList )>>
+<<set $playerPos to {layer:5, block:"L5流通走廊"}>><br><br>
+可前往：<br>
+[[工程部]]<br>
+[[设备部]]<br>
+[[维修部]]<br>
+[[返回电梯->电梯]]<br>
+
+
+:: L6地图测试 [nobr] {"position":"3800,200","size":"100,100"}
+地面上固定着灰色的地毯，每隔一段磨损程度和材质都不一样。<br><br>
+
+笨重的运输用无人车正在沿着规划的路线行驶，旁边的人形纷纷给它们让出道路。<br>
+<<tick 15>>
+可前往：<br>
+[[洗衣部->0-6-0-1]] <br>
+保洁部<br>
+纺裁部<br>
+日用品部<br>
+[[返回电梯->电梯测试]]<br>
+
+
+:: L6流通走廊 [move nobr] {"position":"1600,5900","size":"200,200"}
+L6地面上固定着灰色的地毯，每隔一段磨损程度和材质都不一样，这可能是纺裁部联合洗衣部做的某种布料实验。<br>
+<<totalcorridorwidget>>
+<<set $electcrosstime = Math.abs($movelayer - 6)>><<tick $electcrosstime * 15>><<print either( $textList )>>
+<<set $playerPos to {layer:6, block:"L6流通走廊"}>><br><br>
+可前往：<br>
+[[洗衣部]] <br>
+[[保洁部]]<br>
+[[纺裁部]]<br>
+[[日用品部]]<br>
+[[返回电梯->电梯]]<br>
+
+
+:: L7流通走廊 [nobr] {"position":"1625,7125","size":"200,200"}
+L7的走廊由简单的灰蓝色漆覆盖的铁架和平板搭建而成，电灯被蜿蜒其中的电线点亮。<br>
+<<totalcorridorwidget>> 
+<<if !$enterpersonnel && $playerPos.layer==7>>  <span style="color:yellow;">你要去的人事部就在这一层。</span> <</if>><br>
+<<set $electcrosstime = Math.abs($movelayer - 7)>><<tick $electcrosstime * 15>><<print either( $textList )>>
+<<set $playerPos to {layer:7, block:"L7流通走廊"}>><br><br>
+可前往：<br>
+[[人事部]]<br>
+[[食品部]]<br>
+[[返回电梯->电梯]]<br>
+
+
+:: L8流通走廊 [nobr] {"position":"1475,7850","size":"200,200"}
+L8的高度比其他层更高，或许是因为垂直农场在这一层。作为一个生产专用的层级，L8几乎没有墙面和玻璃，有的只是基础的承重柱和依附其上搭建的大量水培植物架。<br>
+<<totalcorridorwidget>>
+<<set $electcrosstime = Math.abs($movelayer - 8)>><<tick $electcrosstime * 15>><<print either( $textList )>>
+<<set $playerPos to {layer:8, block:"L8流通走廊"}>><br><br>
+可前往：<br>
+[[垂直农场|食品部-生产车间-垂直农场]]<br>
+[[返回电梯|电梯]]<br>
+
+
+:: L9流通走廊 [nobr] {"position":"1475,8250","size":"200,200"}
+L9的墙壁用凹凸不平的白漆涂抹手法装饰，和强光一起在墙面上投下颗粒状的阴影。作为会议室的区域尚且有玻璃外墙，但也都是磨砂材质的，无法看见里面发生什么。缺乏功能区域使得它并没有太多人形光顾。<br>
+<<totalcorridorwidget>>
+<<print either( $textList )>>
+<<set $electcrosstime = Math.abs($movelayer - 9)>><<tick $electcrosstime * 15>><<set $playerPos to {layer:9, block:"L9流通走廊"}>><br><br>
+可前往：<br>
+[[会议室]]<br>
+<<if !$enterdarkarea>>
+  你留意到L9一段走廊中的的照明灯似乎损坏了，惨白的走廊通向深不见底的黑暗。<br>
+[[照明不足的区域]]<br>
+<<else>>
+  <<if $darkopenday !=$time.day>>
+  L9一段走廊中的的照明灯似乎损坏了，惨白的走廊通向深不见底的黑暗。<br>
+  [[探索黑暗]]<</if>><br>
+<</if>>
+[[返回电梯->电梯]]<br>
+
+
+:: L10流通走廊 [nobr] {"position":"1475,8650","size":"200,200"}
+充分而柔和的照明布满了L10的走廊，使得无需费力调节视觉传感器便能清晰地看清这里的每一样东西。<br>
+作为全管理区最大的休息区所在的地方，L10总是挤满了来自各个后勤部门的人形。<br>
+<<set $electcrosstime = Math.abs($movelayer - 10)>><<tick $electcrosstime * 15><<print either( $textList )>>
+<<set $playerPos to {layer:10, block:"L10流通走廊"}>><br><br>
+<<if $playerJob !="后勤">>后勤休息区的门并没有向你开启，你需要成为后勤类部门的一员才能进入。<<else>>[[后勤休息区]]<</if>><br>
+[[商店]]<br>
+[[返回电梯->电梯]]<br>
+
+
+:: 照明不足的区域
+你一步步走向照明以外的区域，直到黑暗就在你面前，用它虚无的目光凝视着你。
+
+<<link "前进" "探索黑暗">><<set $enterdarkarea to true>><</link>>
+[[丢一个东西进去]]
+[[算了|L10流通走廊]]
+
+:: 丢一个东西进去
+你往黑暗张开的大口中丢了一枚硬币。
+
+硬币丁零当啷地落到地上，滚了一段距离，咕噜咕噜的转动声离你越来越远，最后消失了。
+
+听起来前方有相当一段距离都是硬表面的平路。
+
+<<link "前进" "探索黑暗">><<set $enterdarkarea to true>><</link>>
+[[算了|L10流通走廊]]
+
+
+
+:: 超感知事件1
+你的视角转变了。你目之所及是被灰烟和灰色云层笼罩的天空，建筑和炮弹燃烧产生的刺鼻气味笼罩着你。
+几架灰黑涂装的小型战机划过云层，导弹和爆炸物朝你倾泻而下。在它们略过你的上方时，你看到那些飞机的机翼上都有着相同的图案——空心倒三角的中央有一个头发卷曲成蛇的愤怒女性人脸。
+爆炸带来的疼痛激怒了你，一根可怖的触手挥向空中，将其中一架位置较低的飞机拖下，在重压和扭曲中将它变为了碎片。
+<<set $superperceptionevent1 to true>>

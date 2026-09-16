@@ -1,0 +1,338 @@
+
+:: 保洁部 [nobr] {"position":"2500,6200","size":"100,100"}
+<<set $playerPos to {layer:6, block:"保洁部"}>><<tick 30>>
+<<if $enterCleaning === false>>
+你走进保洁部的那一刻差点被闪瞎。
+<br><br>
+这几乎不是夸张，这里的地面像是刚刚被眼镜布抛光过，设备的表面由于勤劳的擦拭闪闪发光，甚至连空气过滤口的扇叶里都没有一丝灰。
+<br><br>
+一台低矮的圆形扫拖一体机从你眼前的地面上嗡嗡地经过，绕过诸多关闭状态的清洁用机器，最终停在前方一名人形的脚边。
+<br><br>
+她慢慢地抬起头，小心地伸出手把垂下的白金色的卷发从视线上拉开，你看到了一张被忧虑所折磨的脸。
+<span style="color: red;">+混乱</span><<set $chaos+=2>><br><br>
+“喔，你是那个……新启动的人形。”<br><br>
+<<contactsAdd "lucy" "Lucy-露西" "保洁部|领班" "Lucy视你为新人。" "内线 017">>
+<<if $difficulty == "easy">>
+  <<set $npc.lucy.like to 30>> 
+  <<elseif $difficulty == "normal">>
+  <<set $npc.lucy.like to 30>> 
+  <<else>>
+  <<set $npc.lucy.like to 25>> 
+<</if>>
+她顿了顿：“我是 Lucy，保洁部的领班。管理区的灰尘和污渍归我们部门负责——”<br>
+你感觉到她的目光下移，“包括你的鞋印。”
+<br><br>
+[[道歉并擦掉鞋印]]<br>
+[[无视她的语气]]<br>
+[[再在地上踩几个印子]]
+<<set $enterCleaning to true>>
+<<else>>
+保洁部的地板闪闪发光，各种各样的清扫机器人摆满了四周。从天花板上横贯而过的的庞大管道中传出液体流动的声音。<br>
+ <<cleanbeforefight>>
+<<if $workplace=="cleaning">>
+<br><br>[[开始工作|保洁部待命]]
+<<else>>
+<br><br>[[寻求在保洁部的工作]]
+<</if>>
+<br>[[清洁间|保洁部-清洁间]]
+<br> [[返回走廊|L6流通走廊]]
+ <</if>>
+
+:: 道歉并擦掉鞋印 {"position":"3000,6275","size":"100,100"}
+Lucy眨了眨眼。
+<span style="color: green;">+Lucy的好感</span>
+“……不用。”她低声说。她身旁的那台小小的扫拖一体机不紧不慢地靠近你，转动着清扫布将你留下的脚印抹去。
+“抱歉，我只是习惯了在意这些。”她重新抬头看向你。
+“……那么，有什么事吗？”
+<<tick 5>>
+[[继续|保洁部]]
+
+:: 无视她的语气 {"position":"3000,6175","size":"100,100"}
+Lucy看了你一眼。
+“行吧，反正很快就会被清理掉。”
+
+她身旁的那台小小的扫拖一体机不紧不慢地靠近你，转动着清扫布将你留下的脚印抹去。
+
+“……那么，有什么事吗？”她重新抬头看向你。
+<<tick 5>>
+[[继续|保洁部]]
+
+:: 再在地上踩几个印子 {"position":"3100,6225","size":"100,100"}
+你又在一旁的地面上踩了几下，灰渍虽然扩大了，但也减淡了一些。
+
+Lucy皱起眉，挥了挥手。她身旁的那台小小的扫拖一体机不紧不慢地靠近你，转动着清扫布将你留下的脚印抹去。
+
+“……那么，有什么事吗？”她重新看向你。
+<<tick 5>>
+[[继续|保洁部]]
+
+:: 寻求在保洁部的工作 {"position":"3000,6075","size":"100,100"}
+“管理区的日常清洁由自动清洁机负责，但那些更复杂的污渍，就不是它们能处理的了。”
+“你应该知道，管理区会被怪物袭击。巡逻队负责击杀它们，清道夫则会搬走尸块，让区域可以通行。可倘若不进行更细致的清理，工程部和设备部就无法修复被破坏的区域。”
+“我们的任务——就是确保后续修复工作不会被脏污影响。因此，保洁部必须随时待命，因为袭击随时可能发生。”
+“你可以在每个整点来保洁部进行待命登记，至少工作2小时。总待命时间越久，你得到的工分就越多。“
+
+[[接受在保洁部的工作]]
+[[我再想想|放弃保洁部工作]]
+
+:: 接受在保洁部的工作 {"position":"3100,6125","size":"100,100"}
+<<set $playerJob to "后勤">>
+<<set $workplace to"cleaning">>
+“嗯，保洁部欢迎你。”
+<em><span style="color: grey;">你现在是保洁部的一员了！可以随时来工作</span></em>
+
+[[继续|保洁部]]
+
+
+:: 放弃保洁部工作 {"position":"3100,6025","size":"100,100"}
+“这样啊……嗯，没关系。”
+
+[[继续|保洁部]]
+
+
+:: 保洁部-清洁间
+<<set $playerPos to {layer:6, block:"保洁部-清洁间"}>>
+保洁部的清洁间由印有简单几何图案的一排瓷砖装饰着，和它的其他区域一样保持着极端的整洁，在你目之所及一丝水垢的痕迹都没有。
+你可以在这里清理你自己和更换衣服，如果你想的话。
+
+[[清洗自己|清洗自己2]]
+[[衣柜]]
+[[离开|保洁部]]
+
+:: 清洗自己2
+你打开水龙头，清洗你身上的污渍。
+<<if $equippedCloth is not null>>干净的水流带走了你衣服上的一部分脏污。
+<<set $equippedCloth.clothdirty to Math.max(0, ($equippedCloth.clothdirty || 0) - 10)>><<tick 10>>
+<</if>>
+[[完成|化工部-清洁间]]
+
+
+/* =====================================================================
+ *  保洁部工作流程：接入 $dirtyZones
+ * =====================================================================
+ *  依赖："战斗系统_最终整合版.twee" 里的 resolveDirtyZoneManually widget
+ *  （用于清理完成后把对应条目从 $dirtyZones 移除并写日志），以及
+ *  JS 那边 _applyAfterFight 往 $dirtyZones 里写入 {layer, block, since,
+ *  autoCleanAt} 的机制。这两个文件要配套加载。
+ *
+ *  改动摘要：
+ *   1) "保洁部待命"：原来只有等待/紧急离开/下班三条路，完全没有
+ *      进入"保洁部过场"的入口。现在改成每次待命 tick 都检查
+ *      $dirtyZones 里有没有待处理现场，有的话把它存进
+ *      $assignedCleanZone 并给一条"前往处理"的链接（不强制跳转，
+ *      玩家可以选择继续等）。
+ *   2) "保洁部过场"：原来目的地楼层写死成 6（Math.abs(6 - ...)），
+ *      改成用 $assignedCleanZone.layer；到达后同步更新 $playerPos，
+ *      让后续逻辑（比如以后再触发袭击拦截）能正确读到玩家实际位置。
+ *   3) "到达" / "tidywork2"：清理进度达到 100% 时，调用
+ *      <<resolveDirtyZoneManually>> 把这个现场从 $dirtyZones 里移除，
+ *      并顺手把两处变量名笔误改对（见上面的说明），让"选对清洁剂
+ *      更快清理"这个机制真正生效。
+ *   4) "紧急离开" / "保洁部结算"：清空 $assignedCleanZone，避免
+ *      玩家中断/下班后再次进入待命时看到一个已经不属于当前流程的
+ *      残留派工。
+ * ===================================================================== */
+
+
+:: 保洁部待命 [nobr] {"position":"2975,6375","size":"100,100"}
+<<if $totalcleaningwaittime <=15>><<set $cleanjobsituation to true>>
+打卡机滴滴作响，显示开始计时。你目前已经在这里待命了$totalcleaningwaittime分钟。<br><br>
+<</if>>
+15分钟过去了。<br><br>
+<<set _zone to ($dirtyZones && $dirtyZones.length) ? $dirtyZones[0] : null>>
+<<if _zone>>
+打卡机弹出一条新的派工提示：<<print _zone.layer>>层「<<print _zone.block>>」需要清理。<br><br>
+<<link "前往处理">>
+  <<set $assignedCleanZone to _zone>>
+  <<goto "保洁部过场">>
+<</link>><br><br>
+<<else>>
+你正在保洁部等待工作……话虽如此，没有工作是不是更好呢？<br><br>
+<</if>>
+
+<<set $totalcleaningwaittime +=15>><<tick 15>><<set $woreout-=1>>
+
+
+[[继续待命|保洁部待命]]<br>
+<<if  $totalcleaningwaittime <=120>>
+[[紧急离开]]
+<<else>>
+[[下班|保洁部结算]]
+<</if>>
+
+
+
+
+:: 保洁部过场 [nobr] {"position":"3075,6375","size":"100,100"}
+人形移动中……<br><br>
+<<set _zone to $assignedCleanZone>>
+<<set $crosstime = Math.abs((_zone ? _zone.layer : 6) - $playerPos.layer)>>
+<<tick $crosstime * 30>><<set $totalcleaningwaittime += $crosstime * 30>>
+
+<<if _zone>>
+  <<set $playerPos to { layer:_zone.layer, block:_zone.block }>>
+<</if>>
+
+<<set $tidycleaninground to random(1,5)>>
+[[到达]]
+
+:: 紧急离开 [nobr] {"position":"3075,6475","size":"100,100"}
+确定吗？在两小时内中断在保洁部的待命将不会获得任何工分。<br><br>
+
+<<link "确定">>
+<<set $cleanjobsituation to false>>
+<<set $assignedCleanZone to null>>
+<<goto "保洁部">>
+<</link>><br>
+[[取消中断待命|保洁部待命]]
+
+
+:: 到达 [nobr] {"position":"3175,6375","size":"100,100"}
+<<if $assignedCleanZone>>
+你们到达了<<print $assignedCleanZone.layer>>层「<<print $assignedCleanZone.block>>」的工作区域。怪物较大的尸块已经被清道夫带走，但仍然剩下了不少东西。地面被血液、碎屑和混合污渍覆盖得几乎无法辨认，脚底踩上去还会发出黏腻的摩擦声。<br><br>
+<<else>>
+你们到达了保洁部的工作区域。地面上残留着血迹、油污和碎裂的零件，踩上去还会发出黏腻的摩擦声。<br><br>
+<</if>>
+<<set $cleaningefficiency to 1>><<set $cleaningproccess to 0>><<tick 5>>
+<<nobr>>
+<<if !($cloth && $cloth.stainId)>>
+  <<set _sid = Object.keys(setup.stains).random()>>
+  <<set $cloth = {stainId:_sid, dissolved:false, processed:false}>>
+<</if>>
+
+脏污类型看上去像是：<strong><<= setup.stains[$cloth.stainId].name >></strong><br><br>
+你在清洁车旁翻出一排标识清晰的清洁剂和溶液，现在需要按照污渍性质挑选最合适的：<br>
+<<listbox "$choice">><<optionsfrom Object.keys(setup.cleaners).map(k => [setup.cleaners[k], k])>><</listbox>><br><br>
+<</nobr>>
+<em><span style="color: grey;">不同污渍对应不同的处理方案：用错清洁剂只会让污渍更顽固，正确的选项能显著降低后续清理难度。</span></em><br><br>
+
+[[使用清洁剂|tidywork1]]<br>
+[[不使用清洁剂，直接开工|tidywork2]]
+
+
+:: tidywork1 [nobr] {"position":"3275,6375","size":"100,100"}
+<<set _rawChoice = $choice>>
+<<if Array.isArray(_rawChoice)>>
+  <<set _realChoice = _rawChoice[1] ?? _rawChoice[0] ?? "water">>
+<<elseif typeof _rawChoice === "string">>
+  <<set _realChoice = _rawChoice>>
+<<else>>
+  <<set _realChoice = "water">>
+<</if>>
+<<set _s = setup.stains[$cloth.stainId]>>
+<<if _s.cleaners.includes(_realChoice)>>
+    你将<<print setup.cleaners[_realChoice]>>沿着污渍边缘缓缓倒下，溶液很快在地面上铺开，附着的污垢开始有松动并浮起。<br><br>
+    <<set $cleaningefficiency += 1>>
+    <span style="color: green;">处理方案有效，后续清理效率提升了。</span><br><br>
+    [[继续工作|tidywork2]]
+<<else>>
+    你试着把<<print setup.cleaners[_realChoice] ?? "该清洁剂">>泼在污渍上，结果只是让地面表层泛起一圈无效的泡沫，污渍几乎没有变化。<br><br>
+    [[重新选择清洁剂|到达]]<br>
+    [[放弃使用清洁剂|tidywork2]]
+<</if>>
+
+:: tidywork2 [nobr] {"position":"3375,6375","size":"100,100"}
+<<set $tasktime += 15>><<tick 15>>
+你在地面上展开拖布和抹布，沿着污渍的边缘缓慢推进。
+<<if $cleaningefficiency >= 2>>
+  <<set $cleaningproccess += random(25,35) * $cleaningefficiency>>
+  受益于正确的处理方案，污渍很快被浮起的溶液软化，接下来你清理起来比平时轻松得多。<br><br>
+<<else>>
+  <<set $cleaningproccess += random(12,22)>>
+  你只能靠反复擦拭和压水去除表层污渍，工作节奏明显慢了下来。<br><br>
+<</if>>
+
+<<if $cleaningproccess <= 10*$tidycleaninground>>
+    <<if $equippedCloth is not null>>
+        <<set $equippedCloth.clothdirty +=10 >>
+    <<else>>
+        <<set $woreout +=7>>
+    <</if>>
+    这片区域的污渍实在过分顽固，地面已经被浸润得发黏，你只能一步一步压住脚下的液体，尽量不让脏污随着你的走动继续扩散。<br><br>
+<<elseif $cleaningproccess < 50*$tidycleaninground>>
+      <<if $equippedCloth is not null>>
+        <<set $equippedCloth.clothdirty += 7 >>
+    <<else>>
+        <<set $woreout +=3>>
+    <</if>>
+    你已经清理掉了相当一部分污渍，但地面上仍然留着一层粘稠的残痕，必须继续推进。<br><br>
+<<else>>
+      <<if $equippedCloth is not null>>
+        <<set $equippedCloth.clothdirty +=2 >>
+    <<else>>
+        <<set $woreout +=0.5>>
+    <</if>>
+    这片区域基本上已经被清理干净，只有零星的污渍残留在缝隙里，只需要简单再扫几遍应该就没问题了。<br><br>
+<</if>>
+<<if $cleaning <= 70>>
+  <<set $cleaning += 2>>
+  你在清理的过程中摸索出一套更有效的擦拭节奏，污渍处理手法也顺了些。<br>
+  <span style="color: green;">+清扫技能</span><br><br>
+ <<else>>
+    你已经对这种现场的脏污处理有了相当熟练的判断，继续保持节奏就足够了。<br>
+<</if>>
+<<if $cleaningproccess < 100*$tidycleaninground>>
+    [[继续清理|tidywork2]]<br>
+    [[中断工作|中断清理并返回保洁部]]
+<<else>>
+    这片区域已经被你和同伴处理得干干净净，管理区的通行风险也随之降低了。<br><br>
+    /* 清理完成：把这个现场从 $dirtyZones 里摘掉，避免自动清理系统
+       和其它清道夫/保洁部玩家重复处理同一个现场 */
+    <<if $assignedCleanZone>>
+      <<resolveDirtyZoneManually $assignedCleanZone.layer $assignedCleanZone.block>>
+      <<set $assignedCleanZone to null>>
+    <</if>>
+    [[返回保洁部待命|返回保洁部]]
+<</if>>
+
+:: 中断清理并返回保洁部 [nobr] {"position":"3475,6375","size":"100,100"}
+出于某些原因，你决定暂时停止对这个现场的处理，并返回保洁部继续待命。<br>
+这次提前撤离会按照已完成工时扣减报酬，因此你的工作记录会受到一定惩罚。<br><br>
+<<set _penaltyMinutes to Math.min(15, Math.max(5, Math.floor($tasktime * 0.2)))>>
+<<set $tasktime to Math.max(0, $tasktime - _penaltyMinutes)>>
+<<set $cleaningefficiency to 1>>
+<<set $cleaningproccess to 0>>
+<<set $assignedCleanZone to null>>
+你本次未完成的清洁工作会保留在现场，等待后续人形继续处理。<br>
+<span style="color: red;">-已累计工作时长：_penaltyMinutes 分钟</span><br><br>
+
+[[返回保洁部待命|返回保洁部]]
+
+:: 返回保洁部 [nobr] {"position":"3075,6375","size":"100,100"}
+你收拾起地上的清理工具，尽量清理干净自己身上的污渍，准备返回保洁部继续待命。<br><br>
+
+<<link "回到保洁部">>
+   <<set $crosstime = Math.abs(6 - $playerPos.layer)>><<tick $crosstime * 30>><<set $tasktime += $crosstime * 30>> 
+    <<goto "保洁部待命">>
+<</link>>
+
+:: 保洁部结算 [nobr]{"position":"2975,6475","size":"100,100"}
+打卡机因为你的触碰而再次滴滴作响。<<set $cleanjobsituation to false>><br>
+<<set $assignedCleanZone to null>>
+<<set _payback to Math.floor($totalcleaningwaittime/15)*2+$tasktime*0.2>>
+根据屏幕显示，你一共待命了 $totalcleaningwaittime 分钟，工作了 $tasktime 分钟，获得了 _payback 工分。<br>
+现在你可以下班了。<br>
+<<set $money +=_payback>><<set  $totalcleaningwaittime to 0>><<set $tasktime to 0>>
+[[确认|保洁部]]
+
+
+:: 保洁部widget[widget nobr]
+/* 手动完成清理时调用（在"工作开始"清洁小游戏结束的地方调用这个，
+   两者都会移除 $dirtyZones 里的条目，但这个是"玩家亲手清理成功"的路径，
+   会额外给一次奖励结算的口子，你可以在这里接你自己的奖励逻辑） */
+<<widget "resolveDirtyZoneManually">>
+  <<set _layer to $args[0]>>
+  <<set _block to $args[1]>>
+  <<if $dirtyZones>>
+    <<set $dirtyZones to $dirtyZones.filter(function(z){
+      return !(z.layer === _layer && z.block === _block);
+    })>>
+  <</if>>
+  <<if !$cleanLog>><<set $cleanLog to []>><</if>>
+  <<set $cleanLog.push({
+    layer:_layer, block:_block, cleaner:$playerName, time:$time.totalMinutes
+  })>>
+  <<if typeof addLog is "function">>
+    <<run addLog(`<b>清洁完成</b>：${_layer}层「${_block}」已恢复（$playerName 亲自处理）`)>>
+  <</if>>
+<</widget>>

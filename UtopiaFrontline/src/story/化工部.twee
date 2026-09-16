@@ -1,0 +1,267 @@
+
+:: 化工部 [nobr]{"position":"2925,3950","size":"100,100"}
+<<set $playerPos to {layer:4, block:"化工部"}>>
+<<if $enterChemical === false>>
+空气中充斥着淡淡的化酸味，一道道锥状光线冷冷地投射下来，让你足够看清身穿防护服的身影穿梭其中。<br>
+一个人形站在顶部打开的巨大反应塔前，绿色的短发在光线的照明下给予旁人散发着荧光的错觉。<br><br>
+<<contactsAdd "quintina" "Quintina-昆汀娜" "化工部部|领班" "Quintina并没有真的注意到你。" "内线 128">>
+<<if $difficulty == "easy">>
+  <<set $npc.quintina.like to 20>> 
+  <<elseif $difficulty == "normal">>
+  <<set $npc.quintina.like to 20>> 
+  <<else>>
+  <<set $npc.quintina.like to 10>> 
+<</if>>
+[[打招呼|1-4-0]]
+<<else>>
+空气中充斥着化学物品的气味，就算排气扇已经全速运转也无法改变这一点。 一道道锥状光线冷冷地投射下来，让你足够看清身穿防护服的身影穿梭其中。<br>
+<<cleanbeforefight>><br>
+<<showNpcContent>><br>
+<<if $workplace=="chemical">>[[开始工作|FactoryOrder]]
+<<else>>[[寻求在化工部的工作]]<</if>><br>
+<<if $openpipeline>>
+    [[生产特殊防护漆]]<br>
+<</if>>
+[[清洁间|化工部-清洁间]]<br>
+[[返回走廊|L4流通走廊]]
+<</if>>
+:: 1-4-0 {"position":"3025,3950","size":"100,100"}
+“……”
+人形对你的声音置若罔闻。
+<<set $calltime to 0>>
+[[再喊一次|1-4-0-1]]
+[[靠近看看|1-4-0-2]]
+
+
+:: 1-4-0-1 {"position":"3125,3900","size":"100,100"}
+<<tick 1>>“…………”
+人形对你的声音置若罔闻。
+<<set $calltime+=1>>
+[[再喊一次|1-4-0-1]]
+[[靠近看看|1-4-0-2]]
+<<if $calltime>=3>> <<goto "1-4-0-1-0">><</if>>
+
+
+:: 1-4-0-1-0 {"position":"3275,3975","size":"100,100"}
+你像是对着空气一样说话，直到Lodia推着一辆装满瓶瓶罐罐的推车出现在门口。
+她的目光在你和那个和雕塑大差不差的人形间游移了一下，马上露出一副了然的神情。
+
+“别告诉我你就这样和她对峙了这么久。”她眨眨眼，把车推到你旁边。
+
+[[事实上你说的没错|1-4-0-1-1]]
+[[并没有发生这样的事情|1-4-0-1-1]]
+
+
+
+:: 1-4-0-1-1 {"position":"3275,3875","size":"100,100"}
+”好吧，不管怎么样，她把你晾在这都太过分了——Quintina！“
+
+人形终于回过头，你没法透过她脸上的那副深色护目镜判断她究竟有着一双什么样的眼睛——又或者她根本没有这个结构。
+
+“我把你可能需要的调和剂都带来了。”
+
+“……”
+护目镜光滑的表面反射出你们的身影，Quintina没有做出任何的动作、发出任何的声音，只是那样——看着你们？
+
+“……不要用内部通讯和我说话，我的外部音频接收器好着呢。”Lodia严肃地摇了摇手指，拍了一下你的肩膀，“而且这对$playerName不公平，你说的话她听不见。”
+
+“……&#%#^效率最高的方式。”一阵电流声后，Quintina似乎终于找回了她毫无特点的声音，”$playerName未取得权限不是出于我的缘故，因此我不会再重复刚才的话。”
+
+“我真该和Corrina打个报告，让她治治你爱答不理的毛病。”Lodia看上去相当无奈,“好吧，$playerName，刚刚Quintina说有个倒霉蛋刚从反应塔里被打捞出来，无色的酸液滴得到处都是——还烧坏了无数清洁机器和拖把，让我们小心点。”
+<<set $enterChemical to true>>
+[[继续|化工部]]
+
+
+:: 1-4-0-2 {"position":"3125,4000","size":"100,100"}
+“小心地面上的酸液。”
+
+你刚踏出一步，她的声音像是触发了机关一般毫无感情地响起：“十分钟前有个人形从反应塔里被打捞出来时留下了无色高危化合物，我还没来得及检测它在损耗两个自动清洗机和五个拖把后是否得到了充分的无害化反应。”
+
+人形回过头，你没法透过她脸上的那副深色护目镜判断她究竟有着一双什么样的眼睛——又或者她根本没有这个结构。
+“我是Quintina，化工部的领班。”护目镜光滑的表面反射出你的身影。
+
+“如果你是误闯进来的——我劝你立刻离开，否则我将不得不把你写进事故记录。”
+<<set $enterChemical to true>>
+[[继续|化工部]]
+
+
+
+
+
+:: 化工部-清洁间 {"position":"2475,7650","size":"100,100"}
+<<set $playerPos to {layer:4, block:"化工部-清洁间"}>>化工部的清洁间除了衣柜，还安装有数个金属制的紧急冲洗器，看来这里除了更换衣服还可以冲洗溅到身上的化学物质。
+<<showNpcContent>>
+
+<<if $checkmap&&!$outlet4on>>[[寻找通风口|寻找通风管4]]<</if>>
+[[清洗自己]]
+[[衣柜]]<<if $outlet4on>><br>[[通风口]]<</if>>
+[[离开|化工部]]
+
+:: 清洗自己
+你打开水龙头，清洗你身上的污渍。
+<<if $equippedCloth is not null>>    干净的水流带走了你衣服上的一部分脏污。
+<<set $equippedCloth.clothdirty to Math.max(0, ($equippedCloth.clothdirty || 0) - 10)>>
+<<tick 10>>
+<</if>>
+[[完成|化工部-清洁间]]
+
+:: 寻求在化工部的工作 {"position":"3300,3700","size":"100,100"}
+<<if $workgrade >= 3>>“……”Quintina好像没听到你的要求，因为她并没有对此做出回复。
+
+在你几乎要以为她要用沉默拒绝你的时候，她指向一排金属色的管道，开口道：
+“冷却系统出现异常，帮我拧开那边编号4到7的冷却阀。”
+
+阀门在压力下发出尖锐的鸣叫声，警告灯随之开始闪烁，把整块区域都笼罩在闪烁的橙色光芒下。
+“不再做点什么的话反应塔要在五分钟内爆炸了。不帮忙就走，别妨碍我修复系统。”
+
+Quintina的另一只手飞快地操作着面板，语气平淡到可怕。
+
+[[帮忙]]
+[[退后]]
+<<else>>“你还没到可以来化工部工作的等级，等到够格的时候再来找我。”
+Quintina头都没抬起来。
+<span style="color: grey;">【你目前的工作等级是$workgrade,需要提升到3级或者以上才能来化工部工作。】</span>
+
+[[好吧|化工部]]
+<</if>>
+
+:: 退后 {"position":"3400,3725","size":"100,100"}
+“明智的决定，和危险保持距离的人通常能活得更久。”
+随着Quintina按下操作台上的某个按键，阀门处传来一阵牙酸的摩擦声——你能听到一阵液体冲过管道，警报灯熄灭了。
+
+Quintina终于抬头，但是没有看向你：“你可以走了。”
+
+[[离开|化工部]]
+
+
+:: 帮忙 {"position":"3400,3625","size":"100,100"}
+你顶着开始泄露的白烟冲过去，尽可能快地把指定的阀门全部拧开。
+阀门处传来一阵牙酸的摩擦声——你能听到一阵液体流动的声音冲过管道，警报灯熄灭了。
+
+Quintina终于抬头看向你，你从她的脸上捕捉到了一丝赞许的神色：“不错。”
+“化工部的工作内容就是控制这些仪器，从而让它们制造出合格的产品。订单会发送到你的操作台上，每完成一单都会有工分作为报酬。考虑一下吧。”
+
+[[接受这份工作]]
+[[我再想想]]
+
+
+
+:: 接受这份工作 {"position":"3500,3625","size":"100,100"}
+“挺有胆的嘛？那就好好干，别让我失望。”
+
+<em>你现在是化工部的一员了！你可以随时过来工作。</em>
+<<set $playerJob to "后勤">>
+<<set $workplace to "chemical">>
+[[继续|化工部]]
+
+:: 我再想想 {"position":"3500,3725","size":"100,100"}
+Quintina不置可否地耸肩：“和危险保持距离的人通常能活得更久，多数情况下。”
+
+
+[[继续|化工部]]
+
+
+:: FactoryOrder [nobr] {"position":"3875,3825","size":"100,100"}
+<<nobr>>
+<<set _order = setup.orders.random()>>
+<<set $job = {
+    ing   : _order.ing,
+    prod  : _order.prod,
+    pay   : _order.pay,
+    route : _order.ing + "→" + _order.prod,   /* “A→X” 这种键 */
+    step  : 0,                                /* 0=待开始 1=化学处理 2=分离 3=后处理 */
+    ok    : [false,false,false]               /* 三步是否都正确 */
+}>>
+终端送来了新的化工订单……
+<h2>新订单</h2>
+需求产品：<strong><<= $job.prod >></strong><br>
+交付酬劳：<strong><<= $job.pay >></strong> money<br>
+原料已备好：<strong><<= $job.ing >></strong><br><br>
+<<button "开始加工">><<goto "ProcessPhase">><</button>>
+<</nobr>>
+
+
+
+:: FinishOrder {"position":"3875,3425","size":"100,100"}
+<h2>生产成功！</h2>
+你成功操作机器，把 <<= $job.ing >> 加工成了 <<= $job.prod >>！<br>
+获得 <<= $job.pay >> money。<br><br>
+<<set $money += $job.pay>>
+<<button "下一个订单">><<goto "FactoryOrder">><</button>>
+[[结束工作|化工部]]
+
+
+:: OrderFail {"position":"3875,3525","size":"100,100"}
+<<set $chemorderfail = [
+    "你制造出了一堆很奇怪的产品。",
+    "你制造出了一种看上去就不能被使用的产品。",
+    "你制造出了一种一言难尽的产品。"
+]>>
+<<print either( $chemorderfail )>>
+
+生产线末端的机器在扫描它们时闪烁起红灯，是因为你选择了错误的工艺吗……？
+<em><span style="color: grey;">你可以在开始制作时选择【任务日志】中的【查看工序合集】复习正确的工艺流程。</span></em>
+
+[[重新接单|FactoryOrder]]
+[[结束工作|化工部]]
+
+
+:: ProcessCheck [nobr] {"position":"3875,3625","size":"100,100"}
+<<nobr>>
+debug: 当前 route = <<= $job.route >><br>
+debug: 化学正确值 = <<= setup.processes.chem[$job.route] >><br>
+debug: 分离正确值 = <<= setup.processes.sep[$job.route]  >><br>
+debug: 后处理值   = <<= setup.processes.post[$job.route] >><br>
+debug: 玩家选了0  = <<= $step0 >><br>
+debug: 玩家选了1  = <<= $step1 >><br>
+debug: 玩家选了2  = <<= $step2 >><br>
+<</nobr>>
+<<nobr>>
+<<set _route = $job.route>>
+
+<<set _ok0 = (setup.processes.chem[_route]   == $step0)>>
+<<set _ok1 = (setup.processes.sep[_route]    == $step1)>>
+<<set _ok2 = (setup.processes.post[_route]   == $step2)>>
+
+<<set $job.ok = [_ok0,_ok1,_ok2]>>
+<<set _allCorrect = _ok0 && _ok1 && _ok2>>
+
+<<if _allCorrect>>
+    <<goto "FinishOrder">>
+<<else>>
+    <<goto "OrderFail">>
+<</if>>
+<</nobr>>
+
+
+:: ProcessPhase [nobr] {"position":"3875,3725","size":"100,100"}
+<<nobr>>
+/* 工具：数组去重 */
+<<set _uniq = (arr) => arr.filter((v,i,a)=>a.indexOf(v)===i)>>
+
+/* 生成三道工序的不重复列表 */
+<<set _listChem = _uniq(Object.values(setup.processes.chem))>>
+<<set _listSep  = _uniq(Object.values(setup.processes.sep))>>
+<<set _listPost = _uniq(Object.values(setup.processes.post))>>
+
+<h2>请一次性完成三道工序</h2>
+
+化学处理：<br>
+<<listbox "$step0">><<optionsfrom _listChem>><</listbox>><br><br>
+
+产物分离与纯化：<br>
+<<listbox "$step1">><<optionsfrom _listSep>><</listbox>><br><br>
+
+后处理与产品成型：<br>
+<<listbox "$step2">><<optionsfrom _listPost>><</listbox>><br><br>
+
+<<button "全部确认">><<goto "ProcessCheck">><</button>>
+<</nobr>>
+
+
+:: 生产特殊防护漆
+
+
+
+
+[[取消|化工部]]

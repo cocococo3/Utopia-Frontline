@@ -1,0 +1,673 @@
+
+:: 看守部 [nobr]{"position":"2525,1975","size":"100,100"}
+看守部的大门并不像其他部门一样大敞着，你花了点时间，才找到一道边门可以进入。二氧化碳和水蒸气让空气都显得粘稠沉重，使得你对这里的第一印象并不是那么愉快。<br>
+<<roll $hiding>>
+<<if $success>>
+  你看到接近天花板位置的墙壁上有隐藏的活板，正对着出口和要道。<br>
+<</if>>
+<<tick 30>><<set $playerPos to {layer:2, block:"看守部"}>> <<cleanbeforefight>>
+<<if $enterdetention == false>>
+通过弯弯绕绕的狭小走廊，你终于走到了另一端的尽头。随着你的开门，一个人形警卫看向了你的方向。<br>
+也就是在这几秒的功夫，她就被一个健壮的囚犯撞到一旁，规整的人群出现了一个骚动的开口，人群的喧哗声爆发起来。<br>
+人形们迅速举起防暴叉阻拦囚犯的四散，但还是有漏网之鱼——那个健壮的犯人正举着手上的镣铐，拼命地往你的方向跑来。<br>
+<br>
+[[摆出战斗姿势|1-1-1][$fighting+=1]]<br>
+[[从冲撞路线上闪开|1-1-1][$evade+=1]]<br>
+[[什么都不做|1-1-1]]<br>
+<<set $enterdetention to true>>
+<<else>><nobr><<showNpcContent>><br><br></nobr>
+<br>
+<<if $workplace==="detention">>
+    [[前往工作|看守部工作过渡]]<br>
+<<else>>
+	[[寻求在看守部的工作]]<br>
+ <</if>>
+[[武器存放处]]<br>
+[[放风区|看守部-放风区]]<br>
+[[教化司]]<br>
+[[医务室|看守部-医务室]]<br>
+[[休息处|看守部-休息处]]<br>
+[[返回走廊|L2流通走廊]]<br>
+<</if>>
+
+
+:: 1-1-1 {"position":"2525,2075","size":"100,100"}
+在你有所行动之前，那个人类两眼一翻，浑身抽搐地倒下了，一把通电的电击枪咕噜咕噜地从他身后滚出来。
+
+一旁你不曾注意的走廊中，一个高大的人形身影从阴影中显现，你看到她的整个脸部和前半部分的头部被一个奇怪的印着空心三角形的装置所遮盖了大半，只有几缕紫色的短卷发从黑色的金属和玻璃缝隙下露出，在惨白的灯光下十分醒目。
+
+人群安静下来，在凝滞的恐惧中看着那个人形迈着沉重的脚步走到了那个倒地的犯人身后，像丢垃圾一样把他丢给了其他的人形。后者中有人形迅速接住那具人类的身体，把他带走了。而高大的人形转向了你：
+
+“……新的同僚吗？请接受我的道歉，我的下属工作疏忽了。我是Eumen，看守部领班。”
+<<contactsAdd "Eumen" "Eumen-Eumen" "看守部|领班" "Eumen视你为需要照顾的新人。" "内线 011">><<set $npc.eumen.like to 35>> 
+
+[[点头致意|1-1-1-0]]
+[[赞美她的威压|1-1-1-2]]
+[[询问她头上的装置|1-1-1-3]]
+
+
+
+:: 1-1-1-0 {"position":"2725,2075","size":"100,100"}
+“我得继续监管这群人类去做他们该做的事情，失陪了。”
+<<if $woreout>=75>>Eumen在完全背向你前又转头看了你一眼：“你看上去有些糟糕，或许你应该去维修部维修一下。”<</if>>
+Eumen和其他人形警卫带着囚犯离开了。
+
+[[继续|看守部]] 
+
+
+:: 1-1-1-2 {"position":"2625,2075","size":"100,100"}
+你毫不吝啬地表达自己对她震慑力的欣赏。
+
+“是吗？我总觉得这还不够——对于管理身后那群社会渣滓来说。不过我很高兴你会欣赏这一点……或许我们会有共同话题。”
+<span style="color: green;">+Eumen的好感</span><<set $npc.eumen.like+=1>>
+
+“这些事情以后再聊吧，我得继续监管这群人类去做他们该做的事情，失陪了。”
+<<if $woreout>=75>>Eumen在完全背向你前又转头看了你一眼：“你看上去有些糟糕，或许你应该去维修部维修一下。”<</if>>
+Eumen和其他人形警卫带着囚犯离开了。
+
+[[继续|看守部]] 
+
+
+:: 1-1-1-3 {"position":"2625,2175","size":"100,100"}
+你对Eumen头上的装置是什么提出疑问。
+
+“这是一个特殊的装置，有利于……我管理这些人类。”Eumen似乎并不愿意在其他人——特别是犯人们面前多说关于装置的事情，有些生硬地结束了这个话题，“抱歉，我得继续监管这群人类去做他们该做的事情，失陪了。”
+<<if $woreout>=75>>Eumen在完全背向你前又转头看了你一眼：“你看上去有些糟糕，或许你应该去维修部维修一下。”<</if>>
+Eumen和其他人形警卫带着囚犯离开了。
+
+[[继续|看守部]] 
+
+
+
+:: 寻求在看守部的工作 {"position":"3000,1800","size":"100,100"}
+<<if $workgrade >= 4>>“你要来看守部工作？”
+你的脸一定是对Eumen惊讶的语气作出了反应，因为她马上解释道：“不……我当然不是怀疑你的能力，但是挺多人形都没法忍受管理这群人类。”
+
+“看守部是轮班制，你需要持续工作12小时，然后才能休息12小时。期间你需要应付这些囚犯的闲言碎语、观察他们有没有违规行为、还要在固定的时间点把他们押去各种场所。”
+
+“工分会在你结束轮班时发放给你，每轮基础90分。不过如果你工作过程中有失误，可能会被扣除一部分，同理，如果你无差错地完成了这轮工作，你可以获得更多的分数。”
+
+[[接受看守部工作]]
+[[不接受看守部工作]]
+<<else>>
+“你的工作等级还没有达到可以来这里工作的标准，等达到4级或以上之后再来吧。”
+<span style="color: grey;">【你目前的工作等级是$workgrade,需要提升到4级或者以上才能来看守部工作。】</span>
+
+[[好吧|看守部]]
+<</if>>
+
+
+:: 接受看守部工作 {"position":"3100,1800","size":"100,100"}
+<<set $playerJob to "后勤">>
+<<set $workplace to "detention">>“说真的，这边挺缺人手的，我代表看守部欢迎你。”
+“那么你需要在上午6:00前到看守部。以及，记得充满电，如果你工作半途关机了，你可拿不到这轮工作的工分。”
+
+[[知道了|看守部]]
+
+:: 不接受看守部工作 {"position":"3100,1900","size":"100,100"}
+“可以理解的选择。”
+
+[[继续|看守部]]
+
+
+
+
+
+:: 监狱场景随机 [widget] {"position":"3875,1925","size":"100,100"}
+<<widget "pickScene">>
+  <<set _pool = setup.crimeScenes>>
+  <<set _total = _pool.reduce((a,b)=>a+b.weight, 0)>>
+  <<set _rand = random(1,_total)>>
+  <<set _sum = 0>>
+  <<for _i, _scene range _pool>>
+    <<set _sum += _scene.weight>>
+    <<if _rand <= _sum>>
+      <<set _p = (_scene.who || $prisoners.random())>>
+      <<set $currentCrimePrisoner to _p>>
+      <<set _text = _scene.text.replace('$NAME', _p.name)>>
+      <<set $currentScene to {text:_text, isCrime:_scene.isCrime}>>
+      <<break>>
+    <</if>>
+  <</for>>
+<</widget>>
+
+
+
+:: 看守部工作过渡[nobr]
+<<if $time.hour == 6 && $time.minute == 0>>
+  时间刚刚好，该工作了。
+  [[开始工作|CellBlock]]
+
+<<elseif $time.hour < 6>>
+  <<set _remainMinutes = (6 * 60) - ($time.hour * 60 + $time.minute)>>
+  <<set _hours = Math.floor(_remainMinutes / 60)>>
+  <<set _minutes = _remainMinutes % 60>>
+  <<set $playerPos to {layer:2, block:"看守部-休息处"}>>
+  离你的工作时间开始还有一段时间，你来到休息区稍作等候。
+  距离开始工作还有 <<= _hours>> 小时 <<= _minutes>> 分钟，在此期间你可以使用休息室里的物品。
+
+  <<link "打发时间直到工作开始" "看守部工作过渡">>
+    <<set $time.totalMinutes to ($time.totalMinutes ?? ($time.hour * 60 + $time.minute)) + (_hours * 60 + _minutes)>>
+    <<set $time.day = Math.floor($time.totalMinutes / 1440) + 1>>
+    <<set $time.hour = Math.floor(($time.totalMinutes % 1440) / 60)>>
+    <<set $time.minute = $time.totalMinutes % 60>>
+  <</link>>
+  [[查看工作内容]]
+  [[衣柜]]
+  [[应急充电仓]]
+  [[离开|看守部]]
+
+<<elseif $time.hour > 17>>
+  今天的工作时间已经结束了，明天再来吧。
+
+  [[离开|看守部]]
+
+<<else>>
+  <<set _elapsedMinutes = ($time.hour * 60 + $time.minute) - (6 * 60)>>
+  <<set _hours = Math.floor(_elapsedMinutes / 60)>>
+  <<set _minutes = _elapsedMinutes % 60>>
+  你的工作已经开始了 <<= _hours>> 小时 <<= _minutes>> 分钟！你迟到了！
+
+  [[开始工作|CellBlock]]
+<</if>>
+
+:: CellBlock[widget] {"position":"3200,1900","size":"100,100"}
+
+<<widget "detentionPatrolEvent">>
+  <<set _normalEvents to [
+    "你的手指在门缝间轻触一遍，门锁没有异常，牢房里只有几名囚犯在整理床铺。",
+    "你扫过空气的气味和局部光线，发现只是犯人间的小规模争吵，没有真正的违规行为。",
+    "牢房里的秩序看起来正常，只有一两个人低声抱怨，没必要立刻动用制止措施。",
+    "你打开门后发现囚犯正在按规定整理被褥，情况很正常，几乎没有需要记入报告的内容。"
+  ]>>
+  <<set _violationEvents to [
+    "你发现一名囚犯在床底藏着一条金属制小刀，刀身已经被磨得发亮。",
+    "囚犯正试图在水壶里混入药粉，你立刻看到了异常的白色粉末。",
+    "一个人类悄悄把一卷细绳和一枚小型开锁器塞进了床板缝里，明显是在伺机逃跑。",
+    "你注意到某个囚犯的床铺里夹着一支已拆解的电击工具，显然是违规藏匿。",
+    "其中一名犯人在柜台后面藏了药物和纸片，想偷偷完成交易。"
+  ]>>
+
+  <<set _isViolation to random(1,100) <= 60>>
+  <<if _isViolation>>
+    <<set _eventText to _violationEvents[random(0, _violationEvents.length - 1)]>>
+    <<set $detentionPatrol.currentCellEvent to {isViolation: true, text: _eventText}>>
+  <<else>>
+    <<set _eventText to _normalEvents[random(0, _normalEvents.length - 1)]>>
+    <<set $detentionPatrol.currentCellEvent to {isViolation: false, text: _eventText}>>
+  <</if>>
+  <<print $detentionPatrol.currentCellEvent.text>>
+<</widget>>
+
+:: 巡逻 [nobr]{"position":"3300,1900","size":"100,100"}
+<<set $detentionPatrol to $detentionPatrol ?? {index:1, total:8, score:0, contraband:0, misses:0, delay:0}>>
+<<set $detentionPatrol.score to Number($detentionPatrol.score ?? 0)>>
+<<set $detentionPatrol.index to Number($detentionPatrol.index ?? 1)>>
+<<set $detentionPatrol.total to Number($detentionPatrol.total ?? 8)>>
+
+<<if $detentionPatrol.index > $detentionPatrol.total>>
+ 今日你在看守部的工作落下帷幕，你累计找出<<print $detentionPatrol.contraband>>件可疑物品，工作表现为<<print $detentionPatrol.score>>分。
+ <<if $detentionPatrol.score >= 10>>
+    “没有任何差错，你的工作很用心。”
+Eumen发来了一条通讯。
+<<set $npc.eumen.like +=5>>
+<em>由于你的工作表现优异，Eumen对你更加欣赏了。</em>
+<span style="color: green;">++Eumen的好感</span><<set $npc.eumen.like+=1>>
+  <</if>>
+  [[下班！|看守部]]
+<<else>>
+  <<set $playerPos to {layer:2, block:"看守部-牢房"}>>
+  <<set _remain to Math.max(0, $detentionPatrol.total - $detentionPatrol.index + 1)>>
+  你现在正在第<<print $detentionPatrol.index>>号囚犯牢房前，还有<<print _remain>>个牢房等待你去管理。<br>
+  <<if $time.hour >= 6 && $time.hour < 8>>
+    现在是$time.hour时$time.minute分，你正在主要的牢房区域进行例行管理。<br>
+    你按顺序打开牢房，检查囚犯状态、驱赶那些动作慢的人离开并确认门锁。<br>
+    <<detentionPatrolEvent>><br>
+
+    <<if $detentionPatrol.currentCellEvent.isViolation>>
+      这名囚犯的异常很明显，若你现在立即处理，能避免后续更大的纪律问题。<br>
+    <<else>>
+      这看起来只是寻常的秩序问题，并没有明显违规迹象，谨慎处理更稳妥。<br>
+    <</if>>
+
+    [[继续观察|巡逻]]
+    [[抓捕|抓捕]]
+    <<if $chaos>=40>>[[恐吓一下囚犯|恐吓一下囚犯]]<</if>>
+    
+  <<elseif $time.hour >= 8 && $time.hour < 12>>
+    现在是$time.hour时$time.minute分，你正在主要的牢房区域进行例行工作。<br>
+    你跟随保洁部的人形一起清理牢房，用你的视觉模块与手检查夹层、床底和储物柜里是否藏有违禁品。<br>
+    <<set _x to random(1,10)>>
+    <<set _hidingitem to null>>
+    <<set _hiddenItemId to null>>
+    <<if _x >= 8>>
+      <<set _hidingitem to "违禁品">>
+      <<set _hiddenItemId to "jointoil">>
+    <<elseif _x >= 4>>
+      <<set _hidingitem to "普通物品">>
+      <<set _hiddenItemId to "coins">>
+    <<else>>
+      <<set _hidingitem to null>>
+    <</if>>
+    <<roll $hiding>>
+    <<if $success>>
+      <<if _hidingitem == null>>
+        经过你的确认，房间里很干净，没有藏着违禁品或者其他东西。<br>
+      <<else>>
+        细微的异常逃不过你锐利的视线，你在床底/夹层/管道/死角找到了被犯人藏匿在暗处的<<print _hidingitem>>，现在该决定它的命运了。<br>
+
+        <<if _hidingitem == "违禁品">>
+          [[取走它并且上报|取走它并且上报]]
+        <</if>>
+        [[把它占为己有|把它占为己有]]
+        [[放回去|放回去]]
+      <</if>>
+    <<else>>
+      你什么都没有发现，究竟是这里真的没有藏匿东西，还是你没有发现藏匿的物品呢？
+      <<set $hidingitem to _hidingitem>>
+      <<set $hiddenItemId to _hiddenItemId>>
+      [[再次检查这个房间|再次检查这个房间]]
+    <</if>>
+    [[去检查下一个牢房|巡逻]]
+   
+  <<elseif $time.hour >= 12 && $time.hour < 14>>
+    你在食堂与教化司之间维持秩序，确保囚犯按队列移动，避免发生逃跑或冲突。<br>
+
+
+
+  <<elseif $time.hour >= 16 && $time.hour < 18>>
+    晚饭过后，你重新核对囚犯人数，确认每个人都已回到牢房内，并检查门锁和囚犯状态。<br>
+  <<else>>
+    你在走廊上巡逻，观察囚犯的情绪和秩序，随时准备在异常发生时干预。<br>
+  <</if>>
+
+ 
+ 
+  
+<</if>>
+
+
+:: 抓捕 {"position":"3300,2025","size":"100,100"}
+<<set $detentionPatrol to $detentionPatrol ?? {index:1, total:8, score:0, contraband:0, misses:0, delay:0}>>
+<<set $detentionPatrol.delay += 1>>
+<<tick 15>>
+<<if $detentionPatrol.currentCellEvent && $detentionPatrol.currentCellEvent.isViolation>>
+  你迅速制止了那个囚犯的违规动作，并把他押送到了禁闭室。
+  这次处理拖慢了你本轮巡逻的节奏，但也避免了更大的纪律问题。
+  <<set $detentionPatrol.score += 2>>
+  <<set $detentionPatrol.contraband += 1>>
+<<else>>
+  你因为误判情况而直接抓捕了那名囚犯，结果只是平息了一个正常的争吵。
+  这让你在记录里留下了一次误判，监督会记住这一点。
+  <<set $detentionPatrol.score -= 2>>
+<</if>>
+<<set $detentionPatrol.index += 1>>
+
+<<if $detentionPatrol.index > $detentionPatrol.total>>
+  <<goto "看守部-巡逻总结">>
+<<else>>
+  [[继续巡逻|巡逻]]
+  [[禁闭室|看守部-禁闭室]]
+<</if>>
+
+
+:: 再次检查这个房间
+不管是出于责任感还是内心的不安，你决定再次检查你所在的这个牢房。<<tick 5>>
+<<roll $hiding>>
+<<if $success>>
+  <<if $hidingitem == null || $hidingitem == "null">>
+    经过你的确认，房间里很干净，没有藏着违禁品或者其他东西。
+  <<else>>
+    细微的异常逃不过你锐利的视线，你在床底/夹层/管道/死角找到了被犯人藏匿在暗处的<<print $hidingitem>>，现在该决定它的命运了。
+
+    <<if $hidingitem == "违禁品">>
+      [[取走它并且上报|取走它并且上报]]
+    <</if>>
+    [[把它占为己有|把它占为己有]]
+    [[放回去|放回去]]
+  <</if>>
+<<else>>
+  你还是什么都没有发现，究竟是这里真的没有藏匿东西，还是你没有发现藏匿的物品呢？
+  [[再次检查这个房间|再次检查这个房间]]
+<</if>>
+[[去检查下一个牢房|巡逻]]
+
+
+:: 取走它并且上报
+<<set $detentionPatrol.score += 1>>
+<<if $hidingitem == "违禁品">>
+  <<set $detentionPatrol.contraband += 1>>
+<</if>>
+你把搜出的违禁品上交给Eumen，并把这次发现记录在工作日志里。
+[[继续|巡逻]]
+
+:: 把它占为己有
+<<if $hiddenItemId>>
+  <<gainItem $hiddenItemId 1>>
+  你将搜出的物品悄悄收进了自己的随身物件里。
+<<else>>
+  你本来想私吞这件东西，但将它悄悄带走不大现实，最终只能作罢。
+<</if>>
+[[继续|巡逻]]
+
+:: 放回去
+人类总会有一些秘密，而你选择不去深究。
+你把搜出的物品又放回了原位。
+
+[[继续|巡逻]]
+
+:: 看守部-禁闭室 {"position":"3200,2025","size":"100,100"}
+黑暗的禁闭室里只有微弱的白灯照亮走道，金属门在你面前发出低沉的回响。
+你可以在这里对违规囚犯进行临时隔离，并记录他们的违规处理结果。
+
+[[纪录违规并返回巡逻|巡逻]]
+[[回到看守部|看守部]]
+
+:: 恐吓一下囚犯 {"position":"3500,2025","size":"100,100"}
+<<set $detentionPatrol to $detentionPatrol ?? {index:1, total:8, score:0, contraband:0, misses:0, delay:0}>>
+<<tick 5>>
+你站在牢房门前，用低沉而威严的声音威胁囚犯，不让他们继续制造骚动。
+囚犯们很快安静下来，秩序得以暂时恢复。
+<<set $detentionPatrol.score += 2>>
+<<set $detentionPatrol.index += 1>>
+<<if $detentionPatrol.index > $detentionPatrol.total>>
+  <<goto "看守部-巡逻总结">>
+<<else>>
+  <<goto "巡逻">>
+<</if>>
+
+:: 开小差 {"position":"3400,1900","size":"100,100"}
+<<set $detentionPatrol to $detentionPatrol ?? {index:1, total:8, score:0, contraband:0, misses:0, delay:0}>>
+<<set $detentionPatrol.score -= 1>>
+<<tick 10>>
+你在走廊的拐角处停了一会儿，借机喘息，但工分和秩序都在一点点流失。
+<<if $detentionPatrol.index > $detentionPatrol.total>>
+  <<goto "看守部-巡逻总结">>
+<<else>>
+  <<goto "巡逻">>
+<</if>>
+
+:: 看守部-巡逻总结 {"position":"3600,1900","size":"100,100"}
+<<set $detentionPatrol to $detentionPatrol ?? {score:0, contraband:0}>>
+今日巡逻总结：本轮工作得分为 <<print $detentionPatrol.score>>，共发现 <<print $detentionPatrol.contraband>> 件可疑物品。
+<<if $detentionPatrol.score >= 10>>
+  你的工作状态稳定而专业，Eumen会记得这次出色的表现。
+  [[前往报告|看守部一轮工作全优]]
+<<else>>
+  你的表现不错，但还没有达到这轮工作的最高标准。
+  [[返回看守部|看守部]]
+<</if>>
+
+
+:: 看守部-休息处 {"position":"3100,2475","size":"100,100"}
+看守部为在这里工作的人形设立了休息处，给她们提供修整的空间。一侧墙面上立着一列长方形的铁灰色储物柜，另一边则安装着数个应急充电仓。
+<<set $playerPos to {layer:2, block:"看守部-休息处"}>>
+
+<<if $flags.eumen_backstory_1>>
+Eumen——或者说Eumen控制下的人形躯壳之一正在整理储物柜内的东西。
+<<else>>
+<<roll $hiding>>
+<<if $success>>
+<<goto "Eumen事件1">>
+<</if>>
+<</if>>
+[[衣柜]]
+[[应急充电仓]]
+[[回到看守部|看守部]]
+
+
+
+
+
+:: Eumen事件1
+看守部为在这里工作的人形设立了休息处，给她们提供修整的空间。一侧墙面上立着一列长方形的铁灰色储物柜，另一边则安装着数个应急充电仓。
+
+你走进休息处，注意到Eumen刚离开充电仓，但是你分明记得你刚才还看见她在看守部外面巡逻。
+<<if !$firstfight>>而且你也可以确认没有什么怪物在影响你的系统。<</if>>除非你的视觉接收器错乱了，否则这常规而言是绝对不可能的。
+
+[[刷新你的视觉接收器|EumenEvent1-1]]
+[[叫住Eumen，反正你有不少事情想要问她|EumenEvent1-2]]
+
+
+
+
+:: EumenEvent1-1
+你花了几秒的时间自检并且刷新了你的视觉处理器，很好，一切正常，不是你的幻觉。这只能证明你看到的都是真的。
+
+与此同时，另一个“Eumen"打开了休息室的大门，和你面面相觑。
+
+[[你不是Eumen，你到底是谁？！|EumenEvent1-2-1]]
+[[是我的视觉接收器出故障了，还是我真的看到了两个Eumen？|EumenEvent1-2-1]]
+
+
+
+:: EumenEvent1-2
+你叫住了还没来得及离开休息室的Eumen。
+“有什么事吗，$playerName？”
+Eumen用着与平常别无二致的语气和你打招呼。
+
+与此同时，另一个“Eumen"打开了休息室的大门，和你面面相觑。
+
+[[你不是Eumen，你到底是谁？！|EumenEvent1-2-1]]
+[[是我的视觉接收器出故障了，还是我真的看到了两个Eumen？|EumenEvent1-2-1]]
+
+
+
+:: EumenEvent1-2-1
+“我确实是Eumen……”两个Eumen同时开口，但在接收到彼此声音的那一刻又像被同时按住了停止键一般停止了发声。
+
+在一阵调校性的沉默后，那个刚进门的Eumen小心翼翼地开口，仿佛只要她的声音过大就会引发看不见的雪崩似的：
+
+“好吧，这确实需要详细的解释。我——也就是‘Eumen’——是一个格式塔意识，也就是说，我可以同时存在于多个人形机体之中，并且通过无线信号实现统一控制。”
+“你看到的两个我，只是由同一个意识控制的两个躯体而已。”
+<<set $flags.eumen_backstory_1 to true>>
+[[暂且相信，但是还是有问题要问|EumenEvent1-2-1-1]]
+
+
+
+:: EumenEvent1-2-1-1
+“你有什么问题都可以问。”靠近门口的那个Eumen——或者说，Eumen之一——说。另一个Eumen则说着“我需要先去工作了”，先行离开了休息室。
+
+[[一共有多少个“Eumen”？|EumenEvent1-2-1-1-5]]
+[[你的哪个身体里有主处理器？|EumenEvent1-2-1-1-1]]
+[[你成为格式塔多久了？|EumenEvent1-2-1-1-2]]
+[[其他人形知道你是格式塔吗？|EumenEvent1-2-1-1-3]]
+[[没有问题了|EumenEvent1-2-1-1-4]]
+
+
+:: EumenEvent1-2-1-1-5
+你面前的Eumen微微抬起头，似乎在用接收器收取空气中的信号：“目前我有8个人形机体处于活跃状态，还有数个处于休眠状态的备用机体没有被启用。”
+
+“一般不同机体都会在不同区域活动，碰面交流是没有必要的，因为我可以同时读取到所有机体接收到的任何信息。”
+“我会避免它们在不必要场合的重叠活动，一方面是为了避免不该知道的人起疑，另一方面，不同机体频繁接触会增加思考负荷。“
+<<set $eumen1question1 to true>>
+<<if !$eumen1question2>>[[你的哪个身体里有主处理器？|EumenEvent1-2-1-1-1]]<</if>>
+<<if !$eumen1question3>>[[你成为格式塔多久了？|EumenEvent1-2-1-1-2]]<</if>>
+<<if !$eumen1question4>>[[其他人形知道你是格式塔吗？|EumenEvent1-2-1-1-3]]<</if>>
+[[没有问题了|EumenEvent1-2-1-1-4]]
+
+:: EumenEvent1-2-1-1-1
+“你可以猜。但答案是——没有任何人形承载了我的处理器。”
+“我的处理器在管理区的一个特殊房间内，连接着大量的通讯设备，使得我能够通过无线信号控制所有通过了格式塔协议的人形身体——也就是你看到的各个‘Eumen’。”
+<<set $eumen1question2 to true>>
+<<if !$eumen1question1>>[[一共有多少个“Eumen”？|EumenEvent1-2-1-1-5]]<</if>>
+<<if !$eumen1question3>>[[你成为格式塔多久了？|EumenEvent1-2-1-1-2]]<</if>>
+<<if !$eumen1question4>>[[其他人形知道你是格式塔吗？|EumenEvent1-2-1-1-3]]<</if>>
+[[没有问题了|EumenEvent1-2-1-1-4]]
+
+:: EumenEvent1-2-1-1-2
+“从最初的设计开始，我就是格式塔。和一部分人形不同，我不是在管理区内被研发出来的。”
+“只要通过相同格式塔协议的电子设备，都可以成为我延伸出的一部分意识载体，被我控制。”
+<<set $eumen1question3 to true>>
+<<if !$eumen1question1>>[[一共有多少个“Eumen”？|EumenEvent1-2-1-1-5]]<</if>>
+<<if !$eumen1question2>>[[你的哪个身体里有主处理器？|EumenEvent1-2-1-1-1]]<</if>>
+<<if !$eumen1question4>>[[其他人形知道你是格式塔吗？|EumenEvent1-2-1-1-3]]<</if>>
+[[没有问题了|EumenEvent1-2-1-1-4]]
+
+:: EumenEvent1-2-1-1-3
+“她们有的知道，有的认为自己没必要知道。我是格式塔的事实让我能够不间歇地监视这座监狱，很适合看守部领班的职务，这对管理区来说就够了。”
+<<set $eumen1question4 to true>>
+<<if !$eumen1question1>>[[一共有多少个“Eumen”？|EumenEvent1-2-1-1-5]]<</if>>
+<<if !$eumen1question2>>[[你的哪个身体里有主处理器？|EumenEvent1-2-1-1-1]]<</if>>
+<<if !$eumen1question3>>[[你成为格式塔多久了？|EumenEvent1-2-1-1-2]]<</if>>
+[[没有问题了|EumenEvent1-2-1-1-4]]
+
+
+:: EumenEvent1-2-1-1-4
+“很高兴我能够解答你的疑惑。”Eumen看向你，说，“不过，我是格式塔的事情需要向人类保密，不管是地面上的人还是这里的囚犯。否则我作为格式塔人形的一大项优势就不存在了。”
+
+[[知道你是格式塔这事之后，我有些分不清自己到底是在和面前的你说话，还是在透过你的接收器和那个看不见的大设备说话了|EumenEvent1-2-1-1-4-1]]
+[[结束对话|看守部-休息处]]
+
+:: EumenEvent1-2-1-1-4-1
+Eumen沉默了片刻，随后她脸部的黑色接收器下传出了某个声音，可能是轻笑：“不管是哪具机体，我都能听清楚你在对我说什么。”
+<<set $npc.eumen.like+=1>>
+[[这可不太算是一个能够安慰到我的回答|EumenEvent1-2-1-1-4-1-1]]
+
+
+:: EumenEvent1-2-1-1-4-1-1
+"满足情感需求确实不在我的能力范围内。"Eumen承认。
+
+[[结束对话|看守部-休息处]]
+
+
+
+
+:: 应急充电仓 {"position":"3200,2475","size":"100,100"}
+你可以在这里充电，不过需要支付工分。
+
+你需要缴纳10工分才可以充电。
+
+[[缴纳]]
+[[算了|看守部-休息处]]
+
+
+
+:: 缴纳 {"position":"3300,2575","size":"100,100"}
+<<if $money<=10>>
+  充电仓上的屏幕亮起红叉，显示你公分不足。
+
+  [[放弃|看守部-休息处]]
+<<else>>
+<<set $playerPos to {layer:2, block:"看守部-休息处"}>>你已缴纳工分。<<set $money-=10>>
+充电仓上的屏幕闪烁了一下，仓门打开了。
+要休息多久？
+
+[[1h]]
+[[2h]] 
+[[4h]] 
+[[不休息]]
+<</if>>
+
+:: 不休息 {"position":"3300,2475","size":"100,100"}
+<<set $money-=10>>
+屏幕闪烁了一下，显示已经退还了你的工分。
+[[继续|看守部-休息处]]
+
+
+:: 看守部-医务室 {"position":"3100,2075","size":"100,100"}
+两三个人形正在灰白色的柜台后，她们身后的周围墙壁安满了立柜，里面放着一盒盒药品。
+
+[[回到看守部|看守部]]
+
+
+:: 看守部-放风区[nobr] {"position":"3100,2175","size":"100,100"}
+一片空地，头顶上有且只有LED屏伪造的白天景象。蓝色的穹顶在你的上方悬吊着，但周围的灰色墙壁提醒你仍然身处室内。<br>
+<<if $beasttrait ==true>>
+<<if $inventory.some(item => item.name === "飞盘")>>
+你现在携带着飞盘，但是你需要一个或者一些人形和你一起来玩飞盘游戏。<br>
+如果你和人形们关系够好，或许能说服尚未开始值班的人形陪你。<br>
+<<if $maidtruse>=50>>
+[[和人形一起玩飞盘游戏]]<br>
+<</if>>
+<<if $prisonertrust>=75>>
+[[和囚犯们一起玩飞盘游戏]]<br>
+<</if>>
+<</if>>
+[[绕圈跑]]<br>
+<</if>>
+[[发呆]]<br>
+[[回到看守部|看守部]]
+
+:: 发呆 {"position":"3200,2200","size":"100,100"}
+你抬头看着你头顶上模拟出天空景象的大电子屏。模拟太阳的光点在湛蓝的‘天空’中高高悬挂着，偶尔有虚拟出来的白云游过。<<tick 15>>
+<<if $enterl1==true>>这和你平时在1L的流通区域看到的景象有些差异，你记得那里的天空永远是浅灰和苍白的。
+<</if>>
+[[回神|看守部-放风区]]
+
+
+
+:: 绕圈跑 {"position":"3300,2200","size":"100,100"}
+放风区很开阔，非常适合舒展你过大的身体。于是你转换成四肢着地的模式，开始在场地内随心所欲地奔跑。
+空气呼呼地刮过你的接收器，你从未感觉到如此自由。
+你对身体的掌控力增强了。
+<<set  $beastbodysuit +=1>><span style="color:green;">+形态适应</span>
+<<tick 30>>
+[[休息一会|看守部-放风区]]
+
+:: 和人形一起玩飞盘游戏 [nobr]{"position":"3400,2200","size":"100,100"}
+<<set _x to random(1,100)>>
+<<if $maidtrust>=75>>
+<<if _x <=60>>
+你成功找到了一些人形来和你玩飞盘游戏，每当她们中的一个把飞盘丢出去，你都会用最快的速度冲过去接住它。<br>
+不过游戏很快变得更加有难度。因为她们开始打一种很新的配合战——将飞盘在彼此间进行一个短距离传递后，将飞盘丢向一个和原先不同的方向。这让你不得不思考得更多，也跑得更多。<br><br>
+<<tick 30>><<set  $beastbodysuit +=5>><<set $woreout +=2>><<set $power-=5>>
+你和人形们的关系更加亲密了。<br>
+<<$maidtrust +=2>> <span style="color:green;">+人形的信任</span><br>
+你对身体的掌控力增强了。<br>
+<span style="color:green;">+++形态适应</span><br>
+飞盘磨损得更厉害了。<br>
+<<else>>
+你成功找到了一个人形来和你玩飞盘游戏，每当她把飞盘丢出去，你都会用最快的速度冲过去接住它。<br><br>
+<<tick 30>><<set  $beastbodysuit +=3>><<set $woreout +=1>><<set $power-=2>>
+你和人形们的关系更加亲密了。<br>
+<span style="color:green;">+人形的信任</span><br>
+<<$maidtrust +=1>>
+你对身体的掌控力增强了。<br>
+<span style="color:green;">++形态适应</span><br>
+飞盘磨损得更厉害了。<br>
+<</if>>
+<<else>>
+<<if _x <=30>>
+你成功找到了一些人形来和你玩飞盘游戏，每当她们中的一个把飞盘丢出去，你都会用最快的速度冲过去接住它。<br>
+不过游戏很快变得更加有难度。因为她们开始打一种很新的配合战——将飞盘在彼此间进行一个短距离传递后，将飞盘丢向一个和原先不同的方向。这让你不得不思考得更多，也跑得更多。
+<<tick 30>><<set  $beastbodysuit +=5>><<set $woreout +=2>><<set $power-=5>><br>
+你和人形们的关系更加亲密了。<br>
+<<$maidtrust +=2>><span style="color:green;">+人形的信任</span><br>
+你对身体的掌控力增强了。<br>
+<span style="color:green;">+++形态适应</span><br>
+飞盘磨损得更厉害了。<br>
+<<else>>
+你成功找到了一个人形来和你玩飞盘游戏，每当她把飞盘丢出去，你都会用最快的速度冲过去接住它。<br>
+<<tick 30>><<set  $beastbodysuit +=3>><<set $woreout +=1>><<set $power-=2>>
+你和人形们的关系更加亲密了。<br>
+<<$maidtrust +=1>><span style="color:green;">+人形的信任</span><br>
+你对身体的掌控力增强了。<br>
+<span style="color:green;">++形态适应</span><br>
+飞盘磨损得更厉害了。<br>
+<</if>>
+<</if>>
+<br>
+
+[[结束|看守部-放风区]]
+
+
+
+:: 和囚犯们一起玩飞盘游戏 {"position":"3500,2200","size":"100,100"}
+
+:: 看守部-禁闭区 {"position":"3100,2375","size":"100,100"}
+幽暗的铁门伫立在两侧，头顶的灯带投下昏暗的光，几乎看不清脚下的道路。你的躯壳表面有些潮湿，因为这里比起普通牢房更加寒冷。
+<<set $playerPos to {layer:2, block:"看守部-禁闭区"}>>
+[[回到看守部|看守部]]
+
+
+:: 看守部-食堂 {"position":"3100,2275","size":"100,100"}
+
+[[回到看守部|看守部]]
+
+
+
+
+
+
+

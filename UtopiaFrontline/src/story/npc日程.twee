@@ -1,0 +1,870 @@
+:: NPCdaily {"position":"5300,575","size":"100,100"}
+<<set $npcSchedule to [
+  {
+    npc: "lodia", layer: 6, block: "洗衣部",
+    text: "Lodia正在和洗衣部的其他人形一起更换或者添加清洗机器中的化学液体。空气中弥漫着淡淡的肥皂香气。",
+    options: [
+      ["聊天", "lodiachat"]
+    ],
+    start: 1, end: 150, repeatDaily: true
+  },
+    {
+    npc: "lodia", layer: 6, block: "洗衣部",
+    text: "Lodia正在和洗衣部的其他人形一起清洗机器和地面。",
+    options: [
+      ["聊天", "lodiachat"]
+    ],
+    start: 151, end: 270, repeatDaily: true
+  },
+  {
+    npc: "lodia", layer: 6, block: "洗衣部",
+    text: "Lodia正在将一大把空衣架挂到空中通过轮索控制移动的晾衣绳上，准备开始今天的工作。",
+    options: [
+      ["聊天", "lodiachat"]
+    ],
+    start: 271, end: 360, repeatDaily: true
+  },
+  {
+    npc: "lodia", layer: 6, block: "洗衣部",
+    text: "Lodia正在和其他洗衣部的人形一起将需要清洗的衣服填满每个清洗机。\n你听到 Lodia 在层层叠叠的钢架间走来走去，在把衣服塞进清洗机器的同时低低地哼着不知名的曲调。",
+    options: [
+      ["聊天", "lodiaworkchat"]
+    ],
+    start: 361, end: 600, repeatDaily: true
+  },
+    {
+    npc: "lodia", layer: 6, block: "洗衣部",
+    text: "Lodia和其他在洗衣部工作的人形正在把洗好的衣服从滑索上取下，分门别类地放进柜子。",
+    options: [
+      ["聊天", "lodiachat"]
+    ],
+    start: 601, end: 780, repeatDaily: true
+  },
+  {
+    npc: "lodia", layer: 6, block: "洗衣部",
+    text: "Lodia 现在不在这里，或许她去充电了，也可能跑到哪个你看不见的角落摸鱼去了。",
+    options: [],
+    start: 781, end: 1440, repeatDaily: true
+  },
+//=====================Eumen=====================
+  {
+    npc: "eumen", layer: 2, block: "看守部",
+    text: "Eumen正在和看守部的人形一起把囚犯从牢房赶出去，让他们列队前往教化司。",
+    options: [],
+    start: 361, end: 480, repeatDaily: true
+  },
+  {
+    npc: "eumen", layer: 2, block: "看守部",
+    text: "Eumen正在和看守部的人形一起对空牢房进行检查和记录。",
+    options: [],
+    start: 481, end: 960, repeatDaily: true
+  },
+  {
+    npc: "eumen", layer: 2, block: "看守部",
+    text: "Eumen正在看守部的人形中监视着排队行走的囚犯，确保他们全部从教化司回到看守部。",
+    options: [
+      ["聊天", "eumenchat"],
+    ],
+    start: 961, end: 1080, repeatDaily: true
+  },
+  {
+    npc: "eumen", layer: 2, block: "看守部",
+    text: "Eumen正在和看守部的人形一起把每个囚犯押进他们的牢房。",
+    options: [],
+    start: 1081, end: 1200, repeatDaily: true
+  },
+  {
+    npc: "eumen", layer: 2, block: "看守部",
+    text: "现在是看守部的宵禁时间，走廊上只剩下零星的设备亮光，Eumen和看守部的人形不时从走廊上经过检查牢房的状况。",
+    options: [
+    ],
+    start: 1201, end: 1320, repeatDaily: true
+  },
+//=======================Ada=======================
+  {
+    npc: "ada", layer: 2, block: "教化司",
+    text: "你看到 Ada 和 Eumen 正在教室门口讨论着什么。",
+    options: [
+      ["和她们打招呼", "sayhelloeumenada"]
+    ],
+    start: 241, end: 360, repeatDaily: true
+  },
+  {
+    npc: "ada", layer: 2, block: "教化司-教室礼堂",
+    text: "……你透过门口看到艾达正在讲台上给囚犯们讲课。",
+    options: [ ],
+    start: 361, end: 720, repeatDaily: true
+  },
+  {
+    npc: "ada", layer: 2, block: "教化司",
+    text: "你看到 Ada 在囚犯陆陆续续离开后走出了教室。",
+    options: [
+      ["上前搭话", "adachat"]
+    ],
+    start: 721, end: 750, repeatDaily: true
+  },
+  {
+    npc: "ada", layer: 2, block: "教化司",
+    text: "Ada 办公室上的状态显示她在休息中。",
+    options: [
+      ["敲门", "adaknockdoor"]
+    ],
+    start: 751, end: 810, repeatDaily: true
+  },
+    {
+    npc: "ada", layer: 2, block: "教化司-Ada的办公室",
+    text: "Ada 正在办公室里休息。",
+    options: [
+        ["上前搭话", "adachat"]
+    ],
+    start: 751, end: 810, repeatDaily: true
+  },
+  {
+    npc: "ada", layer: 2, block: "教化司",
+    text: "Ada 走出了办公室，朝教室走去。",
+    options: [
+      ["请求同行", "adaaskacompany"]
+    ],
+    start: 811, end: 820, repeatDaily: true
+  },
+  {
+    npc: "ada", layer: 2, block: "教化司-教室礼堂",
+    text: "你看到 Ada 在教室里调试着设备。",
+    options: [
+      ["上前搭话", "adachat"]
+    ],
+    start: 821, end: 840, repeatDaily: true
+  },
+  {
+    npc: "ada", layer: 2, block: "教化司-教室礼堂",
+    text: "……你透过门口看到 Ada 正在讲台上给囚犯们讲课。",
+    options: [
+      ["旁听", "listeninglecture"]
+    ],
+    start: 841, end: 1080, repeatDaily: true
+  },
+  {
+    npc: "ada", layer: 2, block: "教化司",
+    text: "……你看到 Ada 在囚犯陆陆续续离开后走出了教室。",
+    options: [
+      ["上前搭话", "adachat"]
+    ],
+    start: 1081, end: 1110, repeatDaily: true
+  },
+  
+/*=====================Carmel=====================*/
+  {
+    npc: "carmel", layer: 5, block: "维修部",
+    text: "Carmel 不在这里，你看到排班屏幕上显示她正在休息。",
+    options: [],
+    start: 1, end: 360, repeatDaily: true
+  },
+  {
+    npc: "carmel", layer: 5, block: "维修部",
+    text: "Carmel 正在和其他维修部的人形一起对前来进行检修的人形们进行修复。",
+    options: [
+    ],
+    start: 361, end: 720, repeatDaily: true
+  },
+  {
+    npc: "carmel", layer: 5, block: "维修部",
+    text: "Carmel 正在整理维修台，清理污渍，补充消耗品，预备着下一轮的工作。",
+    options: [
+      ["搭话", "carmelchat"]
+    ],
+    start: 721, end: 840, repeatDaily: true
+  },
+  {
+    npc: "carmel", layer: 5, block: "维修部",
+    text: "Carmel 正在和其他维修部的人形一起对前来进行检修的人形们进行修复。",
+    options: [
+    ],
+    start: 841, end: 1200, repeatDaily: true
+  },
+  {
+    npc: "carmel", layer: 5, block: "维修部",
+    text: "Carmel 正在整理维修台，清理污渍。她准备下班了。",
+    options: [
+      ["搭话", "carmelchat"]
+    ],
+    start: 1201, end: 1320, repeatDaily: true
+  },
+  {
+    npc: "carmel", layer: 5, block: "维修部",
+    text: "Carmel 不在这里，你看到排班屏幕上显示她正在休息。",
+    options: [],
+    start: 1321, end: 1440, repeatDaily: true
+  },
+  /*=====================Quintina=====================*/
+   {
+    npc: "quintina", layer: 5, block: "维修部",
+    text: "Quintina正在修复身上因为化学物质和其他原因造成的磨损。",
+    options:[],
+    start: 0, end: 60, repeatDaily: true
+  },
+  {
+    npc: "quintina", layer: 4, block: "化工部",
+    text: "Quintina正在做开始今天工作的准备。",
+    options:[],
+    start: 61, end: 120, repeatDaily: true
+  },
+  {
+    npc: "quintina", layer: 4, block: "化工部",
+    text: "Quintina正在和化工部的人形一起清空并检查升降平台周围。",
+    options:[],
+    start: 121, end: 180, repeatDaily: true
+  },
+   {
+    npc: "quintina", layer: 4, block: "化工部",
+    text: "Quintina正在清点要运上地表的化学品的数目和品类。",
+    options:[],
+    start: 181, end: 240, repeatDaily: true
+  },
+   {
+    npc: "quintina", layer: 4, block: "化工部",
+    text: "Quintina正在高处看着下方的流水线和人形将装着化学制品的箱子搬运到升降平台附近，并在上升的升降台有空位的情况下将化工部的制品搬上去。",
+    options:[],
+    start: 241, end: 360, repeatDaily: true
+  },
+   {
+    npc: "quintina", layer: 4, block: "化工部-清洁间",
+    text: "Quintina正在将换下来的衣服放进洗衣部回收换洗衣物的篮子里。",
+    options:[],
+    start: 301, end: 306, repeatDaily: true
+  },
+    {
+    npc: "quintina", layer: 10, block: "后勤休息区",
+    text: "Quintina结束了她的休息，正在走出休息区。",
+    options:[["问候","quintinagreet"]],
+    start: 672, end: 677, repeatDaily: true
+  },
+ {
+    npc: "quintina", layer: 4, block: "化工部",
+    text: "Quintina站在巨大的反应塔前，绿色的超短发在光线的照明下给予你一种正散发着荧光的错觉。",
+    options:[["搭话","quintinachat"]],
+    start: 685, end: 1440, repeatDaily: true
+  },
+  /*======================Mapka=========================== */
+{
+  npc: "mapka", layer: 8, block: "食品部-生产车间-垂直农场",
+  text: "Mapka正在指挥人形们操作机械臂完成对蔬菜和果实的收割。",
+  options: [["搭话", "mapkachat"]],
+  start: 0, end: 120, repeatDaily: true
+},
+{
+  npc: "mapka", layer: 7, block: "食品部-加工车间-包装区",
+  text: "Mapka正在和其他食品部里的人形一起把收割下来的果实和叶菜放到流水线上进行清洗和包装处理。",
+  options: [],
+  start: 121, end: 240, repeatDaily: true
+},
+{
+  npc: "mapka", layer: 7, block: "食品部",
+  text: "Mapka和人形们正在监督机器将包装好的农产品堆放到货框里，并将它们叠在一起，移动到升降平台上。",
+  options: [],
+  start: 241, end: 420, repeatDaily: true
+},
+{
+  npc: "mapka", layer: 8, block: "食品部-生产车间-垂直农场",
+  text: "Mapka正在用水枪清扫刚才摆放收割作物的区域。",
+  options: [["搭话", "mapkachat"]],
+  start: 421, end: 480, repeatDaily: true
+},
+{
+  npc: "mapka", layer: 7, block: "食品部-清洁间",
+  text: "Mapka结束了上午的工作，她正在更换制服。",
+  options: [],
+  start: 481, end: 500, repeatDaily: true
+},
+{
+  npc: "mapka", layer: 7, block: "食品部-生产车间",
+  text: "你看到了正在往外走的Mapka。",
+  options: [],
+  start: 501, end: 505, repeatDaily: true
+},
+{
+  npc: "mapka", layer: 5, block: "维修部",
+  text: "Mapka正在修复身上的磨损。",
+  options: [],
+  start: 511, end: 570, repeatDaily: true
+},
+{
+  npc: "mapka", layer: 7, block: "食品部",
+  text: "此刻这里因为完成了今日的任务而空空荡荡，用来装各种农产品的塑料框按照着某种规律摞放在一旁。",
+  options: [],
+  start: 481, end: 1200, repeatDaily: true
+},
+{
+  npc: "mapka", layer: 10, block: "后勤休息区",
+  text: "Mapka结束了她的休息，正在走出休息区。",
+  options: [],
+  start: 930, end: 940, repeatDaily: true
+},
+{
+  npc: "mapka", layer: 7, block: "食品部-垂直农场",
+  text: "Mapka正在垂直农场检查作物和动物的生长情况，用机械臂为它们添加水肥或者饲料。",
+  options: [],
+  start: 945, end: 1200, repeatDaily: true
+},
+{
+  npc: "mapka", layer: 7, block: "食品部-生产车间",
+  text: "Mapka正在检查所需物资清单，为下一轮工作做准备。",
+  options: [["搭话", "mapkachat"]],
+  start: 1201, end: 1320, repeatDaily: true
+},
+{
+  npc: "mapka", layer: 8, block: "食品部-生产车间-垂直农场",
+  text: "Mapka正在操作机械臂完成对蔬菜和果实的收割。",
+  options: [["搭话", "mapkachat"]],
+  start: 1321, end: 1440, repeatDaily: true
+}
+
+
+
+
+
+
+] >>
+
+:: mapkachat
+<<set $mapkachat = [
+"“慢点儿，桌上那些瓶瓶罐罐可别碰着了！那些都是用来养虫子的。说实话，大多数也不咋好吃……不过啊，对改善土壤、处理废料那可老有用了。”Mapka顺手拎起你旁边一个放置着一些在你看来是纸壳和土壤的塑料瓶，晃了晃，“倒是也能配营养土替代这种老法子，但我吧，还是更信自给自足那一套。”",
+"“哦对了，你见过看守部的领班没？就那个现在有紫头发的。我跟她打过几次照面，在Pearlma的战场上。哎呀，那地方冷得能把你机油都给冻住。我偶尔会想回到那里去，但是那里现在已经没有居民了。”"
+]>>
+
+<<set $giftnpc to "Mapka">><<print either( $mapkachat )>><<tick 25>>
+<em>Mapka和你更熟悉了。</em>
+<<set $npc.mapka.like += 1>> <span style="color: green;">+Mapka的好感</span>
+
+<<if !$flags.mapka_backstory_1>>[[你有两个语音模块？|你有两个语音模块？2]]<</if>>
+[[说你有想要提问的问题|MapkaQuestion]]
+[[赠送礼物|GiftSelect]]
+[[返回|生产车间]]
+
+:: MapkaQuestion
+Mapka煞有介事地端详了一下你：“看上去确实有些问题憋在你的肚子里。说吧，在它们把你撑死之前。”
+
+<<if $superperceptionevent1>>[[我在幻觉中看见了几架灰黑色的战机轰炸一只怪物，那些飞机上都有一个有着蛇发女人面容的标志|mapkasuperperceptionevent1]]<</if>>
+<<link "我没其他问题了">><<goto $playerPos.block>><</link>>
+
+
+
+
+:: mapkasuperperceptionevent1
+“蛇发女人的标志？”Mapka摸摸下巴，“蛇发女人……噢，那是Erinyes的标志，我们大名鼎鼎的复仇女神。”
+
+
+[[为什么你将Erinyes称为复仇女神？|mapkasuperperceptionevent1-3]]
+
+
+:: mapkasuperperceptionevent1-1
+“Erinyes是一个格式塔人工智能，她被一个雇佣武装组织创造和管理。”Mapka嘟囔道，“这样拥有Erinyes的武装组织就可以使用格式塔控制的无人军用设施而不是人类作为作战单位。他们也不用再去培养炮灰一样的新兵了，我想这大概给他们省下了不少开支，哈！”
+“至于你看到的东西……曾经Erinyes也被派遣去处理怪物，这倒是没什么稀奇的。”
+
+[[那个标志让我有些眼熟|mapkasuperperceptionevent1-2]]
+[[为什么你将Erinyes称为复仇女神？|mapkasuperperceptionevent1-3]]
+
+:: mapkasuperperceptionevent1-2
+“你当然会眼熟它，因为Eumen的人形形态一部分就参考了那个标志。”
+
+[[和我讲讲Erinyes|mapkasuperperceptionevent1-1]]
+[[为什么你将Erinyes称为复仇女神？|mapkasuperperceptionevent1-3]]
+
+
+:: mapkasuperperceptionevent1-3
+“因为那时候的人们总这么叫她——我指的是那会的Erinyes——不过具体原因我不大了解，好像是因为Erinyes这个名字和某个人类的典故相关来着。”
+Mapka挠了挠头发，把一部分棕发弄乱了：“你好奇的话，可以去问下看守部教化司的领班。我记得她好像是叫——Ada来着？她对更久以前的人类历史有了解。”
+<<set $superperceptionevent1.mapka to true>>
+[[和我讲讲Erinyes|mapkasuperperceptionevent1-1]]
+[[那个标志让我有些眼熟|mapkasuperperceptionevent1-2]]
+[[你的名字也和Erinyes一样有典故吗？|mapkasuperperceptionevent1-3-1]]
+<<link "我没其他问题了">><<goto $playerPos.block>><</link>>
+
+
+:: mapkasuperperceptionevent1-3-1
+“我的名字？”Mapka夸张地倒吸一口气，“你也要把我名字拆解成一个个字母然后放进数据库里跟八竿子打不着的内容比对吗？不，小家伙，不要浪费你的算力去做那种事情。我可以很明确地告诉你，‘Mapka’就只是Mapka，仅此而已。”
+<<set $npc.mapka.like += 1>> <span style="color: green;">+Mapka的好感</span>
+
+[[和我讲讲Erinyes|mapkasuperperceptionevent1-1]]
+[[那个标志让我有些眼熟|mapkasuperperceptionevent1-2]]
+<<link "我没其他问题了">><<goto $playerPos.block>><</link>>
+
+:: carmelchat {"position":"5175,1350","size":"100,100"}
+<<set $carmelchat = [
+"“看守部领班Eumen对她的工作很上心。很多人形觉得她爱人类超过了自己的同类，但她们都不得不承认，就算再有十个新的人形来干看守部领班这活，也不会比Eumen一个人做得更好了。”",
+"“维修部是管理区最早建立的部门之一，因为人形需要时常检修，否则她们就会出大岔子……”她哼了一声，“有时候我还挺羡慕人类的，就算身体再怎么不健康也能苟活。”",
+"“Corrina？不，我不讨厌她。我有说过在管理区建立之初大部分人形都是她带来的吗？她当时是一位很好的领导者，温和又坚毅。她现在也是，但我能感觉到有什么被改变了。”Carmel摇摇头，“但我现在已经没有多余的时间和精力去探究为什么了，或许不这么做才是最好的选择。”",
+"“我会修人形，也会医人类。两种活计都是我在管理区建立前就学会了的，不过现在我更上手了。”她擦拭着工具上的油污，“别惊讶，人形只要不在那场战争中死去，那她们大概就永远活着。Corrina找到了我，把我带到了这里，之后我就一直在管理区做活，现在这里就是我的家。”",
+"“上一批人形被制造还是三年前的事情，当时的情况可真是一团糟。不过看着那些宛若视觉处理器出故障般分不清胳膊和腿的木头脑袋们现在竟然能独自组装好一套人形的所有管线，我还是很欣慰的。”",
+"“我对在管理区建立后才被制造出来的领班没有太多的印象，主要是我没有很多机会和她们共事——相对于先前来说。当你足够忙的时候，足够深入的社交就成为了一种奢侈。”"]>>
+	<<set $giftnpc to "Carmel">><<print either( $carmelchat )>><<tick 25>>
+
+<em>Carmel和你更熟悉了。</em>
+<<set $npc.carmel.like += 1>> <span style="color: green;">+Carmel的好感</span>
+
+<<if !$task2.carmel>>[[和Carmel谈谈你的异常]]<</if>>
+[[说你有想要提问的问题|CarmelQuestion]]
+[[赠送礼物|GiftSelect]]
+[[返回|维修部]]
+
+
+:: CarmelQuestion
+Carmel放下手里的工具，捏了捏眉心，你认为这个动作比起真的能有效缓解她的焦躁，更像是某种模仿结果。
+“首先，不要问我‘能不能做出四肢都是手或者脚的人形’或者‘能不能做出人形蜈蚣’，或者其他类似的任何问题！然后，你可以问了。”
+
+[[所以，能不能做出四肢都是手或者脚的人形？]]
+<<if $superperceptionevent1>>[[我在幻觉中看见了几架战机轰炸一只怪物，那些飞机上都有一个有着蛇发女人面容的标志|carmelsuperperceptionevent1]]<</if>>
+<<link "我没其他问题了">><<goto $playerPos.block>><</link>>
+
+:: carmelsuperperceptionevent1
+
+
+:: 所以，能不能做出四肢都是手或者脚的人形？
+“你再重复一遍，我将不介意让你作为实验体亲自试试这个假设。”
+Carmel捏着工具的那只手做了一个对你或者任何人形而言都相当具有威胁意味的拧转动作。
+
+再重复这个话题显然不仅没有意义，还会让你身处危险之中。
+
+[[好吧|CarmelQuestion]]
+
+
+
+:: lodiaworkchat [nobr] {"position":"5300,1450","size":"100,100"}
+<<tick 25>><<set $lodiachat = [
+"“不同主职业人形的衣服要分开洗，这么做的原因主要是因为衣物布料耐酸腐蚀的强度不同……如果不想打开洗衣机的时候发现一些衣服莫名其妙地消失了，就把来自后勤部门和清道夫的制服分开清洗吧。”",
+"“如果清道夫送来了换洗的衣服，一定要先用试纸测一下它的pH有没有低于危险值。”\nLodia看到你的表情，语气严肃起来：“我是认真的，洗衣部曾经因为这个原因直接报废了至少一百五十台洗衣机。”",
+"“如果试纸变成了这种危险的红色，就要把些衣服全倒进清洗机的调和池里，然后加入相反的平衡液……”Lodia拎起一罐你觉得起码有5升容量的容器，“这么多衣物的话就加两升左右进去。”\n你看着她哐哐往池子里倒液体，然后开启了清洗机。",
+"一台清洗机正在不断吐出巨大绵密的红色泡泡，散发出难闻的气味。\n“天哪！我刚说过不要把氯化清洗剂和还原剂放进同一台清洗机！”Lodia恼怒地喊着，倒了一盆干粉上去。",
+"“不同的清洁剂能去除的污渍也不同，如果放错了清洁剂会很麻烦的。”"
+]>>
+<<print either( $lodiachat )>><br><br>
+	<<set $giftnpc to "Lodia">>
+<span style="color: green;"><em>+Lodia的好感</em></span><br>
+<<set $npc.lodia.like += 2>> <br><br>
+[[说你有想要提问的问题|LodiaQuestion]]
+[[返回|洗衣部]]
+
+
+
+:: lodiachat[nobr]
+<<tick 25>><<set $lodiachat = [
+"“嘛，这里有很多人形来了又走了，多数都是像你一样的新人，留下来的几乎没有。”Lodia慵懒地笑了笑，“我倒是不介意，但是我不得不一直教来这的新人，这让我很忙。”\n你觉得你看不出来她有多忙。",
+"“虽然在后勤部门工作的人形一般来说不像巡逻队有直接升职的空间，但是如果做得好的话还是会受到大家的尊敬的。而且很适合我这样不喜欢打打杀杀的人形~”",
+"“你有去见过Lucy吗？因为她是保洁部的领班所以她总是忙忙碌碌的样子……虽然我觉得这两者之间并没有什么关联。”\nLodia一边把衣服从脏衣篮倒进清洗机里一边说。",
+"“其实和我们洗衣部联系最大的除了纺裁部还有化工部……我们总是在一起研讨开发新型布料和新型洗衣液的事情。”"
+]>>
+<<print either( $lodiachat )>><br><br>
+	<<set $giftnpc to "Lodia">>
+<span style="color: green;"><em>+Lodia的好感</em></span><br>
+<<set $npc.lodia.like += 2>> <br><br>
+[[说你有想要提问的问题|LodiaQuestion]]
+[[赠送礼物|GiftSelect]]<br><br>
+[[返回->洗衣部]]
+
+
+:: LodiaQuestion
+
+<<if $superperceptionevent1>>[[我在幻觉中看见了几架战机轰炸一只怪物，那些飞机上都有一个有着蛇发女人面容的标志|lodiasuperperceptionevent1]]<</if>>
+<<link "我没其他问题了">><<goto $playerPos.block>><</link>>
+
+:: lodiasuperperceptionevent1
+
+
+
+
+
+
+
+
+
+:: 获得战技凝神屏息
+“说起来啊，$playername。你会不会有时觉得怪物很棘手？‘如果躲起来就好了……’有这样的想法，但是实战中却很难发挥？”
+
+“当当！我有一个办法，算是我个人的小技巧吧。以前在地表上这招总是很管用。”
+
+隐蔽效果*1.5，偷袭（上一回合隐蔽不被发现，下一回合任意攻击）伤害*1.5
+
+
+
+
+:: adachat {"position":"5125,900","size":"100,100"}
+<<set $adachat = [
+"“我体罚过的囚犯比Eumen惩罚过的数量高上一倍，然而有些人类还是烂泥扶不上墙，我真该考虑向审判会提出多判他们几年。”",
+"“那台管风琴原先只作为装饰存在，但我试着弹了几下之后，它就逐渐变得可以使用了。很神奇吧？在管理区里就是这样。”",
+"“Eumen从前是服务于战争的机器人——所以她很难控制自己的力气，虽然她总是对此耿耿于怀，但我真心觉得没什么大不了的。我还希望能够像她一样能把囚犯踹飞出去呢，很多事情会因此简单不少的。”Ada笑了起来。",
+"“我是在管理区被建造时被制作出来的，在领班里算是迟的了。不过这并不影响我履行领班的职权。”Ada眯眯笑。",
+"“你应该知道囚犯不是没有原因地被关在这里吧？”她靠近你，眯眼笑道，“在管理区，所有的罪人都不无辜，因此要始终保持警惕，别被塞块糖就把他们当自己人了。”",
+"“啊，那些比较老实的囚犯一般是在这里关了比较久的家伙。新来的刺头比较多，所以得多关注关注他们。”",
+"“你有看到桌子上的镣铐吧？那些都是通电的哦。如果下面有犯人不老实，只要输入就能给他们一下。我以前很爱用，不过因为一些事故，Corrina要求我降低使用频率。真遗憾。”",
+"“听说化工部的一些化学品很适合用来制成麻醉枪，或许我应该去和Corrina申请一下。”"
+]>>
+	<<set $giftnpc to "Ada">>
+<<print either( $adachat )>><<tick 25>>
+
+<em>Ada和你更熟悉了。</em>
+<<set $npc.ada.like += 1>> 
+<br><br>
+[[说你有想要提问的问题|AdaQuestion]]
+[[赠送礼物|GiftSelect]]<br>
+[[返回->教化司]]
+
+
+:: AdaQuestion
+
+
+<<if $superperceptionevent1>>[[我在幻觉中看见了几架战机轰炸一只怪物，那些飞机上都有一个有着蛇发女人面容的标志|adasuperperceptionevent1]]<</if>>
+<<if $superperceptionevent1.mapka>>[[你能和我讲讲复仇女神Erinyes的典故吗？|adasuperperceptionevent1-1]]<</if>>
+<<link "我没其他问题了">><<goto $playerPos.block>><</link>>
+
+
+
+
+
+:: adasuperperceptionevent1
+“那是什么？我可没有在管理区见过类似的东西。”
+“管理区建立以前的历史还是问问Corrina或者Eumen那些老骨头吧，我对这个世界近百年以来发生的事都没什么兴趣。”
+
+<<link "没事了">><<goto $playerPos.block>><</link>>
+
+
+
+:: adasuperperceptionevent1-1
+“我竟不知道你对人类古文化还有如此兴趣。好吧，严谨来说，Erinyes是三位复仇女神的统称。她们通常面目狰狞，并且有着缠绕的蛇发。有说法说她们自地下深渊出现，对犯罪者进行永恒的追捕和惩罚，直至他们赎罪，或者毁灭。”
+“当然，那都是早在管理区，甚至比第一个人形被研发出来还要久以前的事情了，而且也不是真的。如果是真的，那么管理犯罪者的事就不用我们操心了。“
+
+[[听起来有点像是Eumen|adasuperperceptionevent1-1-1]]
+[[听起来有点像你|adasuperperceptionevent1-1-2]]
+
+:: adasuperperceptionevent1-1-1
+“Eumen？”Ada的眼珠转向一边，这说明她在思考。片刻之后她又看向你：“除了第一个发音相似，我没感觉到什么相同之处。”
+
+<<link "没事了">><<goto $playerPos.block>><</link>>
+
+
+
+
+:: adasuperperceptionevent1-1-2
+“我假设你是在说‘对罪犯施行惩罚’这点。是的，我喜欢研究惩罚和折磨，并且我乐在其中。就算是真正复仇女神，也不会比我更有创意了。”
+“虽然目前而言，我的想法中被允许的只不过是冰山一角……”
+
+<<link "没事了">><<goto $playerPos.block>><</link>>
+
+
+
+:: sayhelloeumenada {"position":"5225,900","size":"100,100"}
+玫红色长发和紫色短发的人形转向你的方向。
+“早上好，$playerName~”
+“你好。”
+Ada和Eumen回应了你的问候。
+<span style="color: green;">+Ada的好感</span>
+<span style="color: green;">+Eumen的好感</span>
+<<set $npc.ada.like +=1>><<set $npc.eumen.like +=1>>
+<<link "向Ada赠送礼物">>	<<set $giftnpc to "Ada">>	<<goto "GiftSelect">><</link>>
+<<link "向Eumen赠送礼物">>	<<set $giftnpc = "Eumen">>	<<goto "GiftSelect">><</link>>
+[[继续|教化司]]
+
+
+
+:: eumenchat {"position":"5125,800","size":"100,100"}
+你站在Eumen旁，和她一起监督犯人行走的同时，小声和她聊天。从犯人的视角来看你们像是某种正在讨论下一步干什么的反派吧。
+<<tick 25>>
+<<set $eumenchat = [
+  "“人类比起人形很易碎，所以你需要在对待他们时注意一些。别把他们真的捏成碎片了……”",
+  "“有一些看守会很招囚犯的喜欢，但你得注意他们到底喜欢你的哪一点。之前有看守差点被囚犯设计，他们觉得人多就能打赢一个落单的人形……事实是他们失败了，还好他们失败了。”",
+  "“虽然看守部是惩罚罪犯的地方，但是我仍然希望这样的经历能够给那些人类带来向善的动力。不论是出于真心悔改，还是出于对看守部的恐惧。”",
+  "“看守部生病或者受伤的人类都是由维修部的人形来治疗的，Carmel偶尔也会来。说真的，我就没见过她治不好的病。”她说，“Carmel算是我们中间资历最久的一员了，大家都尊敬她。”",
+  "“看守部只接手地面上来的人类罪犯，如果人形犯了错，应该会被带到三楼的安息之地，由Shaterra处理。”",
+  "“Corrina是个很好的领导者，不过她很少来这里，我们没怎么在工作以外见过面。但是我听说她多数时候都和巡逻队待在一起，大概巡逻队的人形会更了解她吧。”"
+]>>
+<<print either( $eumenchat )>>
+
+<em>Eumen和你更熟悉了。</em>
+<<set $npc.eumen.like += 1>> <span style="color: green;">+Eumen的好感</span>
+<<if $beasttrait&&$totalminute%1440<481&&$totalminute>960>>
+  [[请求抚摸|eumenstoke]]
+<</if>>
+[[说你有想要提问的问题|EumenQuestion]]
+[[返回->看守部]]
+
+
+
+:: EumenQuestion
+
+
+<<if $superperceptionevent1>>[[我在幻觉中看见了几架战机轰炸一只怪物，那些飞机上都有一个有着蛇发女人面容的标志|eumensuperperceptionevent1]]<</if>>
+<<link "我没其他问题了">><<goto $playerPos.block>><</link>>
+
+:: eumensuperperceptionevent1
+
+
+
+<<link "我没其他问题了">><<goto $playerPos.block>><</link>>
+
+
+
+
+
+:: eumenstoke {"position":"5025,800","size":"100,100"}
+你缓缓踱步到Eumen的身侧，用面部的盔甲轻轻蹭她。Eumen犹豫了一下，但还是小心地伸手摸了摸你的头部和下巴。
+
+<span style="color: green;">+Eumen的好感</span>
+<<set $npc.eumen.like += 1>> 
+
+你听到囚犯中传来一阵窃窃私语，其中不乏好奇和恐惧的目光投在你身上。+威信
+
+[[返回->看守部]]
+
+:: quintinachat
+<<set $quintinachat = [
+
+]>>
+<<set $npc.quintina.like+=1>>
+<span style="color: green;"><em>+Quintina的好感</em></span><br>
+
+[[说你有想要提问的问题|QuintinaQuestion]]
+[[继续|化工部]]
+
+
+
+:: quintinagreet[nobr]
+你向Quintina打招呼。
+<<if $npc.quintina.like<30>>
+  Quintina没有回应，或许她是没注意到你吧。
+  <<else>>
+    她简短地回应了一声，你猜测那是“知道了”的意思。
+<</if>>
+<<set $npc.quintina.like+=1>><br>
+<em>Quintina和你更熟悉了。</em>
+</span><br><br>
+[[说你有想要提问的问题|QuintinaQuestion]]
+[[继续|后勤休息区]]
+
+
+:: QuintinaQuestion
+Quintina没有回应，但也没有马上离开或者把你赶走的趋势。如果你的问题不够有意义或者“有趣”，她显然会选择不予回答并且直接离开。
+
+<<if $task5>>[[询问特殊防护漆流水线的事|化工部询问]]<</if>>
+<<if $task6>>  [[开通特殊防护漆流水线]]<</if>>
+<<link "我没其他问题了">><<goto $playerPos.block>><</link>>
+
+
+:: GiftSelect [nobr] {"position":"4875,1075","size":"100,100"}
+你要向 <<print $giftnpc>> 赠送什么样的礼物呢？赠送的礼物只能从你的持有物中取出。<br><br>
+
+<<set _list = []>>
+
+<<if $inventory>>
+  <<for _id, _qty range $inventory>>
+    <<if _qty > 0 && $giftDB[_id]>>
+      <<set _list.push(_id)>>
+    <</if>>
+  <</for>>
+<</if>>
+
+<<if _list.length > 0>>
+  你现在可赠送：<br>
+  <<for _id range _list>>
+    <<set _def = $giftDB[_id]>>
+    <<link "赠送："+_def.name+"（x"+$inventory[_id]+"）">>
+      <<giveGift $giftnpc _id>>
+    <</link>><br>
+  <</for>>
+<<else>>
+  <span style="color:grey;">持有物中没有可以赠送的物品，还是下次再来吧。</span>
+<</if>>
+<br><br>
+[[返回|$playerPos.block]]
+
+
+:: showNpcContent [widget nobr] {"position":"1275,1150","size":"100,100"}
+<<widget "showNpcContent">>
+
+/* 0. 取数据 */
+<<silently>>
+	/* 这些都写成 $ 变量，确保作用域正确 */
+	<<set $todayMin to ($time.totalMinutes % 1440)>>
+	<<set $layerNow to $playerPos.layer>>
+	<<set $blockNow to $playerPos.block>>
+
+/* 找今天能碰到的 NPC，允许同一地点同时出现在多个 NPC */
+	<<set $currentNpcList to ($npcSchedule || []).filter(s => 
+	Number(s.layer) == Number($playerPos.layer) &&
+	String(s.block).trim() == String($playerPos.block).trim() &&
+	((s.repeatDaily ? $todayMin : $time.totalMinutes) >= s.start) &&
+	((s.repeatDaily ? $todayMin : $time.totalMinutes) <= s.end)
+	)>>
+	<<set $currentNpc to ($currentNpcList && $currentNpcList.length > 0 ? $currentNpcList[0] : null)>>
+
+<</silently>>
+
+/* 1. 有 NPC 就输出各自的对话 + 选项 */
+<<if $currentNpcList && $currentNpcList.length > 0>>
+	<<for _npcIndex, _npc range $currentNpcList>>
+		<<if _npc && _npc.text>>
+			<<= _npc.text + '<br><br>'>>
+		<</if>>
+
+		<<for _i, _opt range (_npc && _npc.options ? _npc.options : [])>>
+			<<silently>>
+				<<set _text to _opt[0]>>
+				<<set _target to _opt[1]>>
+				<<set _condition to (_opt.length > 2 ? _opt[2] : null)>>
+				<<set _canShow to true>>
+
+				/* 条件判断 */
+				<<if _condition>>
+					<<if _condition.match(/^\$\w+$/)>>
+						<<set _varName to _condition.slice(1)>>
+						<<if State.variables.hasOwnProperty(_varName)>>
+							<<set _canShow to State.variables[_varName]>>
+						<</if>>
+					<<else>>
+						<<set _expr to _condition.replace(/^\$\{|\}$/g,'')>>
+						<<try>>
+							<<set _canShow to Scripting.eval(_expr)>>
+						<<catch _err>>
+							<<set _canShow to false>>
+						<</try>>
+					<</if>>
+				<</if>>
+			<</silently>>
+
+			<<if _canShow>>
+				<<link _text _target>>
+				<</link>>
+				<<print " ">>
+			<</if>>
+		<</for>>
+
+		<<if _npcIndex < $currentNpcList.length - 1>>
+			<br><br>
+		<</if>>
+	<</for>>
+<<else>>
+	领班看上去不在这里。
+<</if>>
+<</widget>>
+
+
+
+:: showtimewidget [widget nobr] {"position":"825,850","size":"100,100"}
+<<widget "showTime">>
+<<silently>>
+    /* 1. 保底初始化 */
+    <<if !$time>>
+        <<set $time to {
+            day: 1,
+            hour: 8,
+            minute: 0,
+            totalMinutes: 8 * 60
+        }>>
+    <</if>>
+
+    /* 2. 补零 */
+    <<set _pad to (n) => (n < 10 ? '0' + n : n)>>
+
+    /* 3. 拼装字符串 */
+    <<if $time.minute% 1 !== 0>>
+       <<set $time.minute to Math.floor($time.minute)>>
+    <</if>>
+    <<set _str to `Day ${$time.day}  ${$time.hour}:${_pad($time.minute)}`>>
+<</silently>>
+/* 4. 一次性输出 —— 用 <<= >> 或 <<print>> 都行 */
+<<= _str>>
+<</widget>>
+
+
+:: giftwidget [widget] {"position":"4775,1075","size":"100,100"}
+<<widget "giveGift">>
+  <<set _npc  = $args[0]>>
+  <<set _item = $args[1]>>
+
+  <<if !_npc || !_item>><<return>><</if>>
+  <<if !$inventory || !$inventory[_item] || $inventory[_item] <= 0>>
+    你没有这个物品，无法赠送。
+    <<return>>
+  <</if>>
+
+  <<set _def = $giftDB[_item]>>
+  <<if !_def>>
+    这个物品真的适合送人吗？还是再看看吧。
+    <<return>>
+  <</if>>
+
+  <<set _rules = $npcGiftRules && $npcGiftRules[_npc] ? $npcGiftRules[_npc] : null>>
+
+  /* --- A) 先判断是否拒收（拒收：不扣库存、不加好感） --- */
+  <<set _reject = false>>
+  <<if _rules>>
+    <<if _rules.rejectItems && _rules.rejectItems.includes(_item)>>
+      <<set _reject = true>>
+    <</if>>
+  <</if>>
+
+  <<if _reject>>
+    <<set _rejLine = (_rules.rejectItemDialog && _rules.rejectItemDialog[_item]) ? _rules.rejectItemDialog[_item] : "“对不起，我不太能接受这个。”">>
+    <<print _rejLine>><br>
+    <<print _npc>> 拒绝了你的礼物。
+    <<return>>
+  <</if>>
+
+  /* --- B) 记录首次/非首次（按 tag 或 item） --- */
+  <<set $giftHistory[_npc] = $giftHistory[_npc] ?? {items:{}, tags:{}}>>
+  <<set _his = $giftHistory[_npc]>>
+
+  /* 这里选择“用文化tag做芯片书类” */
+  <<set _tags = _def.tags ?? []>>
+  <<set _keyTag = _tags.includes("文化") ? "文化" : null>>
+
+  <<set _isFirstTag = false>>
+  <<if _keyTag>>
+    <<if !_his.tags[_keyTag]>>
+      <<set _isFirstTag = true>>
+    <</if>>
+  <</if>>
+
+  /* --- C) 接受：扣库存 --- */
+  <<set $inventory[_item] -= 1>>
+  <<if $inventory[_item] <= 0>><<unset $inventory[_item]>><</if>>
+
+  /* --- D) 计算好感增量（你可继续用你原本那套） --- */
+  <<set _delta = _def.value ?? 1>>
+  <<set $npcFavor[_npc] = ($npcFavor[_npc] ?? 0) + _delta>>
+
+  /* --- E) 输出对话（首次/非首次） --- */
+  <<if _keyTag && _rules>>
+    <<if _isFirstTag && _rules.firstTagDialog && _rules.firstTagDialog[_keyTag]>>
+      <<for _line range _rules.firstTagDialog[_keyTag]>>
+        <<print _line>><br>
+      <</for>>
+    <<elseif !_isFirstTag && _rules.repeatTagDialog && _rules.repeatTagDialog[_keyTag]>>
+      <<for _line range _rules.repeatTagDialog[_keyTag]>>
+        <<print _line>><br>
+      <</for>>
+    <<else>>
+      <<print "“谢谢你，$playerName。”">><br>
+    <</if>>
+  <<else>>
+    你把「<<print _def.name>>」递给了 <<print _npc>>。<br>
+  <</if>>
+
+  ++<<print _npc>>的好感（+<<print _delta>>）
+<em>_npc和你更熟悉了。</em>
+<<set $npc to $npc ?? {}>>
+<<set $npc[_npc] to $npc[_npc] ?? {}>>
+<<set $npc[_npc].like to ($npc[_npc].like ?? 0) + _delta>>
+
+
+  /* --- F) 更新历史与日志 --- */
+  <<set _his.items[_item] = (_his.items[_item] ?? 0) + 1>>
+  <<for _t range _tags>>
+    <<set _his.tags[_t] = (_his.tags[_t] ?? 0) + 1>>
+  <</for>>
+
+  <<set $giftLog.push({npc:_npc,item:_item,itemName:_def.name,delta:_delta})>>
+<</widget>>
+
+
+
+
+
+

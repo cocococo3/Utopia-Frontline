@@ -1,0 +1,194 @@
+
+:: 清道夫休息室 {"position":"2250,3400","size":"100,100"}
+<<set $playerPos to { layer: 3, block: "清道夫休息室" }>>
+清道夫休息室永远保持着昏暗的状态，目之所见只有寥寥几盏绿色的安全灯提供必要的照明和路线标注。空气中弥漫着浓重的清洁剂气味，靠近堆放换洗衣物的位置则仍然残留着酸液和怪物腐血的味道。
+两侧的黑暗中偶尔亮起几只眼睛或者复眼，而走道深处不时传来金属节肢行走的声音。
+ <<cleanbeforefight>>
+
+ <<if $alienlike>>  [[睡眠]] <</if>>
+[[充电仓|休息2]]
+[[衣柜]]
+[[清道夫休息室-装备储存室]]
+[[清道夫休息室-快速浴室]]
+[[清道夫休息室-清理室]]
+[[返回走廊|L3流通走廊]]
+
+
+:: 清道夫休息室-装备储存间
+在铁架和其他防护措施的支撑下，微光中伫立着数十个个巨大的金属储液罐。
+<<set $playerPos to {layer:3, block:"清道夫休息室-装备储存室"}>>
+
+[[装载你的溶液罐]]
+[[进入储存室]]
+[[离开|清道夫休息室]]
+
+
+:: 装载你的溶液罐
+你的溶液罐已清空，装载什么液体呢？
+
+肌松剂
+分解酶水
+
+[[确定|装载液体]]
+[[取消|清道夫休息室-装备储存间]]
+
+::装载液体
+液体灌满了你的溶液罐。
+
+[[完成|清道夫休息室-装备储存间]]
+
+
+
+:: 清道夫休息室-快速浴室 {"position":"2375,3400","size":"100,100"}
+地面上灰绿色瓷砖的缝隙里残留着无法被抹除的溶蚀污渍，墙壁上安装着因为磨损而已经有些陈旧的不锈钢淋浴头。
+<<set $playerPos to {layer:3, block:"清道夫休息室-快速浴室"}>>
+<<if $checkmap&&!$outlet3on>>[[寻找通风口|寻找通风管3]]<</if>><<if $outlet3on>>[[通风口]]<</if>>
+[[打开水龙头]]
+[[返回|清道夫休息室]]
+
+
+:: 打开水龙头 {"position":"2475,3400","size":"100,100"}
+冷水从淋浴头里头洒下，浇在地面的瓷砖上。
+<<tick 15>>
+<<if $equippedCloth.clothdirty<=30>>
+这样简单的清洁已经没法让你变得更整洁了。
+<<else>>
+你让水流清洗着你身上和衣服上的污渍，你稍微变得整洁了一些，但想要更进一步，你需要更彻底的清洁。
+<<set $equippedCloth.clothdirty to 30>>
+<</if>>
+[[关上并且离开|清道夫休息室-快速浴室]]
+
+:: 清道夫休息室-清理室 {"position":"2375,3300","size":"100,100"}
+大量沉重且封闭的清洁机器被安置在两侧，比常规粗上几倍的管道昭显着让它们正常运转需要多少额外的水量。
+<<set $playerPos to {layer:3, block:"清道夫休息室-清理室"}>>
+[[深度清洁]]
+[[返回|清道夫休息室]]
+
+:: 深度清洁 [nobr]
+<<if $dirt>0>><<tick 60>>
+你开启了其中一台机器，一些湿润的海绵滚轮弹了出来，开始清洁你的躯壳和其上的缝隙。随后几把由机械臂操作的刷子重新为你涂抹了新的防护膜层，又仔细地烘干。<br>
+
+你感到自己变得焕然一新。<br><br>
+<<set $dirt to 0>><<set $woreout -=10>>
+[[结束清洁|清道夫休息室-清理室]]
+
+<<else>>
+你现在很干净，没有深度清洁的必要。
+<br><br>
+[[返回|清道夫休息室-清理室]]
+<</if>>
+
+
+
+
+:: 清理确认 {"position":"4650,1500","size":"100,100"}
+<<set $fromPassage to previous()>>
+<<if $playerJob is "清道夫">>
+你接收到来自 <<= $pendingLayer >> 层「<<= $pendingBlock >>」的清理请求。
+<<set $fromPassage to previous()>>
+是否立即前往现场？
+<br><br>
+<<link "是的，前往工作">>
+  <<goto "工作开始">>
+<</link>>
+
+<<if $fromPassage>>
+   <<creturn 返回>>
+<</if>>
+<<else>>
+<<goto $fromPassage>>
+<</if>>
+
+
+
+
+
+
+:: 工作开始 {"position":"4650,1625","size":"100,100"}
+
+<<set _l = $pendingLayer>>
+<<set _b = $pendingBlock>>
+
+/* ✅ 安全初始化（只做一次）*/
+<<set $woreout to $woreout or 0>>
+<<set $cleaning to $cleaning or 0>>
+
+<<if $work is undefined>>
+  <<set _base = 20 + random(0,30)>>
+  <<set $work = {
+    layer: _l,
+    block: _b,
+    dirt: _base,
+    initialDirt: _base,
+    cleanPerTurn: 8 + random(0,4)
+  }>>
+<</if>>
+
+<<set $crosstime = Math.abs(_l - $playerPos.layer)>>
+<<tick $crosstime * 30>>
+
+你正赶往 <<= _l >> 层「<<= _b >>」……
+
+<<timed 1s>><<goto "工作现场">><</timed>>
+
+
+
+:: 工作现场 {"position":"4650,1775","size":"100,100"}
+
+<!-- ✅ 再次防呆 -->
+<<if $work is undefined>>
+  <<goto "工作开始">>    <!-- 强制重新初始化 -->
+<</if>>
+
+<<set _baseClean = $work.cleanPerTurn>>
+<<set _eff = 1 + ($cleaning / 100)>>
+<<set _cleanAmt = Math.round(_baseClean * _eff)>>
+<<set _wearAmt = random(1,3)>>
+
+<<set $woreout += _wearAmt>>
+<<set $work.dirt = Math.max(0, $work.dirt - _cleanAmt)>>
+
+<<if $work.initialDirt <= 0>>
+  <<set _prog = 100>>
+<<else>>
+  <<set _prog = Math.min(100, Math.round((1 - ($work.dirt / $work.initialDirt)) * 100))>>
+<</if>>
+
+你开始认真工作……
+
+本轮清理：<<=_cleanAmt>>
+工具磨损：+<<=_wearAmt>>
+
+进度：<<=_prog>>%
+
+<<if $work.dirt > 0>>
+  <<linkreplace "继续清洁">><<goto "工作现场">><</linkreplace>>
+<<else>>
+  清洁完成！
+  <<set $cleaning += Math.round($work.initialDirt / 25)>>
+  [[前往完成->工作完成]]
+<</if>>
+
+
+:: 工作回合 {"position":"4525,1900","size":"100,100"}
+<<set _baseClean = State.temporary.cleanPerTurn || 10>>
+<<set _efficiency = 1 + ($cleaning or 0) / 100>>
+<<set _cleanAmt = Math.round(_baseClean * _efficiency)>>
+<<set _wearAmt = random(1,3)>>
+<<set $woreout += _wearAmt>>
+<<set State.temporary.dirt = Math.max(0, State.temporary.dirt - _cleanAmt)>>
+<<goto "工作现场">>
+
+
+:: 工作完成 {"position":"4725,1900","size":"100,100"}
+你和你的同伴们完成了对于这块区域的清洁，虽然地面尚且被怪物血和其他污秽覆盖，但大体上来说，区域已恢复到不影响通行的程度。
+
+你们可以收工了。
+
+<<if $cleaning <=100>>
+<span style="color: green;">你的清洁技能在艰苦工作下获得了大幅提升。</span><br>
+<<set $cleaning += 5>>
+<</if>>
+<<link "结束工作">>
+	<<goto $playerPos.block>>
+<</link>>

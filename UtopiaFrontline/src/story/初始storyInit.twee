@@ -1,0 +1,1023 @@
+:: StoryInit [functional nobr] {"position":"975,1050","size":"100,100"}
+<<script>>Config.history.controls = false
+<</script>>
+/*关闭侧边后退按钮*/
+<<set $optTaskHint = $optTaskHint ?? true>>
+<<set $optAudio = $optAudio ?? true>>
+<<set $optBgm = $optBgm ?? true>>
+
+<<script>>
+  window.audioUnlocked = false;
+
+  function unlockAudio() {
+    if (window.audioUnlocked) return;
+    window.audioUnlocked = true;
+    document.removeEventListener('pointerdown', unlockAudio);
+    document.removeEventListener('keydown', unlockAudio);
+    if (typeof window.syncAudioSystemState === 'function') {
+      window.syncAudioSystemState();
+    }
+  }
+
+  document.addEventListener('pointerdown', unlockAudio, { once: true });
+  document.addEventListener('keydown', unlockAudio, { once: true });
+
+  if (!window.playOneShot) {
+    window.playOneShot = function (file, volume, loop) {
+      try {
+        if (!window.audioUnlocked) return;
+        if (typeof window.isAudioGloballyEnabled === 'function' && !window.isAudioGloballyEnabled()) return;
+
+        var audio = new Audio(file);
+        audio.volume = (typeof volume === 'number') ? volume : 0.7;
+        audio.loop = !!loop;
+        audio.currentTime = 0;
+        audio.play().then(function () {
+          console.log('短音效播放成功:', file);
+        }).catch(function (e) {
+          console.warn('短音效播放失败:', file, e);
+        });
+      } catch (e) {
+        console.warn('播放短音效失败:', e);
+      }
+    };
+  }
+<</script>>
+
+<<include '查看工序合集'>>
+/* ========== 基础状态 ========== */
+<<set $settled to false>>/*是否已经经历过公分审查 */
+<<set $inevent to false>>
+<<set $difficulty to "normal">>
+<<set $disastercountdown to 120>>
+<<set $playerPos to  {layer:5, block:"维修部"}>>
+<<set $power to 100>>          /*电量：100 → 0 */
+<<if $power < 0>><<set $power = 0>><</if>>
+<<if $power > 100>><<set $power = 100>><</if>>
+<<set $woreout to 0>>          /* 磨损：0 → 100 */
+<<if $woreout < 0>><<set $woreout = 0>><</if>>
+<<if $woreout > 100>><<set $woreout = 100>><</if>>
+<<set $chaos to 0>>            /* 混乱：0 → 100 */
+<<if $chaos < 0>><<set $chaos = 0>><</if>>/*混乱，偏离管理区价值观的程度 */
+<<set $superperception to 0>>/*超感知，接触怪物越多这越明显 */
+<<set $hiding to 5>> /*隐蔽*/
+<<set $evade to 5>> /*敏捷*/
+<<set $fighting to 1>> /*战斗*/
+<<set $shoot to 1>>/*射击 */
+
+/*战斗内容 */
+<<set $hiddenstate to false>>/*战斗中是否是隐藏状态 */
+<<set $hiddenstateTurns to 0>>/*隐藏状态持续的敌人回合数，0 表示不在隐藏 */
+<<set $debuffevade to false>>
+<<set $debuffhiding to false>>
+<<set $firstfight to true>>
+<<set $notfight to false>>/*是否临时禁止自动触发区域战斗，用于剧情保护 */
+<<set $hurt to 5>>
+<<set $protectionoilon to false>>/*是否有防护漆保护 */
+<<set $skill_lodia to false>>
+<<set $skill_execute to false>>
+
+/*工作技能*/
+<<set $cleaning to 10>>
+<<set $machineuse to 10>>
+<<set $repair to 0>> /*维修技巧 */
+<<set $skillEloquence to 10>>
+<<set $money to 0>> /*工分*/
+<<set $surroundingsituation to 100>>/*管理区完整程度*/
+<<set $equippedCloth to null>>  /* 玩家当前身上穿的衣服 */
+<<set $possessingEquipment to false>> /*持有电子书*/
+
+<<set $personreason to false>>/*断电重启是不是因为自己的原因 */
+<<set $oilused to false>>/*是否使用了润滑油 */
+<<set $crime ={steal:0,violence:0,kill:0}>>
+<<set $suspect to 0>>
+/*=========外貌==========*/
+<<set $bodyHeight to "标准">>
+<<set $faceType to "标准">>
+<<set $eyeColor to "灰蓝">>
+<<set $hairColor to "灰蓝">>
+<<set $hairFront to "额前">>
+<<set $hairBack to "后颈">>
+<<set $skinTone to "自然肤色">>
+<<set $armorColor to "灰">>
+<<set $facedrawstatus to false>>
+<<set $facedraw to "">>
+
+/*=========穿戴装备情况=========*/
+<<set $gloveon to false>>
+<<set $inv to $inv ?? []>>
+<<set $equip to $equip ?? {hands:null, head:null, body:null, feet:null}>>
+<<set $uidSeed to $uidSeed ?? 0>>
+
+/*=========任务=========*/
+<<set $quests = {}>>
+<<set $achievements = {}>>
+<<set $questPanelTab = 'quest'>>
+<<set $questFilter = 'all'>>
+<<set $entercount to false>>
+<<set $task1 to false>>
+<<set $task2 = {open:false,cleaners: true, carmel: true}>>
+<<set $task3 to false>>/*未激活任务3*/
+<<set $task4 to false>>/*未激活任务4*/
+<<set $task41 to false>>
+<<set $task411 to false>>
+<<set $task5 to false>>
+<<set $finishtask5 to false>>
+<<set $task6 to false>>
+<<set $openpipeline to false>>
+<<set $task7 to false>>
+<<set $task8 to false>>
+<<set $finishtask8 to false>>
+<<set $superperceptionaccident to false>>
+<<set $authority_cabin to false>>
+
+/*=========环境好感=========*/
+
+<<set $maidtrust to 50>> /*人形信任*/
+<<set $incorridorcase to false>>
+
+
+<<set $playerATK to 5>>
+<<set $enemyHP to 0>>
+<<set $enemyATK to 0>>
+<<set $battleLog to []>>
+
+/*转化相关*/
+<<set $prosuperperception to false>> 
+<<set $priorbeasttrait to false>>/*野兽但是还没有换身体 */
+<<set $beasttrait to false>> /*机械野兽身体*/
+<<set $alienlike to false>>/*异星特质 */
+<<set $beastbodysuit to 0>>/*新身体磨合度*/
+<<set $hazardtrait to false>> /*祸根*/
+<<set $humantrait to false>> /*同理心*/
+
+/*工作职位相关*/
+<<set $playerJob to null>>
+<<set $higerleader to false>> /*是否是领班*/
+<<set $workplace to null>>  /*登记的工作地点*/
+<<set $workgrade to 1>>  /*目前的工作等级*/
+
+/*保洁部*/
+<<set $totalcleaningwaittime to 0>>/*待命时间*/
+<<set $tasktime to 0>>/*实际工作时间*/
+<<set $cleanjobsituation to false>>/*是否在工作中*/
+
+/*战技*/
+<<set $skill_lodia to false>>
+<<set $skill_execute to false>>
+<<set $skill_electric to false>>
+
+/* =======初次进入某地特殊对话 ========== */
+<<set $firstfight to true>>
+<<set $enterpersonnel to false>>
+<<set $task1over to false>>
+<<set $enterdetention to false>>
+<<set $enterengineer to false>>
+<<set $entertomb to false>>
+<<set $enterchurch to false>>
+<<set $enterChemical to false>>
+<<set $enterCleaning to false>>
+<<set $enterFarm to  false>>
+<<set $enterPlant to  false>>
+<<set $enterModification to false>>
+<<set $enterl1 to false>>
+<<set $enterlaundry to false>>
+<<set $enterequipment to false>>
+
+<<set $checkmap to false>>
+<<set $outlet2on to false>>
+<<set $outlet3on to false>>
+<<set $outlet4on to false>>
+<<set $outlet8on to false>>
+<<set $outlet10on to false>>
+
+<<set $enterdarkarea to false>>
+<<set $darkopenday to 0>>
+<<set $darkopen to false>>
+<<set $darkexplore to 0>>
+
+<<set $dangerousrepair to true>>
+/* ========== 时间系统 ========== */
+<<set $lastday to 7>>
+
+
+/* ========== 提案相关========== */
+<<set $proposalday to 0>>/*会议会在哪一天进行*/
+<<set $haveproposal to false>>/*玩家是否有提案*/
+<<set $proposaloccupied to false>>/*会议室是否被占用，防止提案冲突*/
+<<set $proposalpassrate to 0>>/*提案通过概率*/
+<<set $beasttraitproposal to false>>
+
+
+
+/* ========== 背包与物品 ========== */
+<<set $wardrobe to []>>/*衣柜*/
+
+
+<<set $weaponSlots = {}>>
+<<set $maxWeaponSlots = 3>>
+<<set $equippedWeapon = "">>
+<<set $deleteConfirmId = "">>
+
+/* 武器列表 - 对象数组格式 */
+<<set $weaponList = []>>
+
+<<set $weaponList.push({
+  id: "ironpipe",
+  name: "铁棍",
+  damageBonus: 1,
+  wearReduction: 1,
+  desc: "普通的铁棍，你不会觉得它真能造成什么有效的伤害吧？"
+})>>
+
+<<set $weaponStrapUnlocked = 0>>
+<<set $extendedHarnessUnlocked = 0>>
+<<set $tacticalRigUnlocked = 0>>
+<<set $omegaFrameUnlocked = 0>>
+
+/* 玩家基础数据 */
+<<set $shopTab = "buy">>
+<<set $shopMessage = "">>
+<<set $shopMessageType = "">>
+<<set $lastViewedWeaponId = "">>
+
+/* 体型常量 */
+<<set $SIZE_SMALL = "small">>
+<<set $SIZE_MEDIUM = "medium">>
+<<set $SIZE_LARGE = "large">>
+
+/* 玩家属性（示例，根据你的实际系统调整） */
+<<set $playerSize = $SIZE_MEDIUM>>
+<<set $playerCombat = 35>>
+
+/* 武器定义库 */
+<<set $shopWeaponDefs = {
+  metal_spear: {
+    id: "metal_spear",
+    name: "金属矛",
+    damageBonus: 5,
+    wearReduction: 2,
+    desc: "一根结实的金属矛，新手也能用得顺手。",
+    basePrice: 40,
+    sizeLimit: [],
+    combatReq: 0,
+    isDefault: true
+  },
+  baton: {
+    id: "baton",
+    name: "警棍",
+    damageBonus: 4,
+    wearReduction: 3,
+    desc: "标准制式警棍，攻守兼备。",
+    basePrice: 60,
+    sizeLimit: [],
+    combatReq: 0,
+    isDefault: true
+  },
+  riot_fork: {
+    id: "riot_fork",
+    name: "防暴叉",
+    damageBonus: 3,
+    wearReduction: 4,
+    desc: "防暴器械，能有效控制敌人。缺点是你需要一定身高才能有效使用它",
+    basePrice: 70,
+    sizeLimit: [$SIZE_SMALL],
+    combatReq: 0,
+    isDefault: true
+  },
+  long_blade: {
+    id: "long_blade",
+    name: "长刀",
+    damageBonus: 6,
+    wearReduction: 1,
+    desc: "刀刃狭长，需要一定空间才能施展。",
+    basePrice: 150,
+    sizeLimit: [$SIZE_SMALL],
+    combatReq: 0,
+    isDefault: false
+  },
+  heavy_shield: {
+    id: "heavy_shield",
+    name: "重盾",
+    damageBonus: 2,
+    wearReduction: 7,
+    desc: "厚重的塔盾，能抵挡绝大多数攻击，但只有经验丰富的战士才能灵活运用。",
+    basePrice: 400,
+    sizeLimit: [$SIZE_SMALL],
+    combatReq: 50,
+    isDefault: false
+  },
+  axe: {
+    id: "axe",
+    name: "斧头",
+    damageBonus: 6,
+    wearReduction: 2,
+    desc: "沉重的战斧，威力强大。",
+    basePrice: 120,
+    sizeLimit: [],
+    combatReq: 0,
+    isDefault: false
+  },
+  explosive_crossbow: {
+    id: "explosive_crossbow",
+    name: "爆炸速射弩",
+    damageBonus: 5,
+    wearReduction: 0,
+    desc: "改装过的速射弩，箭矢装有微型爆炸物，射程内杀伤力惊人。",
+    basePrice: 200,
+    sizeLimit: [],
+    combatReq: 0,
+    isDefault: false
+  }
+}>>
+
+/* 商店库存 */
+<<set $shopInventory = [
+  {weaponId: "metal_spear", stock: 99, price: 80},
+  {weaponId: "baton", stock: 99, price: 60},
+  {weaponId: "riot_fork", stock: 99, price: 70},
+  {weaponId: "long_blade", stock: 5, price: 150},
+  {weaponId: "heavy_shield", stock: 2, price: 400},
+  {weaponId: "axe", stock: 8, price: 120},
+  {weaponId: "explosive_crossbow", stock: 1, price: 800}
+]>>
+
+/* 武器列表（玩家持有，默认给3把初始武器） */
+<<set $weaponList = []>>
+
+/* 武器位系统 */
+<<set $weaponSlots = {}>>
+<<set $maxWeaponSlots = 5>>
+<<set $equippedWeapon = "">>
+<<set $deleteConfirmId = "">>
+
+/* 解锁条件 */
+<<set $weaponStrapUnlocked = 0>>
+<<set $extendedHarnessUnlocked = 0>>
+<<set $tacticalRigUnlocked = 0>>
+<<set $omegaFrameUnlocked = 0>>
+
+
+<<set $contacts to $contacts ?? {}>>
+
+
+
+
+/* ========== 玩家职业与清洁系统 ========== */
+<<set $dirtyZones to []>>
+<<set $cleanLog to []>>
+
+
+<<set $laundryMinutes to 1440>>        /* 送洗耗时：24小时 = 1440分钟 */
+<<set $laundryRepairAmount to 30>>     /* 送洗后修复的耐久量（clothworeout减少量，非满修复） */
+<<set $dirtyDegradeThreshold to 80>>   /* 脏污值达到多少后开始额外侵蚀耐久 */
+<<set $dirtyDegradeStep to 0.2>>       /* 脏污过高时，每次tick额外侵蚀的耐久量 */
+<<set $dirtyIncreaseStep to 0.5>>      /* 穿着衣物时，每次tick脏污值的自然增长量 */
+
+
+/* ========== 种地系统 ========== */
+<<set $emptyPlantSlots to 6>>
+<<set $plantedPlants to []>>  /* {id, type, growth} */
+
+
+/* ========== 监狱小游戏 ========== */
+<<set $currentCrimePrisoner to null>>
+<<set $solitaryConfinement to []>>
+<<set $playerInSecretOrg to false>>
+<<set $bribesTaken to 0>>
+<<set $secretInvitePending to false>>
+
+/* ========== 时间事件与状态 ========== */
+<<set $mealTimes to [7,12,18]>>
+<<set $mealStage to 0>>
+<<set $groupMood to "calm">>
+<<set $baseCrimeUp to 0.1>>
+
+
+
+/* ========== 地图与层级结构 ========== */
+<<set $map to {
+  1:{name:"一层", blocks:["L1流通走廊"]},
+  2:{name:"二层", blocks:["巡逻队休息室","模拟格斗室","看守部","教化司","L2流通走廊"]},
+  3:{name:"三层", blocks:["清道夫休息室","安息之地","处理间","L3流通走廊"]},
+  4:{name:"四层", blocks:["锻造部","化工部","L4流通走廊"]},
+  5:{name:"五层", blocks:["维修部","工程部","设备部","L5流通走廊"]},
+  6:{name:"六层", blocks:["洗衣部","日用品部","纺裁部","保洁部","L6流通走廊"]},
+  7:{name:"七层", blocks:["食品部-生产车间","食品部-加工车间","人事部","L7流通走廊"]},
+  8:{name:"八层", blocks:["食品部-生产车间-垂直农场","L8流通走廊"]},
+  9:{name:"九层", blocks:["L9流通走廊"]},
+ 10:{name:"十层", blocks:["后勤休息区","L10流通走廊"]}
+}>>
+
+<<set $raidLog to []>>
+<<set $movelayer to 6>>
+
+/* ========== 战力表 ========== */
+<<set $npcForce to {
+  "维修部小队":115,"洗衣部小队":80,"设备部小队":110,"工程部小队":95,"化工部小队":105,
+  "日用品部小队":90,"纺裁部小队":85,"武器部小队":115,"监视部小队":100,"食品部小队":125,
+  "保洁部小队":75,"看守部小队":105,"保卫部小队":120,"处理间小队":100
+}>>
+
+<<set $monsterForceTbl to {
+  "二型物理化学伤害怪物":{base:50,range:10},
+  "二型化学错误伤害怪物":{base:80,range:20},
+  "三型物理化学伤害通信阻断怪物":{base:90,range:20},
+  "二型错误伤害通信阻断怪物":{base:60,range:15}
+}>>
+
+<<set $autoBattleEvent to null>>
+<<set $turnPhase to "enemy">>  /*敌人先手*/
+
+<<silently>>
+/* 中文数字（仅 1~4 用到） */
+<<set $cnNumMap to {1:"一",2:"二",3:"三",4:"四"}>>
+
+/* 伤害类型 -> AI 标签 */
+<<set $aiTagByDmg to {
+  "物理":     { style:"aggressive", note:"近战压迫/更爱普通攻击" },
+  "化学":     { style:"toxic",      note:"偏施加减益/腐蚀" },
+  "通信阻断": { style:"jammer",     note:"偏打断/延后巡逻" },
+  "错误化": { style:"errorization",     note:"持续回血" }
+}>>
+
+/* 主AI优先级：多类型时，命中越靠前越优先当主AI */
+<<set $aiPriority to ["物理","化学","通信阻断","错误化"]>>
+
+/* n型数值规则（可调平衡） */
+<<set $byN to {
+  1:{ baseHp:50,  hpRange:10, baseAtk:12, atkRange:2 },
+  2:{ baseHp:70,  hpRange:15, baseAtk:16, atkRange:3 },
+  3:{ baseHp:95,  hpRange:20, baseAtk:20, atkRange:4 },
+  4:{ baseHp:125, hpRange:25, baseAtk:24, atkRange:5 }
+}>>
+
+/* 组合表（15 种）
+   - key: 内部ID
+   - dmg: 伤害类型数组（顺序会影响名字关键词拼接的顺序）
+*/
+<<set $dmgCombos to {
+  /* 1种（4） */
+  p:   { dmg:["物理"] },
+  c:   { dmg:["化学"] },
+  j:   { dmg:["通信阻断"] },
+  i:   { dmg:["错误化"] },
+
+  /* 2种（6） */
+  pc:  { dmg:["物理","化学"] },
+  pj:  { dmg:["物理","通信阻断"] },
+  pi:  { dmg:["物理","错误化"] },
+  cj:  { dmg:["化学","通信阻断"] },
+  ci:  { dmg:["化学","错误化"] },
+  ji:  { dmg:["通信阻断","错误化"] },
+
+  /* 3种（4） */
+  pcj: { dmg:["物理","化学","通信阻断"] },
+  pci: { dmg:["物理","化学","错误化"] },
+  pji: { dmg:["物理","通信阻断","错误化"] },
+  cji: { dmg:["化学","通信阻断","错误化"] },
+
+  /* 4种（1） */
+  pcji:{ dmg:["物理","化学","通信阻断","错误化"] }
+}>>
+
+/* 组合 key 池：用于 random 抽取 */
+<<set $dmgComboKeys to ["p","c","j","i","pc","pj","pi","cj","ci","ji","pcj","pci","pji","cji","pcji"]>>
+<</silently>>
+
+<<silently>>
+/* --- 玩家数据（删掉暂时没用的字段，保留武器/战技/护甲） --- */
+<<set $player to {
+  name: "你",
+  weapon: {},
+  techs: [],                 /* 例如：["震慑打击","自我修复"] */
+  armor: 0
+}>>
+
+/* --- 战斗全局 --- */
+<<set $inCombat to false>>
+<<set $fightround to 0>>
+<<set $patrolTurn to 0>>          /* 巡逻队倒计时：每回合 -1；通信阻断可 +n */
+<<set $maxWoreout to 100>>
+<<set $actionLog to []>>
+<<set $attackCountdown to 10>>
+
+/* --- 道具表--- */
+<<set $itemMaster to {
+  slime: {
+    id:"slime",
+    name:"胶蛋白",
+    type:"material",
+    price:5,
+    desc:"从怪物体内剖出的胶质物体，要小心不要和真正的清洁凝胶弄混了。",
+    icon:"🧫",
+    effect:"material",
+    wear:null
+  },
+  claw: {
+    id:"claw",
+    name:"骨爪",
+    type:"weapon",
+    price:0,
+    damageBonus:4,
+    wearReduction:1,
+    desc:"和怪物骨头相连的尖爪，本身就很适合被当做武器。",
+    icon:"🦴",
+    effect:"weapon",
+    wear:null
+  },
+  armors: {
+    id:"armors",
+    name:"小块甲壳碎片",
+    type:"material",
+    price:5,
+    desc:"一块巴掌大的怪物甲壳碎片，除了被当做装饰和素材什么作用都没有。",
+    icon:"🦴",
+    effect:"material",
+    wear:null
+  },
+  armorm: {
+    id:"armorm",
+    name:"中块甲壳碎片",
+    type:"material",
+    price:10,
+    desc:"一块不是很完整的怪物甲壳碎片，强度略低，适合被制作成装饰品。",
+    icon:"🦴",
+    effect:"material",
+    wear:null
+  },
+  armorl: {
+    id:"armorl",
+    name:"大块甲壳碎片",
+    type:"material",
+    price:20,
+    desc:"一块完整的怪物甲壳碎片，经过适当打磨应该很适合二次加工。",
+    icon:"🦴",
+    effect:"material",
+    wear:null
+  },
+  databomb: {
+    id:"databomb",
+    name:"错误的数据流",
+    type:"material",
+    price:0,
+    desc:"一块不稳定的碎片，时常在你眼前闪烁出奇妙的颜色。",
+    icon:"💠",
+    effect:"material",
+    wear:null
+  },
+  maybeseed: {
+    id:"maybeseed",
+    name:"种子？",
+    type:"material",
+    price:25,
+    desc:"从怪物的残骸里掉出来的……种子？应该可以种植。",
+    icon:"🌱",
+    effect:"seed",
+    wear:null
+  },
+  trash: {
+    id:"trash",
+    name:"垃圾",
+    type:"trash",
+    price:0,
+    desc:"没有任何用途的废弃碎屑，最好尽快丢到回收间。",
+    icon:"🗑️",
+    effect:"material",
+    wear:null
+  }
+}>>
+
+
+<</silently>>
+
+<<set $aiDropPool = {
+    "aggressive": ["claw", "armors", "armorm", "armorl"],     
+    "toxic": ["slime", "armors", "armorm", "armorl"],
+    "errorization": ["databomb", "maybeseed", "armors", "armorm", "armorl"],
+    "jammer": ["databomb"]
+}>>
+
+
+
+/*洗衣小游戏*/
+<<set setup.stains = {
+    blood:   {name:"怪物血渍", cleaners:["bleach","enzyme"], dissolvers:["acid"]},
+    grease:  {name:"油渍", cleaners:["degreaser","soap"], dissolvers:["bleach"]},
+    ink: {name:"墨水渍", cleaners:["alcohol","bleach"], dissolvers:["water"]},
+    mud:     {name:"灰尘", cleaners:["water","soap","alcohol","bleach","degreaser","enzyme"],    dissolvers:["acid"]},
+    stuck:{name:"顽固污渍", cleaners:["acid"]}
+}>>
+
+<<set setup.cleaners = {
+    water:"纯水", soap:"中性皂液", bleach:"漂白剂",
+    enzyme:"生物酶清洁剂", degreaser:"去油剂",
+    alcohol:"酒精喷雾", acid:"强酸溶液（危险）"
+}>>
+
+/* 当前衣服 */
+<<set $cloth = {}>>
+
+
+/* 工艺库：每道工序有哪些可选工艺，以及它们适用的“原料→产品”组合 */
+<<set setup.processes = {
+ chem: {   /* 化学处理 */
+        "脂肪→肥皂": "碱性水解",
+        "环己酮→己二酸": "氧化反应",
+        "水杨酸→阿司匹林": "酯化反应",
+        "玉米淀粉→聚乳酸": "碱性水解",
+        "蒽醌→过氧化氢": "氧化反应",
+        "乙酸乙酯→乙酰乙酸乙酯": "酯化反应",
+        "牛奶蛋白→酪蛋白酸钠": "碱性水解",
+        "苯胺→聚苯胺": "氧化反应"
+    },
+    sep:  {   /* 分离纯化 */
+        "脂肪→肥皂": "过滤干燥",
+        "环己酮→己二酸": "蒸馏结晶",
+        "水杨酸→阿司匹林": "萃取重结晶",
+        "玉米淀粉→聚乳酸": "蒸馏结晶",
+        "蒽醌→过氧化氢": "萃取重结晶",
+        "乙酸乙酯→乙酰乙酸乙酯": "过滤干燥",
+        "牛奶蛋白→酪蛋白酸钠": "萃取重结晶",
+        "苯胺→聚苯胺": "过滤干燥"
+    },
+    post: {   /* 后处理与成型 */
+        "脂肪→肥皂": "造粒包装",
+        "环己酮→己二酸": "喷雾干燥",
+        "水杨酸→阿司匹林": "注塑成型",
+        "玉米淀粉→聚乳酸": "注塑成型",
+        "蒽醌→过氧化氢": "造粒包装",
+        "乙酸乙酯→乙酰乙酸乙酯": "喷雾干燥",
+        "牛奶蛋白→酪蛋白酸钠": "喷雾干燥",
+        "苯胺→聚苯胺": "注塑成型"
+    }
+}>>
+
+/* 订单库：原料、产品、价格 */
+<<set setup.orders = [
+    {ing:"脂肪", prod:"肥皂", pay:20},
+    {ing:"环己酮", prod:"己二酸", pay:30},
+    {ing:"水杨酸", prod:"阿司匹林", pay:50},
+    {ing:"玉米淀粉", prod:"聚乳酸", pay:40},  // 生物塑料附加值较高
+    {ing:"蒽醌", prod:"过氧化氢", pay:35},    // 氧化剂生产中等利润
+    {ing:"乙酸乙酯", prod:"乙酰乙酸乙酯", pay:60}, // 医药中间体价格高
+    {ing:"牛奶蛋白", prod:"酪蛋白酸钠", pay:25}, // 食品添加剂
+    {ing:"苯胺", prod:"聚苯胺", pay:70}       // 功能材料溢价
+]>>
+
+<<run if (!Math.clamp) {
+	window.Math.clamp = function (val, min, max) {
+		return Math.min(Math.max(val, min), max);
+	};
+}>>
+
+
+
+/* ---------- 离散选项定义（编号 → 修正/基础） ---------- */
+/* 下摆：编号1..5 → 修正值（用于 maxworeout），并有名字 */
+<<set $hemOpts to {
+  1: { name: "无下摆",   mod: -6 },
+  2: { name: "超短裙",   mod: -3 },
+  3: { name: "普通短裙", mod:  0 },
+  4: { name: "过膝裙",   mod: +3 },
+  5: { name: "过踝裙",   mod: +6 }
+}>>
+
+/* 袖部：编号1..4 → 修正值 */
+<<set $slvOpts to {
+  1: { name: "无袖", mod: -3 },
+  2: { name: "短袖", mod: -1 },
+  3: { name: "中袖", mod: +3 },
+  4: { name: "长袖", mod: +5 }
+}>>
+
+/* 布料：编号1..3 → 基础耐久 & 基础单价 */
+<<set $fabOpts to {
+  1: { name: "低耐受", baseMax: 10, baseMoney: 10 },
+  2: { name: "中耐受", baseMax: 20, baseMoney: 20 },
+  3: { name: "高耐受", baseMax: 30, baseMoney: 30 }
+}>>
+
+/* ---------- 草稿：用“编号”来记录当前选择 ---------- */
+<<set $draft to {
+  hemIdx: 4,        /* 1..5；默认普通后勤制服 */
+  slvIdx: 3,        /* 1..4；默认中袖 */
+  fabIdx: 2,        /* 1..3；默认中耐受 */
+  overskirt: false, /* 外裙：true/false */
+  /* 计算产出： */
+  hemMod: 0,
+  slvMod: 0,
+  maxworeout: 0,
+  cost: 0,
+  name: "普通后勤部门制服",
+  intro: "常规的后勤部门制服，轻盈而便于日常行动。"
+}>>
+
+<<set $presets to [
+  {
+    name:"普通后勤部门制服",
+    intro:"常规的后勤部门制服，轻盈而便于日常行动。",
+    hem:{min:4, max:5},
+    sleeve:{min:3, max:4},
+    fabric:{min:2, max:2},
+    over:"任意"
+  },
+  {
+    name:"普通巡逻队制服",
+    intro:"常规的巡逻队制服，袖子和裙摆的长度都保证球关节不会因剧烈的运动绞入布料。",
+    hem:{min:2, max:3},
+    sleeve:{min:2, max:3},
+    fabric:{min:2, max:2},
+    over:"任意"
+  },
+  {
+    name:"普通清道夫制服",
+    intro:"常规的清道夫制服，在耐脏的同时妥帖地保护你的机体免受腐蚀。",
+    hem:{min:4, max:5},
+    sleeve:{min:2, max:4},
+    fabric:{min:3, max:3},
+    over:"任意"
+  },
+  {
+    name:"无袖制服",
+    intro:"让袖子再也不会成为你扇别人巴掌的阻力，同时让你看上去像个战神。",
+    hem:{min:2, max:5},
+    sleeve:{min:1, max:1},
+    fabric:{min:2, max:3},
+    over:"任意"
+  },
+  {
+    name:"围裙制服",
+    intro:"你的想法……呃……很有新意。",
+    hem:{min:1, max:1},
+    sleeve:{min:1, max:4},
+    fabric:{min:1, max:3},
+    over:"存在"
+  },
+  {
+    name:"超轻制服",
+    intro:"我希望你是在开玩笑，或者只是纯粹地有收集癖。",
+    hem:{min:1, max:1},
+    sleeve:{min:1, max:1},
+    fabric:{min:1, max:1},
+    over:"无"
+  },
+  {
+    name:"华而不实制服",
+    intro:"这套衣服的设计让我想起了某个词语。",
+    hem:{min:5, max:5},
+    sleeve:{min:4, max:4},
+    fabric:{min:1, max:1},
+    over:"任意"
+  },
+  {
+    name:"轻薄制服",
+    intro:"这类制服不是很耐造，如果不想把它们作为消耗品，等你有工分了最好尽快换一套新的。",
+    hem:{min:1, max:5},
+    sleeve:{min:1, max:4},
+    fabric:{min:1, max:1},
+    over:"无"
+  },
+  {
+    name:"短袖长款制服",
+    intro:"假如你经常需要卷起袖子，这个设计是不错的选择。",
+    hem:{min:4, max:5},
+    sleeve:{min:2, max:2},
+    fabric:{min:2, max:2},
+    over:"任意"
+  },
+  {
+    name:"长袖短款制服",
+    intro:"为想要保护自己的手臂但又需要频繁跑动的人形设计。",
+    hem:{min:2, max:3},
+    sleeve:{min:4, max:4},
+    fabric:{min:1, max:3},
+    over:"任意"
+  }
+]>>
+
+<<set $fallbackPreset to {name:"改良制服", intro:"这是你定制的服装。"}>>
+
+
+<<set $laundryQueue to []>>         /* 存放正在清洗的衣服 */
+<<set _finishedList to []>>
+
+<<set $defaultMaxStack = 99>>
+
+
+<<set $uidSeed to 0>>
+<<set $inv to []>>
+<<set $equip to { hands: null, weapon: null }>>
+<<set $money to 0>>
+
+/* useItem 里用到的其它状态量，没有的话先给个默认值，实际数值请按你自己的数值体系调整 */
+<<set $maxEnergy to 100>>
+<<set $bodyWear to 0>>
+<<set $bodyDamage to 0>>
+<<set $skillRepair to 0>>
+<<set $photos to []>>
+
+<<initShopDB>>
+
+
+
+
+
+/* 定义NPC商店的货物池 */
+<<set $npcShopStock to []>>
+<<set $npcShopDate to 0>>
+<<set $tmp_myOffer to []>>
+<<set $tmp_npcOffer to []>>
+
+<<set $shopPool = {
+    "beautiful_crystal": {id:"beautiful_crystal", name:"美丽结晶", icon:"💎", price:100, qty:1, desc:"高温将各种杂质粘合在一起，最终形成的结晶，在灯光下绽放出五颜六色的光芒。", effect:"material", wear:null},
+    "glass_animal": {id:"glass_animal", name:"彩色玻璃动物", icon:"🎨", price:20, qty:1, desc:"用半融化的玻璃捏制而成，易碎的廉价玩具和艺术品。", effect:"material", wear:null},
+    "plastic_dino": {id:"plastic_dino", name:"塑料小恐龙", icon:"🦖", price:5, qty:2, desc:"只比你指头大一圈的恐龙玩具，模具线上的颜色已经开始剥落。", effect:"material", wear:null},
+    "insect_specimen": {id:"insect_specimen", name:"昆虫标本", icon:"🪲", price:10, qty:2, desc:"被刺穿在硬纸板上的昆虫尸体。", effect:"material", wear:null},
+    "human_painting": {id:"human_painting", name:"人类的画作", icon:"🖼️", price:20, qty:1, desc:"被打印在纸张上的画作。", effect:"material", wear:null},
+    "neuroscience": {id:"neuroscience", name:"人类的脑神经学", icon:"📘", price:60, qty:1, desc:"关于人类大脑结构与功能的学术著作。", effect:"material", wear:null},
+    "hypnosis": {id:"hypnosis", name:"暗示、催眠和遗忘", icon:"📖", price:60, qty:1, desc:"探讨潜意识操控与记忆抹除的心理学书籍。", effect:"material", wear:null},
+    "chronicle": {id:"chronicle", name:"编年史", icon:"📚", price:20, qty:1, desc:"按年代顺序记录历史事件的典籍。", effect:"material", wear:null},
+    "novel": {id:"novel", name:"小说", icon:"📕", price:20, qty:2, desc:"虚构故事集，供消遣阅读的平装书。", effect:"material", wear:null},
+    "lockpick": {id:"lockpick", name:"开锁用具", icon:"🧰", price:20, qty:1, desc:"一套精巧的金属工具，用于打开各种锁具。", effect:"tool", wear:null},
+    "animal_world": {id:"animal_world", name:"动物世界·全集", icon:"📚", price:50, qty:1, desc:"收录各类生物图鉴与生态记录的完整百科全书。", effect:"material", wear:null}
+}>>
+
+
+
+<<set $npc = {
+    corrina: { name: "Corrina", lead:"",like: 0 },
+    carmel:  { name: "Carmel",lead:"维修部", like: 0 },
+    sn_851:  { name:"SN-851",lead:"人事部",like:30},
+    mapka:   { name: "Mapka",lead:"食品部生产车间", like: 0 },
+    mia:     { name: "Mia", lead:"食品部加工车间",like: 0 },
+    eumen:    { name: "Eumen", lead:"看守部",like: 0 },
+    ada:     { name: "Ada",lead:"教化司", like: 0 },
+    lodia:   { name: "Lodia", lead:"洗衣部",like: 0 },
+    quintina:{ name: "Quintina", lead:"化工部",like: 0 },
+    lucy:    { name: "Lucy", lead:"保洁部",like: 0 },
+    beverly: { name: "Beverly", lead:"工程部",like: 0 },
+    sophie:  { name: "Sophie",lead:"人事部", like: 0 },
+    royin:   { name: "Ro’yin",lead:"纺裁部", like: 0 },
+    wafrin:  { name: "Wafrin", lead:"设备部", like: 0 },
+
+    shaterra: { name: "Shaterra", lead:"安息之地",like: 0 },
+    sysin:   { name: "Sysin",lead:"", like: 0 },
+    rican:   { name: "Rican",lead:"", like: 0 },
+
+    nana:    { name: "Nana",lead:"", like: 0 },
+    pep:     { name: "Pep", lead:"",like: 0 },
+    bore:    { name: "Bo’re",lead:"", like: 0 },
+    eartha:  { name: "Eartha", lead:"",like: 0 },
+    canele:  { name: "Canelé", lead:"",like: 0 }
+}>>
+<<set $flags = $flags || {}>>
+<<set $npcGiftTaste to $npcGiftTaste ?? {
+  "Eumen":  { love:["文化"],  like:["科技"], dislike:["特殊"] },
+  "Ada": { love:["野性","特殊"], like:["人类"], dislike:[] }
+}>> 
+
+<<set $giftHistory to $giftHistory ?? {}>>
+<<set $giftHistory["Eumen"] = {
+  items: { "chronicles": 1, "novel": 2 },
+  tags:  { "文化": 1, "人类": 1 }
+}>>
+
+
+<<set $npcGiftRules to $npcGiftRules ?? {
+  "Eumen": {
+    /* 拒绝列表：这些物品直接拒收 */
+    rejectItems: ["suggestion_hypnosis","human_neuroscience"],
+	/*特殊对话列表*/
+    /* 第一次送“文化/芯片书类”的台词（这里用 tag=文化 作为类别） */
+    firstTagDialog: {
+      "文化": [
+        "“啊……可以放进电子阅读器的芯片？这么说起来，我很久没用过它了。”",
+        "“多谢，我还挺喜欢读东西的，可惜一直没什么时间。”"
+      ]
+    },
+    /* 非首次送“文化”类的台词 */
+    repeatTagDialog: {
+      "文化": [
+        "“谢谢你，我很喜欢芯片书。之前你送给我的芯片我也有在看，都是很有趣的内容呢。”"
+      ]
+      
+    },
+
+    /* 针对具体物品的拒收台词（优先级高于通用拒绝） */
+    rejectItemDialog: {
+      "suggestion_hypnosis": "“……对不起，我一般……不看这种书。”",
+      "human_neuroscience": "“这个给Carmel更合适吧？”"
+    }
+  }
+}>> 
+
+
+<<set $inventory to $inventory ?? {}>>  /* 物品ID -> 数量 */
+
+<<set $giftDB to Object.assign($giftDB ?? {}, {
+
+ "human_painting": {name:"被打印在纸张上的人类画作",tags:["人类","文化"],value:7},
+"neuroscience": {name:"人类的脑神经学",tags:["人类","文化","特殊"],value:10},
+"hypnosis": {name:"暗示、催眠和遗忘",tags:["人类","特殊"],value:9},
+"chronicles": {name:"编年史",tags:["人类","文化"],value:8},
+"novel": {name:"小说",tags:["文化"],value:5},
+"animal_world": {name:"动物世界·全集",tags:["野性","文化"],value:9},
+"joint_oil": {name:"关节油剂",tags:["科技","日常"],value:6},
+"emergency_power_pack": {name:"应急充电包",tags:["科技","日常"],value:8},
+"monster_bone_accessory": {name:"怪物骨头饰品",tags:["野性","成果"],value:10},
+"bouquet": {name:"花束",tags:["成果","日常"],value:6}
+})>>
+
+<<set $npcFavor to $npcFavor ?? {}>>  /* npc名 -> 好感 */
+<<set $giftLog  to $giftLog  ?? []>>  /* 赠送记录 */
+
+
+
+
+
+/* 走廊文案 */
+<<set $textList = [
+    "管理区实在是太大了，你不得不小跑起来以求更有效率地前往你的目的地。",
+    "几个巡逻队的成员从你身边经过，她们身上的武器随着走动发出金属的碰撞声。",
+    "笨重的运输用无人车正在沿着规划的路线行驶，旁边的人形纷纷给它们让出道路。",
+    "你乘上停靠在月台旁的列车快线，等待着它的启动。",
+    "快线列车在你旁边的站台拖着六节车厢一闪而过。",
+    "人形们从你的身旁经过，你听到了窸窸窣窣的对话声。",
+    "你路过一队刚刚完成战斗的巡逻队成员，她们身上散发出金属和碳纤维被燃烧和腐蚀后的刺鼻气味。",
+    "你遇见一列清道夫的队伍，她们正把几大块怪物残骸送往处理间。",
+    "自动清扫机从你身边缓缓路过，清扫着地上的灰尘。"
+]>>
+
+<<set $ebookDB to {
+  "ebk_1": {
+    title: "协议片段1",
+    desc: "@#%^%@%@%$%",
+    passage: "协议片段1"
+  },
+  "ebk_2": {
+    title: "协议片段2",
+    desc: "@#@￥%￥……%￥#",
+    passage: "协议片段2"
+  },
+  "ebk_3": {
+    title: "环球科技日报·特别报道",
+    desc: "很久以前的电子版报纸副本。",
+    passage: "环球科技日报 · 特别报道"
+  },
+  "ebk_4": {
+    title: "协议片段3",
+    desc: "一段协议的碎片，如今仍然适用。",
+    passage: "协议片段3"
+  },
+  "ebk_5": {
+    title: "机密文件 · 联合能源与航天发展委员会内部报告",
+    desc: "一段机密文件的碎片，似乎是某个委员会的内部报告。",
+    passage: "机密文件 · 联合能源与航天发展委员会内部报告"
+  },
+  "ebk_6": {
+    title: "现实化",
+    desc: "一段和‘现实化’有关的新闻。",
+    passage: "现实化解说"
+  },
+  "ebk_7": {
+    title: "投射疫",
+    desc: "记录了投射疫爆发的新闻副本。",
+    passage: "突发新闻"
+  }
+
+}>>
+
+<<set $ebookUnlocked to $ebookUnlocked ?? []>>
+
+<<set $systemmention =[        
+"退出之前请一定要存档！",
+"随时注意你的电量和磨损值变化是一个好习惯。",        
+"混乱值过高可能会让你的想法发生变化。",
+"随着工作等级的提升，会有更多部门允许你去那里工作。",
+"人形们对你自然地抱有一定信任感，然而你在她们中的风评会因为犯下错误而下降。",
+"力量、敏捷和观察是你的主属性，它们的数值会影响战斗和你日常的工作。",
+"力量属性越高，你对如何使出更大的力量越有心得。这会影响你在战斗中的造伤和搬动更重东西时的表现。",
+"敏捷属性越高，你的反应速度越快。这会影响你在战斗中的闪避成功率和对突发事件的应对方式。",
+"观察属性越高，你越能在短时间内确认周围的环境状态。这会影响你在战斗中的隐匿成功率和你能否找出被藏起的物品。",
+"你不能同时在多个部门工作。",
+"多和领班们聊天并非浪费时间，她们很可能会告诉你很多有利于工作的注意点。",
+"后勤类部门的休息室在10L，巡逻队休息室在2L，清道夫休息室在3L。注意不要走错了。",
+"虽然除了总休息室，其他地方也可以充电，但必须消耗公分。"]>>
+
+<<if $enterdetention>>
+    <<run $systemmention.push("囚犯被关押不是没有原因的，不管他们和你的关系如何，都要对他们抱有警惕之心。")>>
+<</if>>
+
+<<set $shaterraactive to [
+  "Shaterra正在拿拂尘扫除那些头颅上的灰。",
+  "Shaterra正像一块黑色的石头一样沉默地坐在椅子上。",
+  "Shaterra正在大厅里缓慢地踱步。"
+]>>
+
+<<set $transferaccidenttalk to [
+  "“洗衣部的人形真该少往一辆运输车里塞那么多衣服……”",
+  "“还好没有东西倒出来，化工部的人形真该对此感到幸运……”",
+  "“清道夫们对运输车能运多少重量的东西没有概念吗……”",
+  "“设备部真该改进一下运输车的载重上限了……”"
+]>>
