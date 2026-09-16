@@ -1,0 +1,230 @@
+/* ========== 任务面板 ========== */
+.quest-panel {
+  position: fixed;
+  right: -400px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 380px;
+  height: 85vh;
+  max-height: 700px;
+  background: rgba(20, 20, 25, 0.97);
+  border-left: 3px solid rgba(100, 150, 255, 0.3);
+  box-shadow: -8px 0 25px rgba(0,0,0,0.4);
+  transition: right 0.4s cubic-bezier(0.33, 1, 0.68, 1);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px 0 0 12px;
+}
+
+/* 隐藏真正的 checkbox，只用它的勾选状态驱动面板 */
+.quest-toggle-checkbox {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* checkbox 勾选时让面板滑出——checkbox 必须是面板的前置兄弟节点 */
+.quest-toggle-checkbox:checked ~ .quest-panel {
+  right: 0;
+}
+
+/* ========== 面板头部 ========== */
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: rgba(0,0,0,0.3);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  flex-shrink: 0;
+}
+.panel-header h2 { margin: 0; color: rgba(255,255,255,0.9); font-size: 1.4em; }
+.close-btn {
+  font-size: 24px;
+  cursor: pointer;
+  padding: 5px 10px;
+  transition: all 0.3s ease;
+  color: rgba(255,255,255,0.7);
+}
+.close-btn:hover { color: rgba(255,80,80,0.9); transform: rotate(90deg); }
+
+/* ========== 顶层切换：任务 / 成就 ========== */
+.quest-toplevel-tabs {
+  display: flex;
+  padding: 15px 15px 0;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.toplevel-tab {
+  flex: 1;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.6);
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+.toplevel-tab:hover { background: rgba(255,255,255,0.1); }
+.toplevel-tab.active {
+  background: rgba(100, 150, 255, 0.2);
+  border-color: rgba(100, 150, 255, 0.4);
+  color: rgba(100, 180, 255, 0.9);
+}
+
+/* ========== 子筛选标签 ========== */
+.quest-tabs { display: flex; padding: 0 15px; gap: 8px; margin: 15px 0; flex-shrink: 0; }
+.quest-tab {
+  flex: 1;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.6);
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 13px;
+  transition: all 0.3s ease;
+}
+.quest-tab:hover { background: rgba(255,255,255,0.1); }
+.quest-tab.active {
+  background: rgba(100, 150, 255, 0.2);
+  border-color: rgba(100, 150, 255, 0.4);
+  color: rgba(100, 180, 255, 0.9);
+}
+
+/* ========== 滚动区 ========== */
+.quest-scroll { flex: 1; overflow-y: auto; padding: 0 15px 15px; }
+
+/* ========== 任务条目（<details> 实现展开/收起，无需 JS） ========== */
+details.quest-item {
+  padding: 14px;
+  margin: 10px 0;
+  background: rgba(40, 45, 55, 0.5);
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.05);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+details.quest-item:hover { background: rgba(50, 55, 70, 0.6); border-color: rgba(255,255,255,0.1); }
+details.quest-item summary { list-style: none; }
+details.quest-item summary::-webkit-details-marker { display: none; }
+details.quest-item summary::marker { content: ""; }
+
+details.quest-item.completed { opacity: 0.7; border-left: 3px solid #4ade80; }
+details.quest-item.completed .quest-title { text-decoration: line-through; color: rgba(255,255,255,0.5); }
+details.quest-item.active-quest { border-left: 3px solid #60a5fa; background: rgba(60, 80, 120, 0.3); }
+
+.quest-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.quest-title { margin: 0; font-size: 15px; color: rgba(255,255,255,0.9); font-weight: 600; }
+.quest-status { font-size: 11px; padding: 3px 10px; border-radius: 12px; font-weight: 500; }
+.status-progress { background: rgba(96, 165, 250, 0.15); color: #60a5fa; }
+.status-completed { background: rgba(74, 222, 128, 0.15); color: #4ade80; }
+
+.quest-desc { margin: 0 0 10px 0; font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.5; }
+
+.quest-progress-bar { width: 100%; height: 6px; background: rgba(0,0,0,0.3); border-radius: 3px; overflow: hidden; margin-bottom: 6px; }
+.quest-progress-fill { height: 100%; background: linear-gradient(90deg, #60a5fa, #3b82f6); border-radius: 3px; transition: width 0.5s ease; }
+.quest-progress-text { font-size: 11px; color: rgba(255,255,255,0.5); text-align: right; }
+
+.quest-details { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.08); }
+.detail-section { margin-bottom: 10px; }
+.detail-label { font-size: 11px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.detail-text { font-size: 13px; color: rgba(255,255,255,0.75); line-height: 1.5; margin: 0; }
+
+.objective-list { list-style: none; padding: 0; margin: 0; }
+.objective-item { display: flex; align-items: center; padding: 5px 0; font-size: 13px; color: rgba(255,255,255,0.7); }
+.objective-item::before { content: '○'; margin-right: 8px; color: rgba(255,255,255,0.3); font-size: 12px; }
+.objective-item.done::before { content: '✓'; color: #4ade80; }
+.objective-item.done { color: rgba(255,255,255,0.4); text-decoration: line-through; }
+
+.quest-rewards { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.reward-tag { font-size: 11px; padding: 3px 10px; background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.2); border-radius: 4px; }
+
+/* ========== 成就（面板内列表 & 成就墙共用） ========== */
+.achievement-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+  margin: 10px 0;
+  background: rgba(40, 45, 55, 0.5);
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+.achievement-item.locked { opacity: 0.45; }
+.achievement-item.unlocked { border-left: 3px solid #fbbf24; }
+.achievement-icon {
+  width: 42px; height: 42px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  background: rgba(251, 191, 36, 0.1);
+  border-radius: 50%;
+}
+.achievement-title { font-size: 15px; font-weight: 600; color: rgba(255,255,255,0.9); margin-bottom: 3px; }
+.achievement-desc { font-size: 13px; color: rgba(255,255,255,0.6); }
+
+/* ========== 完成提示 toast ========== */
+.quest-toast {
+  position: fixed; left: -350px; top: 30px; width: 320px; min-height: 70px;
+  background: rgba(30, 35, 40, 0.97);
+  border-left: 4px solid #4ade80;
+  border-radius: 0 10px 10px 0;
+  display: flex; align-items: center; padding: 16px;
+  box-shadow: 5px 5px 20px rgba(0,0,0,0.4);
+  opacity: 0;
+  transition: all 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  z-index: 9999;
+}
+.quest-toast.active { left: 0; opacity: 1; }
+.toast-icon {
+  width: 44px; height: 44px; background: rgba(74, 222, 128, 0.15); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-size: 22px; margin-right: 15px;
+  flex-shrink: 0; color: #4ade80;
+}
+.toast-body { flex-grow: 1; }
+.toast-title { color: #4ade80; margin: 0 0 5px 0; font-size: 16px; font-weight: 600; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+.toast-text { color: rgba(255,255,255,0.85); margin: 0; font-size: 13px; line-height: 1.4; }
+
+/* ========== 打开按钮（label，非 button） ========== */
+.quest-toggle-btn {
+  position: fixed; right: 20px; top: 50%; transform: translateY(-50%);
+  width: 50px; height: 50px;
+  background: rgba(30, 35, 45, 0.9);
+  border: 2px solid rgba(100, 150, 255, 0.3);
+  border-radius: 12px;
+  color: rgba(100, 180, 255, 0.9);
+  font-size: 20px; cursor: pointer; z-index: 9998;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+.quest-toggle-btn:hover { background: rgba(50, 60, 80, 0.9); transform: translateY(-50%) scale(1.05); border-color: rgba(100, 150, 255, 0.6); }
+.quest-toggle-btn .badge {
+  position: absolute; top: -5px; right: -5px;
+  background: #ef4444; color: white; font-size: 11px;
+  width: 20px; height: 20px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-weight: bold;
+}
+.quest-toggle-btn .badge:empty { display: none; } /* 数字为空自动隐藏 */
+
+/* ========== 空状态 ========== */
+.empty-state { text-align: center; padding: 40px 20px; color: rgba(255,255,255,0.3); }
+.empty-state .empty-icon { font-size: 48px; margin-bottom: 10px; }
+
+/* ========== 滚动条 ========== */
+.quest-scroll::-webkit-scrollbar { width: 6px; }
+.quest-scroll::-webkit-scrollbar-track { background: transparent; }
+.quest-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+.quest-scroll::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+/* ========== 独立成就墙（初始页面用） ========== */
+.achievement-page { max-width: 720px; margin: 0 auto; padding: 30px 15px; }
+.achievement-page-title { color: rgba(255,255,255,0.9); font-size: 1.6em; margin-bottom: 4px; }
+.achievement-page-title .quest-count { font-size: 0.6em; color: rgba(255,255,255,0.5); margin-left: 8px; font-weight: normal; }
+.achievement-grid { display: grid; grid-template-columns: 1fr; gap: 6px; margin-top: 20px; }
+
