@@ -1,4 +1,0 @@
-:: 日用品部 {"position":"2500,6800","size":"100,100"}
-<<set $playerPos to {layer:6, block:"日用品部"}>><<cleanbeforefight>><br>
-
-[[返回走廊|L6流通走廊]]
